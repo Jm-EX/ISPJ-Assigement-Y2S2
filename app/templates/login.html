@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+  <h1>Login</h1>
+
+  <form method="post" action="{{ url_for('auth.login_post') }}" class="auth-form">
+    <label for="username">Username</label>
+    <input id="username" name="username" type="text" autocomplete="username" required>
+
+    <label for="password">Password</label>
+    <input id="password" name="password" type="password" autocomplete="current-password" required>
+
+    <button type="submit" class="auth-btn">Continue</button>
+  </form>
+
+  <p class="auth-alt">
+    <a href="{{ url_for('auth.forgot_password_get') }}">Forgot password?</a>
+  </p>
+
+  <p class="auth-alt">
+    New here?
+    <a href="{{ url_for('auth.register_get') }}">Create an account</a>
+  </p>
+</div>
+{% endblock %}

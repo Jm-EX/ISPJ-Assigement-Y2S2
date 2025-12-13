@@ -1,0 +1,93 @@
+.auth-container {
+  max-width: 460px;
+  margin: 48px auto;
+  padding: 24px;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.auth-container h1 {
+  margin: 0 0 16px 0;
+  font-size: 28px;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.auth-form label {
+  font-weight: 600;
+}
+
+.auth-form input {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #cfcfcf;
+  font-size: 16px;
+}
+
+.auth-btn {
+  margin-top: 8px;
+  padding: 12px;
+  border-radius: 10px;
+  border: 0;
+  background: #111;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.auth-alt {
+  margin-top: 12px;
+}
+
+.flash-wrap {
+  max-width: 900px;
+  margin: 16px auto;
+  padding: 0 16px;
+}
+
+.flash {
+  padding: 12px 14px;
+  border-radius: 10px;
+  margin: 10px 0;
+  border: 1px solid;
+}
+
+.flash.error {
+  background: #fff5f5;
+  border-color: #ffb4b4;
+}
+
+.flash.success {
+  background: #f2fff7;
+  border-color: #a7f3c2;
+}
+
+.pw-meter {
+  height: 10px;
+  background: #efefef;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.pw-meter-bar {
+  height: 100%;
+  width: 0;
+  background: #ff4d4d;
+  transition: width 120ms ease;
+}
+
+.pw-meter-text {
+  font-size: 14px;
+  color: #333;
+}
+
+.pw-hints {
+  font-size: 13px;
+  color: #444;
+  line-height: 1.35;
+}
