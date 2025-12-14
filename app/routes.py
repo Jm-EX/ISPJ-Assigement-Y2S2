@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from werkzeug.utils import secure_filename
+from PIL import Image
 import os
 from datetime import datetime
 import random
@@ -16,6 +17,11 @@ def index():
 @main.route("/book")
 def book_room():
     return render_template("book_room.html")
+
+# Allowed file extensions for passport upload
+ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "pdf"}
+def allowed_file(filename):
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @main.route("/book/<room_type>", methods=['GET', 'POST'])
 def book_room_confirm(room_type):
@@ -38,8 +44,9 @@ def book_room_confirm(room_type):
         if passport.filename == '':
             flash('No selected file', 'error')
             return redirect(request.url)
-            
-        if passport:
+        
+        # Validate file type
+        if passport and allowed_file(passport.filename):
             # Create uploads directory if it doesn't exist
             upload_folder = os.path.join('app', 'static', 'uploads', 'passports')
             os.makedirs(upload_folder, exist_ok=True)
@@ -48,40 +55,57 @@ def book_room_confirm(room_type):
             timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
             filename = f"{timestamp}_{secure_filename(passport.filename)}"
             filepath = os.path.join(upload_folder, filename)
+            
+            file_ext = passport.filename.rsplit('.', 1)[1].lower()
+            
+            # Validate image files with Pillow
+            if file_ext in ['jpg', 'jpeg', 'png']:
+                try:
+                    img = Image.open(passport)
+                    img.verify()  # Verify image integrity
+                    passport.seek(0)  # Reset pointer for saving
+                except Exception:
+                    flash('Uploaded file is not a valid image', 'error')
+                    return redirect(request.url)
+            
+            # PDFs are accepted as-is, no Pillow validation
             passport.save(filepath)
-            
-            # Store booking data in session
-            booking_data = {
-                'room_type': room_type,
-                'check_in': check_in,
-                'check_out': check_out,
-                'nights': nights,
-                'guest_name': request.form.get('full_name'),
-                'email': request.form.get('email'),
-                'phone': request.form.get('phone'),
-                'special_requests': request.form.get('special_requests', ''),
-                'passport_filename': filename,
-                'booking_reference': f"{random.randint(100000, 999999)}"
-            }
-            
-            # Calculate price
-            room_prices = {
-                'Deluxe Room': 229,
-                'Luxury Suite': 299,
-                'Executive Suite': 399
-            }
-            booking_data['price_per_night'] = room_prices.get(room_type, 0)
-            booking_data['total_price'] = booking_data['price_per_night'] * nights
-            
-            # Store in session for confirmation page
-            session['booking_data'] = booking_data
-            
-            # In a real app, you would save this to a database here
-            # For now, we'll just redirect to the confirmation page
-            return redirect(url_for('main.booking_confirmation'))
+        else:
+            flash('Invalid file type. Only PDF, JPG, JPEG, PNG allowed.', 'error')
+            return redirect(request.url)
+        
+        # Store booking data in session
+        booking_data = {
+            'room_type': room_type,
+            'check_in': check_in,
+            'check_out': check_out,
+            'nights': nights,
+            'guest_name': request.form.get('full_name'),
+            'email': request.form.get('email'),
+            'phone': request.form.get('phone'),
+            'special_requests': request.form.get('special_requests', ''),
+            'passport_filename': filename,
+            'booking_reference': f"{random.randint(100000, 999999)}"
+        }
+        
+        # Calculate price
+        room_prices = {
+            'Deluxe Room': 229,
+            'Luxury Suite': 299,
+            'Executive Suite': 399
+        }
+        booking_data['price_per_night'] = room_prices.get(room_type, 0)
+        booking_data['total_price'] = booking_data['price_per_night'] * nights
+        
+        # Store in session for confirmation page
+        session['booking_data'] = booking_data
+        
+        # Redirect to the confirmation page
+        return redirect(url_for('main.booking_confirmation'))
     
     # For GET request, show the booking form
     return render_template('booking_confirm.html', room_type=room_type)
+
 @main.route('/booking/confirmation')
 def booking_confirmation():
     booking_data = session.get('booking_data')
