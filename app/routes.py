@@ -1,9 +1,20 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from werkzeug.utils import secure_filename
 from PIL import Image
+import logging
 import os
 from datetime import datetime
 import random
+
+
+# Create logs directory if it doesn't exist
+os.makedirs('logs', exist_ok=True)
+# Configure logging
+logging.basicConfig(
+    filename='logs/bookings.log',   # log file path
+    level=logging.INFO,             # log level
+    format='%(asctime)s - %(levelname)s - %(message)s'  # log format
+)
 
 # Create the blueprint
 main = Blueprint('main', __name__)
@@ -66,12 +77,14 @@ def book_room_confirm(room_type):
                     passport.seek(0)  # Reset pointer for saving
                 except Exception:
                     flash('Uploaded file is not a valid image', 'error')
+                    logging.warning(f"Invalid file upload attempt by {request.form.get('full_name')} ({request.form.get('email')})")
                     return redirect(request.url)
             
             # PDFs are accepted as-is, no Pillow validation
             passport.save(filepath)
         else:
             flash('Invalid file type. Only PDF, JPG, JPEG, PNG allowed.', 'error')
+            logging.warning(f"Invalid file upload attempt by {request.form.get('full_name')} ({request.form.get('email')})")
             return redirect(request.url)
         
         # Store booking data in session
@@ -101,6 +114,7 @@ def book_room_confirm(room_type):
         session['booking_data'] = booking_data
         
         # Redirect to the confirmation page
+        logging.info(f"Booking confirmed: {booking_data['booking_reference']} for {booking_data['guest_name']} ({booking_data['email']})")
         return redirect(url_for('main.booking_confirmation'))
     
     # For GET request, show the booking form
