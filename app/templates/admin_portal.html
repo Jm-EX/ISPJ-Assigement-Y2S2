@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Portal{% endblock %}
+
+{% block content %}
+<h1>Admin Portal</h1>
+<p>Welcome, {{ session.get('username') }}.</p>
+{% endblock %}
