@@ -135,3 +135,262 @@
 2025-12-14 17:50:11,865 - INFO - 127.0.0.1 - - [14/Dec/2025 17:50:11] "GET / HTTP/1.1" 200 -
 2025-12-14 17:50:11,880 - INFO - 127.0.0.1 - - [14/Dec/2025 17:50:11] "[33mGET /static/img/qr.png HTTP/1.1[0m" 404 -
 2025-12-14 17:50:11,880 - INFO - 127.0.0.1 - - [14/Dec/2025 17:50:11] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 14:06:59,499 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001
+2025-12-15 14:06:59,499 - INFO - [33mPress CTRL+C to quit[0m
+2025-12-15 14:06:59,500 - INFO -  * Restarting with stat
+2025-12-15 14:06:59,761 - WARNING -  * Debugger is active!
+2025-12-15 14:06:59,763 - INFO -  * Debugger PIN: 321-144-969
+2025-12-15 14:07:01,011 - INFO - 127.0.0.1 - - [15/Dec/2025 14:07:01] "GET / HTTP/1.1" 200 -
+2025-12-15 14:07:01,030 - INFO - 127.0.0.1 - - [15/Dec/2025 14:07:01] "[33mGET /static/img/qr.png HTTP/1.1[0m" 404 -
+2025-12-15 14:07:01,082 - INFO - 127.0.0.1 - - [15/Dec/2025 14:07:01] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 14:07:08,870 - INFO - 127.0.0.1 - - [15/Dec/2025 14:07:08] "GET /register HTTP/1.1" 200 -
+2025-12-15 14:07:08,883 - INFO - 127.0.0.1 - - [15/Dec/2025 14:07:08] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 14:07:08,888 - INFO - 127.0.0.1 - - [15/Dec/2025 14:07:08] "[33mGET /static/img/qr.png HTTP/1.1[0m" 404 -
+2025-12-15 14:07:08,889 - INFO - 127.0.0.1 - - [15/Dec/2025 14:07:08] "GET /static/css/auth.css HTTP/1.1" 200 -
+2025-12-15 14:07:08,893 - INFO - 127.0.0.1 - - [15/Dec/2025 14:07:08] "GET /static/js/password_meter.js HTTP/1.1" 200 -
+2025-12-15 14:07:10,015 - INFO - 127.0.0.1 - - [15/Dec/2025 14:07:10] "GET /login HTTP/1.1" 200 -
+2025-12-15 14:07:10,027 - INFO - 127.0.0.1 - - [15/Dec/2025 14:07:10] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 14:07:10,033 - INFO - 127.0.0.1 - - [15/Dec/2025 14:07:10] "[33mGET /static/img/qr.png HTTP/1.1[0m" 404 -
+2025-12-15 14:07:10,033 - INFO - 127.0.0.1 - - [15/Dec/2025 14:07:10] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 14:07:11,049 - INFO - 127.0.0.1 - - [15/Dec/2025 14:07:11] "GET /register HTTP/1.1" 200 -
+2025-12-15 14:07:11,063 - INFO - 127.0.0.1 - - [15/Dec/2025 14:07:11] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 14:07:11,069 - INFO - 127.0.0.1 - - [15/Dec/2025 14:07:11] "[33mGET /static/img/qr.png HTTP/1.1[0m" 404 -
+2025-12-15 14:07:11,070 - INFO - 127.0.0.1 - - [15/Dec/2025 14:07:11] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 14:07:11,075 - INFO - 127.0.0.1 - - [15/Dec/2025 14:07:11] "[36mGET /static/js/password_meter.js HTTP/1.1[0m" 304 -
+2025-12-15 14:07:12,878 - INFO - 127.0.0.1 - - [15/Dec/2025 14:07:12] "GET /book HTTP/1.1" 200 -
+2025-12-15 14:07:12,896 - INFO - 127.0.0.1 - - [15/Dec/2025 14:07:12] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 14:07:12,900 - INFO - 127.0.0.1 - - [15/Dec/2025 14:07:12] "[33mGET /static/images/deluxe-room.jpg HTTP/1.1[0m" 404 -
+2025-12-15 14:07:12,901 - INFO - 127.0.0.1 - - [15/Dec/2025 14:07:12] "[33mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 404 -
+2025-12-15 14:07:12,901 - INFO - 127.0.0.1 - - [15/Dec/2025 14:07:12] "[33mGET /static/images/executive-suite.jpg HTTP/1.1[0m" 404 -
+2025-12-15 14:07:12,905 - INFO - 127.0.0.1 - - [15/Dec/2025 14:07:12] "[33mGET /static/img/qr.png HTTP/1.1[0m" 404 -
+2025-12-15 14:07:12,931 - INFO - 127.0.0.1 - - [15/Dec/2025 14:07:12] "GET /static/css/book_room.css HTTP/1.1" 200 -
+2025-12-15 14:07:12,937 - INFO - 127.0.0.1 - - [15/Dec/2025 14:07:12] "[33mGET /static/images/hotel-lobby.jpg HTTP/1.1[0m" 404 -
+2025-12-15 14:08:29,338 - INFO - 127.0.0.1 - - [15/Dec/2025 14:08:29] "GET /book HTTP/1.1" 200 -
+2025-12-15 14:08:29,350 - INFO - 127.0.0.1 - - [15/Dec/2025 14:08:29] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 14:08:29,357 - INFO - 127.0.0.1 - - [15/Dec/2025 14:08:29] "[33mGET /static/images/deluxe-room.jpg HTTP/1.1[0m" 404 -
+2025-12-15 14:08:29,358 - INFO - 127.0.0.1 - - [15/Dec/2025 14:08:29] "[33mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 404 -
+2025-12-15 14:08:29,358 - INFO - 127.0.0.1 - - [15/Dec/2025 14:08:29] "[33mGET /static/images/executive-suite.jpg HTTP/1.1[0m" 404 -
+2025-12-15 14:08:29,362 - INFO - 127.0.0.1 - - [15/Dec/2025 14:08:29] "[33mGET /static/img/qr.png HTTP/1.1[0m" 404 -
+2025-12-15 14:08:29,391 - INFO - 127.0.0.1 - - [15/Dec/2025 14:08:29] "GET /static/css/book_room.css HTTP/1.1" 200 -
+2025-12-15 14:08:29,398 - INFO - 127.0.0.1 - - [15/Dec/2025 14:08:29] "[33mGET /static/images/hotel-lobby.jpg HTTP/1.1[0m" 404 -
+2025-12-15 14:39:20,324 - INFO -  * Detected change in 'c:\\Users\\Ji4Mi\\OneDrive\\Desktop\\NYP\\YearTwo\\ISPJ_Y2S2_Assigment\\app\\payment.py', reloading
+2025-12-15 14:39:20,363 - INFO -  * Restarting with stat
+2025-12-15 14:39:21,616 - WARNING -  * Debugger is active!
+2025-12-15 14:39:21,619 - INFO -  * Debugger PIN: 321-144-969
+2025-12-15 14:39:42,724 - INFO -  * Detected change in 'c:\\Users\\Ji4Mi\\OneDrive\\Desktop\\NYP\\YearTwo\\ISPJ_Y2S2_Assigment\\app\\payment.py', reloading
+2025-12-15 14:39:42,783 - INFO -  * Restarting with stat
+2025-12-15 14:39:43,202 - WARNING -  * Debugger is active!
+2025-12-15 14:39:43,205 - INFO -  * Debugger PIN: 321-144-969
+2025-12-15 14:42:18,991 - INFO - 127.0.0.1 - - [15/Dec/2025 14:42:18] "GET /book HTTP/1.1" 200 -
+2025-12-15 14:42:19,004 - INFO - 127.0.0.1 - - [15/Dec/2025 14:42:19] "[33mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 404 -
+2025-12-15 14:42:19,005 - INFO - 127.0.0.1 - - [15/Dec/2025 14:42:19] "[33mGET /static/images/deluxe-room.jpg HTTP/1.1[0m" 404 -
+2025-12-15 14:42:19,007 - INFO - 127.0.0.1 - - [15/Dec/2025 14:42:19] "[33mGET /static/images/executive-suite.jpg HTTP/1.1[0m" 404 -
+2025-12-15 14:42:19,008 - INFO - 127.0.0.1 - - [15/Dec/2025 14:42:19] "[33mGET /static/img/qr.png HTTP/1.1[0m" 404 -
+2025-12-15 14:42:19,062 - INFO - 127.0.0.1 - - [15/Dec/2025 14:42:19] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 14:42:19,063 - INFO - 127.0.0.1 - - [15/Dec/2025 14:42:19] "[36mGET /static/css/book_room.css HTTP/1.1[0m" 304 -
+2025-12-15 14:42:19,071 - INFO - 127.0.0.1 - - [15/Dec/2025 14:42:19] "[33mGET /static/images/hotel-lobby.jpg HTTP/1.1[0m" 404 -
+2025-12-15 14:42:20,842 - INFO - 127.0.0.1 - - [15/Dec/2025 14:42:20] "GET /book/Luxury%20Suite HTTP/1.1" 200 -
+2025-12-15 14:42:20,859 - INFO - 127.0.0.1 - - [15/Dec/2025 14:42:20] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 14:42:20,862 - INFO - 127.0.0.1 - - [15/Dec/2025 14:42:20] "[33mGET /static/img/qr.png HTTP/1.1[0m" 404 -
+2025-12-15 14:42:20,863 - INFO - 127.0.0.1 - - [15/Dec/2025 14:42:20] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2025-12-15 14:42:32,797 - INFO - Booking confirmed: 889905 for re (j14m1nggg@gmail.com)
+2025-12-15 14:42:32,799 - INFO - 127.0.0.1 - - [15/Dec/2025 14:42:32] "[32mPOST /book/Luxury%20Suite HTTP/1.1[0m" 302 -
+2025-12-15 14:42:32,810 - INFO - 127.0.0.1 - - [15/Dec/2025 14:42:32] "GET /booking/confirmation HTTP/1.1" 200 -
+2025-12-15 14:42:32,826 - INFO - 127.0.0.1 - - [15/Dec/2025 14:42:32] "[33mGET /static/img/qr.png HTTP/1.1[0m" 404 -
+2025-12-15 14:42:32,826 - INFO - 127.0.0.1 - - [15/Dec/2025 14:42:32] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 14:42:32,827 - INFO - 127.0.0.1 - - [15/Dec/2025 14:42:32] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2025-12-15 14:42:34,337 - INFO - 127.0.0.1 - - [15/Dec/2025 14:42:34] "GET / HTTP/1.1" 200 -
+2025-12-15 14:42:34,353 - INFO - 127.0.0.1 - - [15/Dec/2025 14:42:34] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 14:42:34,355 - INFO - 127.0.0.1 - - [15/Dec/2025 14:42:34] "[33mGET /static/img/qr.png HTTP/1.1[0m" 404 -
+2025-12-15 14:43:36,645 - INFO -  * Detected change in 'c:\\Users\\Ji4Mi\\OneDrive\\Desktop\\NYP\\YearTwo\\ISPJ_Y2S2_Assigment\\app\\routes.py', reloading
+2025-12-15 14:43:36,679 - INFO -  * Restarting with stat
+2025-12-15 14:43:36,993 - WARNING -  * Debugger is active!
+2025-12-15 14:43:36,996 - INFO -  * Debugger PIN: 321-144-969
+2025-12-15 14:43:39,560 - INFO - 127.0.0.1 - - [15/Dec/2025 14:43:39] "GET /book HTTP/1.1" 200 -
+2025-12-15 14:43:39,576 - INFO - 127.0.0.1 - - [15/Dec/2025 14:43:39] "[33mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 404 -
+2025-12-15 14:43:39,578 - INFO - 127.0.0.1 - - [15/Dec/2025 14:43:39] "[33mGET /static/images/deluxe-room.jpg HTTP/1.1[0m" 404 -
+2025-12-15 14:43:39,581 - INFO - 127.0.0.1 - - [15/Dec/2025 14:43:39] "[33mGET /static/images/executive-suite.jpg HTTP/1.1[0m" 404 -
+2025-12-15 14:43:39,585 - INFO - 127.0.0.1 - - [15/Dec/2025 14:43:39] "[33mGET /static/img/qr.png HTTP/1.1[0m" 404 -
+2025-12-15 14:43:39,627 - INFO - 127.0.0.1 - - [15/Dec/2025 14:43:39] "[36mGET /static/css/book_room.css HTTP/1.1[0m" 304 -
+2025-12-15 14:43:39,629 - INFO - 127.0.0.1 - - [15/Dec/2025 14:43:39] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 14:43:39,633 - INFO - 127.0.0.1 - - [15/Dec/2025 14:43:39] "[33mGET /static/images/hotel-lobby.jpg HTTP/1.1[0m" 404 -
+2025-12-15 14:43:42,608 - INFO - 127.0.0.1 - - [15/Dec/2025 14:43:42] "GET /book/Luxury%20Suite HTTP/1.1" 200 -
+2025-12-15 14:43:42,626 - INFO - 127.0.0.1 - - [15/Dec/2025 14:43:42] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 14:43:42,629 - INFO - 127.0.0.1 - - [15/Dec/2025 14:43:42] "[33mGET /static/img/qr.png HTTP/1.1[0m" 404 -
+2025-12-15 14:43:42,630 - INFO - 127.0.0.1 - - [15/Dec/2025 14:43:42] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2025-12-15 14:43:54,922 - INFO - 127.0.0.1 - - [15/Dec/2025 14:43:54] "[35m[1mPOST /book/Luxury%20Suite HTTP/1.1[0m" 500 -
+2025-12-15 14:43:54,935 - INFO - 127.0.0.1 - - [15/Dec/2025 14:43:54] "[36mGET /book/Luxury%20Suite?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-12-15 14:43:54,962 - INFO - 127.0.0.1 - - [15/Dec/2025 14:43:54] "[36mGET /book/Luxury%20Suite?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-12-15 14:43:54,980 - INFO - 127.0.0.1 - - [15/Dec/2025 14:43:54] "GET /book/Luxury%20Suite?__debugger__=yes&cmd=resource&f=console.png&s=XzSh5dztcrrwq0hLw4Yk HTTP/1.1" 200 -
+2025-12-15 14:43:54,992 - INFO - 127.0.0.1 - - [15/Dec/2025 14:43:54] "[36mGET /book/Luxury%20Suite?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-12-15 14:44:36,339 - INFO -  * Detected change in 'c:\\Users\\Ji4Mi\\OneDrive\\Desktop\\NYP\\YearTwo\\ISPJ_Y2S2_Assigment\\app\\routes.py', reloading
+2025-12-15 14:44:36,369 - INFO -  * Restarting with stat
+2025-12-15 14:44:36,646 - WARNING -  * Debugger is active!
+2025-12-15 14:44:36,648 - INFO -  * Debugger PIN: 321-144-969
+2025-12-15 14:44:38,644 - INFO - 127.0.0.1 - - [15/Dec/2025 14:44:38] "[35m[1mPOST /book/Luxury%20Suite HTTP/1.1[0m" 500 -
+2025-12-15 14:44:38,708 - INFO - 127.0.0.1 - - [15/Dec/2025 14:44:38] "[36mGET /book/Luxury%20Suite?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-12-15 14:44:38,711 - INFO - 127.0.0.1 - - [15/Dec/2025 14:44:38] "[36mGET /book/Luxury%20Suite?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-12-15 14:44:38,720 - INFO - 127.0.0.1 - - [15/Dec/2025 14:44:38] "GET /book/Luxury%20Suite?__debugger__=yes&cmd=resource&f=console.png&s=ROFOb7yYhFKWGGwyx3RR HTTP/1.1" 200 -
+2025-12-15 14:44:38,727 - INFO - 127.0.0.1 - - [15/Dec/2025 14:44:38] "[36mGET /book/Luxury%20Suite?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-12-15 14:47:03,512 - INFO -  * Detected change in 'c:\\Users\\Ji4Mi\\OneDrive\\Desktop\\NYP\\YearTwo\\ISPJ_Y2S2_Assigment\\app\\routes.py', reloading
+2025-12-15 14:47:03,549 - INFO -  * Restarting with stat
+2025-12-15 14:47:03,797 - WARNING -  * Debugger is active!
+2025-12-15 14:47:03,799 - INFO -  * Debugger PIN: 321-144-969
+2025-12-15 14:47:04,819 - INFO -  * Detected change in 'c:\\Users\\Ji4Mi\\OneDrive\\Desktop\\NYP\\YearTwo\\ISPJ_Y2S2_Assigment\\app\\payment.py', reloading
+2025-12-15 14:47:04,860 - INFO -  * Restarting with stat
+2025-12-15 14:47:05,129 - WARNING -  * Debugger is active!
+2025-12-15 14:47:05,132 - INFO -  * Debugger PIN: 321-144-969
+2025-12-15 14:47:55,453 - INFO -  * Detected change in 'c:\\Users\\Ji4Mi\\OneDrive\\Desktop\\NYP\\YearTwo\\ISPJ_Y2S2_Assigment\\app\\payment.py', reloading
+2025-12-15 14:47:55,488 - INFO -  * Restarting with stat
+2025-12-15 14:47:55,759 - WARNING -  * Debugger is active!
+2025-12-15 14:47:55,762 - INFO -  * Debugger PIN: 321-144-969
+2025-12-15 14:47:58,609 - INFO - 127.0.0.1 - - [15/Dec/2025 14:47:58] "[35m[1mPOST /book/Luxury%20Suite HTTP/1.1[0m" 500 -
+2025-12-15 14:47:58,680 - INFO - 127.0.0.1 - - [15/Dec/2025 14:47:58] "[36mGET /book/Luxury%20Suite?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-12-15 14:47:58,684 - INFO - 127.0.0.1 - - [15/Dec/2025 14:47:58] "[36mGET /book/Luxury%20Suite?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-12-15 14:47:58,692 - INFO - 127.0.0.1 - - [15/Dec/2025 14:47:58] "GET /book/Luxury%20Suite?__debugger__=yes&cmd=resource&f=console.png&s=6yEbeW93M5dsFsRGb0eI HTTP/1.1" 200 -
+2025-12-15 14:47:58,701 - INFO - 127.0.0.1 - - [15/Dec/2025 14:47:58] "[36mGET /book/Luxury%20Suite?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-12-15 14:48:03,425 - INFO - 127.0.0.1 - - [15/Dec/2025 14:48:03] "[35m[1mPOST /book/Luxury%20Suite HTTP/1.1[0m" 500 -
+2025-12-15 14:48:03,441 - INFO - 127.0.0.1 - - [15/Dec/2025 14:48:03] "[36mGET /book/Luxury%20Suite?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-12-15 14:48:03,442 - INFO - 127.0.0.1 - - [15/Dec/2025 14:48:03] "[36mGET /book/Luxury%20Suite?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-12-15 14:48:03,448 - INFO - 127.0.0.1 - - [15/Dec/2025 14:48:03] "[36mGET /book/Luxury%20Suite?__debugger__=yes&cmd=resource&f=console.png&s=6yEbeW93M5dsFsRGb0eI HTTP/1.1[0m" 304 -
+2025-12-15 14:48:03,464 - INFO - 127.0.0.1 - - [15/Dec/2025 14:48:03] "[36mGET /book/Luxury%20Suite?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-12-15 14:49:19,269 - INFO -  * Detected change in 'c:\\Users\\Ji4Mi\\OneDrive\\Desktop\\NYP\\YearTwo\\ISPJ_Y2S2_Assigment\\app\\routes.py', reloading
+2025-12-15 14:49:19,326 - INFO -  * Restarting with stat
+2025-12-15 14:49:20,337 - WARNING -  * Debugger is active!
+2025-12-15 14:49:20,339 - INFO -  * Debugger PIN: 321-144-969
+2025-12-15 14:49:46,508 - INFO -  * Detected change in 'c:\\Users\\Ji4Mi\\OneDrive\\Desktop\\NYP\\YearTwo\\ISPJ_Y2S2_Assigment\\app\\routes.py', reloading
+2025-12-15 14:49:46,564 - INFO -  * Restarting with stat
+2025-12-15 14:49:46,882 - WARNING -  * Debugger is active!
+2025-12-15 14:49:46,884 - INFO -  * Debugger PIN: 321-144-969
+2025-12-15 14:49:51,520 - INFO - 127.0.0.1 - - [15/Dec/2025 14:49:51] "[32mPOST /book/Luxury%20Suite HTTP/1.1[0m" 302 -
+2025-12-15 14:49:51,578 - INFO - 127.0.0.1 - - [15/Dec/2025 14:49:51] "[35m[1mGET /payment HTTP/1.1[0m" 500 -
+2025-12-15 14:49:51,631 - INFO - 127.0.0.1 - - [15/Dec/2025 14:49:51] "GET /payment?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+2025-12-15 14:49:51,634 - INFO - 127.0.0.1 - - [15/Dec/2025 14:49:51] "GET /payment?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+2025-12-15 14:49:51,643 - INFO - 127.0.0.1 - - [15/Dec/2025 14:49:51] "GET /payment?__debugger__=yes&cmd=resource&f=console.png&s=QrQvYWEfHLJHn778OhZr HTTP/1.1" 200 -
+2025-12-15 14:49:51,649 - INFO - 127.0.0.1 - - [15/Dec/2025 14:49:51] "GET /payment?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
+2025-12-15 14:49:52,617 - INFO - 127.0.0.1 - - [15/Dec/2025 14:49:52] "GET /book/Luxury%20Suite HTTP/1.1" 200 -
+2025-12-15 14:49:53,582 - INFO - 127.0.0.1 - - [15/Dec/2025 14:49:53] "[32mPOST /book/Luxury%20Suite HTTP/1.1[0m" 302 -
+2025-12-15 14:49:53,593 - INFO - 127.0.0.1 - - [15/Dec/2025 14:49:53] "[35m[1mGET /payment HTTP/1.1[0m" 500 -
+2025-12-15 14:49:53,607 - INFO - 127.0.0.1 - - [15/Dec/2025 14:49:53] "[36mGET /payment?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-12-15 14:49:53,610 - INFO - 127.0.0.1 - - [15/Dec/2025 14:49:53] "[36mGET /payment?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-12-15 14:49:53,623 - INFO - 127.0.0.1 - - [15/Dec/2025 14:49:53] "[36mGET /payment?__debugger__=yes&cmd=resource&f=console.png&s=QrQvYWEfHLJHn778OhZr HTTP/1.1[0m" 304 -
+2025-12-15 14:50:24,502 - INFO - 127.0.0.1 - - [15/Dec/2025 14:50:24] "[35m[1mGET /payment HTTP/1.1[0m" 500 -
+2025-12-15 14:50:24,514 - INFO - 127.0.0.1 - - [15/Dec/2025 14:50:24] "[36mGET /payment?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-12-15 14:50:24,515 - INFO - 127.0.0.1 - - [15/Dec/2025 14:50:24] "[36mGET /payment?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-12-15 14:50:24,530 - INFO - 127.0.0.1 - - [15/Dec/2025 14:50:24] "[36mGET /payment?__debugger__=yes&cmd=resource&f=console.png&s=QrQvYWEfHLJHn778OhZr HTTP/1.1[0m" 304 -
+2025-12-15 14:50:24,542 - INFO - 127.0.0.1 - - [15/Dec/2025 14:50:24] "[36mGET /payment?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-12-15 14:50:26,378 - INFO - 127.0.0.1 - - [15/Dec/2025 14:50:26] "[35m[1mGET /payment HTTP/1.1[0m" 500 -
+2025-12-15 14:50:26,392 - INFO - 127.0.0.1 - - [15/Dec/2025 14:50:26] "[36mGET /payment?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-12-15 14:50:26,393 - INFO - 127.0.0.1 - - [15/Dec/2025 14:50:26] "[36mGET /payment?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-12-15 14:50:26,411 - INFO - 127.0.0.1 - - [15/Dec/2025 14:50:26] "[36mGET /payment?__debugger__=yes&cmd=resource&f=console.png&s=QrQvYWEfHLJHn778OhZr HTTP/1.1[0m" 304 -
+2025-12-15 14:50:26,424 - INFO - 127.0.0.1 - - [15/Dec/2025 14:50:26] "[36mGET /payment?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-12-15 14:50:28,517 - INFO - 127.0.0.1 - - [15/Dec/2025 14:50:28] "GET /book/Luxury%20Suite HTTP/1.1" 200 -
+2025-12-15 14:50:29,494 - INFO - 127.0.0.1 - - [15/Dec/2025 14:50:29] "[32mPOST /book/Luxury%20Suite HTTP/1.1[0m" 302 -
+2025-12-15 14:50:29,516 - INFO - 127.0.0.1 - - [15/Dec/2025 14:50:29] "[35m[1mGET /payment HTTP/1.1[0m" 500 -
+2025-12-15 14:50:29,527 - INFO - 127.0.0.1 - - [15/Dec/2025 14:50:29] "[36mGET /payment?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-12-15 14:50:29,528 - INFO - 127.0.0.1 - - [15/Dec/2025 14:50:29] "[36mGET /payment?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-12-15 14:50:29,536 - INFO - 127.0.0.1 - - [15/Dec/2025 14:50:29] "[36mGET /payment?__debugger__=yes&cmd=resource&f=console.png&s=QrQvYWEfHLJHn778OhZr HTTP/1.1[0m" 304 -
+2025-12-15 14:51:37,590 - INFO - 127.0.0.1 - - [15/Dec/2025 14:51:37] "GET /payment HTTP/1.1" 200 -
+2025-12-15 14:51:37,607 - INFO - 127.0.0.1 - - [15/Dec/2025 14:51:37] "[33mGET /static/img/qr.png HTTP/1.1[0m" 404 -
+2025-12-15 14:51:37,607 - INFO - 127.0.0.1 - - [15/Dec/2025 14:51:37] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 14:51:39,385 - INFO - message='Request to Stripe api' method=post url=https://api.stripe.com/v1/checkout/sessions
+2025-12-15 14:51:39,571 - INFO - message='Request to Stripe api' method=post url=https://api.stripe.com/v1/checkout/sessions
+2025-12-15 14:51:40,283 - INFO - message='Request to Stripe api' method=post url=https://api.stripe.com/v1/checkout/sessions
+2025-12-15 14:51:40,765 - INFO - message='Stripe API response' path=https://api.stripe.com/v1/checkout/sessions response_code=200
+2025-12-15 14:51:40,766 - INFO - message='Stripe API response' path=https://api.stripe.com/v1/checkout/sessions response_code=200
+2025-12-15 14:51:40,769 - INFO - 127.0.0.1 - - [15/Dec/2025 14:51:40] "[32mPOST /create-checkout-session HTTP/1.1[0m" 303 -
+2025-12-15 14:51:40,770 - INFO - 127.0.0.1 - - [15/Dec/2025 14:51:40] "[32mPOST /create-checkout-session HTTP/1.1[0m" 303 -
+2025-12-15 14:51:40,975 - INFO - message='Stripe API response' path=https://api.stripe.com/v1/checkout/sessions response_code=200
+2025-12-15 14:51:40,977 - INFO - 127.0.0.1 - - [15/Dec/2025 14:51:40] "[32mPOST /create-checkout-session HTTP/1.1[0m" 303 -
+2025-12-15 14:51:40,991 - INFO - message='Request to Stripe api' method=post url=https://api.stripe.com/v1/checkout/sessions
+2025-12-15 14:51:41,697 - INFO - message='Stripe API response' path=https://api.stripe.com/v1/checkout/sessions response_code=200
+2025-12-15 14:51:41,698 - INFO - 127.0.0.1 - - [15/Dec/2025 14:51:41] "[32mPOST /create-checkout-session HTTP/1.1[0m" 303 -
+2025-12-15 14:51:49,409 - INFO - 127.0.0.1 - - [15/Dec/2025 14:51:49] "GET /payment HTTP/1.1" 200 -
+2025-12-15 14:51:49,437 - INFO - 127.0.0.1 - - [15/Dec/2025 14:51:49] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 14:51:49,443 - INFO - 127.0.0.1 - - [15/Dec/2025 14:51:49] "[33mGET /static/img/qr.png HTTP/1.1[0m" 404 -
+2025-12-15 14:51:50,591 - INFO - message='Request to Stripe api' method=post url=https://api.stripe.com/v1/checkout/sessions
+2025-12-15 14:51:51,271 - INFO - message='Stripe API response' path=https://api.stripe.com/v1/checkout/sessions response_code=200
+2025-12-15 14:51:51,272 - INFO - 127.0.0.1 - - [15/Dec/2025 14:51:51] "[32mPOST /create-checkout-session HTTP/1.1[0m" 303 -
+2025-12-15 14:52:30,728 - INFO - message='Request to Stripe api' method=post url=https://api.stripe.com/v1/checkout/sessions
+2025-12-15 14:52:31,497 - INFO - message='Stripe API response' path=https://api.stripe.com/v1/checkout/sessions response_code=200
+2025-12-15 14:52:31,497 - INFO - 127.0.0.1 - - [15/Dec/2025 14:52:31] "[32mPOST /create-checkout-session HTTP/1.1[0m" 303 -
+2025-12-15 14:52:31,548 - INFO - message='Request to Stripe api' method=post url=https://api.stripe.com/v1/checkout/sessions
+2025-12-15 14:52:32,211 - INFO - message='Stripe API response' path=https://api.stripe.com/v1/checkout/sessions response_code=200
+2025-12-15 14:52:32,212 - INFO - 127.0.0.1 - - [15/Dec/2025 14:52:32] "[32mPOST /create-checkout-session HTTP/1.1[0m" 303 -
+2025-12-15 14:52:32,934 - INFO - message='Request to Stripe api' method=post url=https://api.stripe.com/v1/checkout/sessions
+2025-12-15 14:52:33,337 - INFO - message='Request to Stripe api' method=post url=https://api.stripe.com/v1/checkout/sessions
+2025-12-15 14:52:33,681 - INFO - message='Stripe API response' path=https://api.stripe.com/v1/checkout/sessions response_code=200
+2025-12-15 14:52:33,682 - INFO - 127.0.0.1 - - [15/Dec/2025 14:52:33] "[32mPOST /create-checkout-session HTTP/1.1[0m" 303 -
+2025-12-15 14:52:34,087 - INFO - message='Stripe API response' path=https://api.stripe.com/v1/checkout/sessions response_code=200
+2025-12-15 14:52:34,088 - INFO - 127.0.0.1 - - [15/Dec/2025 14:52:34] "[32mPOST /create-checkout-session HTTP/1.1[0m" 303 -
+2025-12-15 14:54:48,525 - INFO - 127.0.0.1 - - [15/Dec/2025 14:54:48] "GET /booking/confirmation HTTP/1.1" 200 -
+2025-12-15 14:54:48,573 - INFO - 127.0.0.1 - - [15/Dec/2025 14:54:48] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 14:54:48,583 - INFO - 127.0.0.1 - - [15/Dec/2025 14:54:48] "[33mGET /static/img/qr.png HTTP/1.1[0m" 404 -
+2025-12-15 14:54:48,583 - INFO - 127.0.0.1 - - [15/Dec/2025 14:54:48] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2025-12-15 14:56:58,123 - INFO - 127.0.0.1 - - [15/Dec/2025 14:56:58] "GET / HTTP/1.1" 200 -
+2025-12-15 14:56:58,143 - INFO - 127.0.0.1 - - [15/Dec/2025 14:56:58] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 14:56:58,144 - INFO - 127.0.0.1 - - [15/Dec/2025 14:56:58] "[33mGET /static/img/qr.png HTTP/1.1[0m" 404 -
+2025-12-15 14:57:00,053 - INFO - 127.0.0.1 - - [15/Dec/2025 14:57:00] "GET /book HTTP/1.1" 200 -
+2025-12-15 14:57:00,068 - INFO - 127.0.0.1 - - [15/Dec/2025 14:57:00] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 14:57:00,074 - INFO - 127.0.0.1 - - [15/Dec/2025 14:57:00] "[33mGET /static/images/deluxe-room.jpg HTTP/1.1[0m" 404 -
+2025-12-15 14:57:00,074 - INFO - 127.0.0.1 - - [15/Dec/2025 14:57:00] "[33mGET /static/images/executive-suite.jpg HTTP/1.1[0m" 404 -
+2025-12-15 14:57:00,074 - INFO - 127.0.0.1 - - [15/Dec/2025 14:57:00] "[33mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 404 -
+2025-12-15 14:57:00,076 - INFO - 127.0.0.1 - - [15/Dec/2025 14:57:00] "[33mGET /static/img/qr.png HTTP/1.1[0m" 404 -
+2025-12-15 14:57:00,076 - INFO - 127.0.0.1 - - [15/Dec/2025 14:57:00] "[36mGET /static/css/book_room.css HTTP/1.1[0m" 304 -
+2025-12-15 14:57:00,082 - INFO - 127.0.0.1 - - [15/Dec/2025 14:57:00] "[33mGET /static/images/hotel-lobby.jpg HTTP/1.1[0m" 404 -
+2025-12-15 14:57:04,284 - INFO - 127.0.0.1 - - [15/Dec/2025 14:57:04] "GET /book/Luxury%20Suite HTTP/1.1" 200 -
+2025-12-15 14:57:04,304 - INFO - 127.0.0.1 - - [15/Dec/2025 14:57:04] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 14:57:04,306 - INFO - 127.0.0.1 - - [15/Dec/2025 14:57:04] "[33mGET /static/img/qr.png HTTP/1.1[0m" 404 -
+2025-12-15 14:57:04,306 - INFO - 127.0.0.1 - - [15/Dec/2025 14:57:04] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2025-12-15 15:01:01,155 - INFO -  * Detected change in 'c:\\Users\\Ji4Mi\\OneDrive\\Desktop\\NYP\\YearTwo\\ISPJ_Y2S2_Assigment\\app\\routes.py', reloading
+2025-12-15 15:01:01,262 - INFO -  * Restarting with stat
+2025-12-15 15:01:01,681 - WARNING -  * Debugger is active!
+2025-12-15 15:01:01,683 - INFO -  * Debugger PIN: 321-144-969
+2025-12-15 15:01:20,889 - INFO - message='Request to Stripe api' method=post url=https://api.stripe.com/v1/checkout/sessions
+2025-12-15 15:01:21,528 - INFO - message='Stripe API response' path=https://api.stripe.com/v1/checkout/sessions response_code=200
+2025-12-15 15:01:21,533 - INFO - 127.0.0.1 - - [15/Dec/2025 15:01:21] "[32mPOST /book/Luxury%20Suite HTTP/1.1[0m" 303 -
+2025-12-15 15:01:48,623 - INFO - 127.0.0.1 - - [15/Dec/2025 15:01:48] "GET /booking/confirmation HTTP/1.1" 200 -
+2025-12-15 15:01:48,680 - INFO - 127.0.0.1 - - [15/Dec/2025 15:01:48] "[33mGET /static/img/qr.png HTTP/1.1[0m" 404 -
+2025-12-15 15:01:48,757 - INFO - 127.0.0.1 - - [15/Dec/2025 15:01:48] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 15:01:48,759 - INFO - 127.0.0.1 - - [15/Dec/2025 15:01:48] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2025-12-15 15:04:07,783 - INFO - 127.0.0.1 - - [15/Dec/2025 15:04:07] "GET /booking/confirmation HTTP/1.1" 200 -
+2025-12-15 15:04:07,814 - INFO - 127.0.0.1 - - [15/Dec/2025 15:04:07] "[33mGET /static/img/qr.png HTTP/1.1[0m" 404 -
+2025-12-15 15:04:07,815 - INFO - 127.0.0.1 - - [15/Dec/2025 15:04:07] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 15:04:07,817 - INFO - 127.0.0.1 - - [15/Dec/2025 15:04:07] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2025-12-15 15:04:45,063 - INFO - 127.0.0.1 - - [15/Dec/2025 15:04:45] "GET /booking/confirmation HTTP/1.1" 200 -
+2025-12-15 15:04:45,075 - INFO - 127.0.0.1 - - [15/Dec/2025 15:04:45] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 15:04:45,076 - INFO - 127.0.0.1 - - [15/Dec/2025 15:04:45] "[33mGET /static/img/qr.png HTTP/1.1[0m" 404 -
+2025-12-15 15:04:45,098 - INFO - 127.0.0.1 - - [15/Dec/2025 15:04:45] "GET /static/css/booking.css HTTP/1.1" 200 -
+2025-12-15 15:04:47,239 - INFO - 127.0.0.1 - - [15/Dec/2025 15:04:47] "GET / HTTP/1.1" 200 -
+2025-12-15 15:04:47,257 - INFO - 127.0.0.1 - - [15/Dec/2025 15:04:47] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 15:04:47,259 - INFO - 127.0.0.1 - - [15/Dec/2025 15:04:47] "[33mGET /static/img/qr.png HTTP/1.1[0m" 404 -
+2025-12-15 15:04:49,400 - INFO - 127.0.0.1 - - [15/Dec/2025 15:04:49] "GET /book HTTP/1.1" 200 -
+2025-12-15 15:04:49,414 - INFO - 127.0.0.1 - - [15/Dec/2025 15:04:49] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 15:04:49,415 - INFO - 127.0.0.1 - - [15/Dec/2025 15:04:49] "[33mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 404 -
+2025-12-15 15:04:49,416 - INFO - 127.0.0.1 - - [15/Dec/2025 15:04:49] "[33mGET /static/images/deluxe-room.jpg HTTP/1.1[0m" 404 -
+2025-12-15 15:04:49,416 - INFO - 127.0.0.1 - - [15/Dec/2025 15:04:49] "[33mGET /static/images/executive-suite.jpg HTTP/1.1[0m" 404 -
+2025-12-15 15:04:49,420 - INFO - 127.0.0.1 - - [15/Dec/2025 15:04:49] "[33mGET /static/img/qr.png HTTP/1.1[0m" 404 -
+2025-12-15 15:04:49,421 - INFO - 127.0.0.1 - - [15/Dec/2025 15:04:49] "[36mGET /static/css/book_room.css HTTP/1.1[0m" 304 -
+2025-12-15 15:04:49,431 - INFO - 127.0.0.1 - - [15/Dec/2025 15:04:49] "[33mGET /static/images/hotel-lobby.jpg HTTP/1.1[0m" 404 -
+2025-12-15 15:04:59,257 - INFO - 127.0.0.1 - - [15/Dec/2025 15:04:59] "GET /book HTTP/1.1" 200 -
+2025-12-15 15:04:59,273 - INFO - 127.0.0.1 - - [15/Dec/2025 15:04:59] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 15:04:59,280 - INFO - 127.0.0.1 - - [15/Dec/2025 15:04:59] "[33mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 404 -
+2025-12-15 15:04:59,281 - INFO - 127.0.0.1 - - [15/Dec/2025 15:04:59] "[33mGET /static/images/deluxe-room.jpg HTTP/1.1[0m" 404 -
+2025-12-15 15:04:59,285 - INFO - 127.0.0.1 - - [15/Dec/2025 15:04:59] "[33mGET /static/images/executive-suite.jpg HTTP/1.1[0m" 404 -
+2025-12-15 15:04:59,294 - INFO - 127.0.0.1 - - [15/Dec/2025 15:04:59] "[33mGET /static/img/qr.png HTTP/1.1[0m" 404 -
+2025-12-15 15:04:59,295 - INFO - 127.0.0.1 - - [15/Dec/2025 15:04:59] "[36mGET /static/css/book_room.css HTTP/1.1[0m" 304 -
+2025-12-15 15:05:01,466 - INFO - 127.0.0.1 - - [15/Dec/2025 15:05:01] "GET /book/Deluxe%20Room HTTP/1.1" 200 -
+2025-12-15 15:05:01,483 - INFO - 127.0.0.1 - - [15/Dec/2025 15:05:01] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 15:05:01,489 - INFO - 127.0.0.1 - - [15/Dec/2025 15:05:01] "[33mGET /static/img/qr.png HTTP/1.1[0m" 404 -
+2025-12-15 15:05:01,490 - INFO - 127.0.0.1 - - [15/Dec/2025 15:05:01] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2025-12-15 15:05:15,195 - INFO - message='Request to Stripe api' method=post url=https://api.stripe.com/v1/checkout/sessions
+2025-12-15 15:05:16,057 - INFO - message='Stripe API response' path=https://api.stripe.com/v1/checkout/sessions response_code=200
+2025-12-15 15:05:16,058 - INFO - 127.0.0.1 - - [15/Dec/2025 15:05:16] "[32mPOST /book/Deluxe%20Room HTTP/1.1[0m" 303 -
+2025-12-15 15:05:38,609 - INFO - 127.0.0.1 - - [15/Dec/2025 15:05:38] "GET /booking/confirmation HTTP/1.1" 200 -
+2025-12-15 15:05:38,647 - INFO - 127.0.0.1 - - [15/Dec/2025 15:05:38] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 15:05:38,656 - INFO - 127.0.0.1 - - [15/Dec/2025 15:05:38] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2025-12-15 15:05:38,657 - INFO - 127.0.0.1 - - [15/Dec/2025 15:05:38] "[33mGET /static/img/qr.png HTTP/1.1[0m" 404 -
+2025-12-15 15:05:40,366 - INFO - 127.0.0.1 - - [15/Dec/2025 15:05:40] "GET / HTTP/1.1" 200 -
+2025-12-15 15:05:40,383 - INFO - 127.0.0.1 - - [15/Dec/2025 15:05:40] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 15:05:40,385 - INFO - 127.0.0.1 - - [15/Dec/2025 15:05:40] "[33mGET /static/img/qr.png HTTP/1.1[0m" 404 -
