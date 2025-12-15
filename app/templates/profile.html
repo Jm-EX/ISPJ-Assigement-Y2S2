@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}Profile{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+<script>
+async function registerPasskey() {
+    try {
+        console.log('Step 1: Starting passkey registration...');
+        const response = await fetch('/auth/passkey/register/begin', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'}
+        });
+        
+        console.log('Step 2: Response status:', response.status);
+        
+        const responseText = await response.text();
+        console.log('Step 2.5: Raw response text:', responseText);
+        
+        if (!response.ok) {
+            console.error('Step 2 ERROR: Server returned error');
+            try {
+                const errorData = JSON.parse(responseText);
+                console.error('Error data:', errorData);
+                throw new Error(errorData.error || 'Failed to start registration');
+            } catch (e) {
+                console.error('Could not parse error as JSON. Raw response:', responseText);
+                throw new Error('Server error: ' + responseText.substring(0, 200));
+            }
+        }
+        
+        let options;
+        try {
+            options = JSON.parse(responseText);
+            console.log('Step 3: Received options from server:', options);
+        } catch (e) {
+            console.error('Step 3 ERROR: Could not parse response as JSON');
+            console.error('Parse error:', e);
+            console.error('Raw response:', responseText);
+            throw new Error('Invalid JSON response from server');
+        }
+        
+        console.log('Step 4: Converting challenge from base64...');
+        options.challenge = Uint8Array.from(atob(options.challenge.replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0));
+        console.log('Step 4: Challenge converted:', options.challenge);
+        
+        console.log('Step 5: Converting user.id from base64...');
+        options.user.id = Uint8Array.from(atob(options.user.id.replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0));
+        console.log('Step 5: User ID converted:', options.user.id);
+        
+        console.log('Step 6: Final options for WebAuthn:', options);
+        console.log('Step 7: Calling navigator.credentials.create...');
+        const credential = await navigator.credentials.create({publicKey: options});
+        console.log('Step 8: Credential created successfully:', credential);
+        
+        console.log('Step 9: Encoding credential data...');
+        const credentialData = {
+            id: credential.id,
+            rawId: btoa(String.fromCharCode(...new Uint8Array(credential.rawId))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, ''),
+            type: credential.type,
+            response: {
+                clientDataJSON: btoa(String.fromCharCode(...new Uint8Array(credential.response.clientDataJSON))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, ''),
+                attestationObject: btoa(String.fromCharCode(...new Uint8Array(credential.response.attestationObject))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
+            }
+        };
+        console.log('Step 10: Credential data encoded:', credentialData);
+        
+        console.log('Step 11: Sending credential to server for verification...');
+        const verifyResponse = await fetch('/auth/passkey/register/complete', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(credentialData)
+        });
+        
+        console.log('Step 12: Verification response status:', verifyResponse.status);
+        const result = await verifyResponse.json();
+        console.log('Step 13: Verification result:', result);
+        
+        if (result.success) {
+            console.log('SUCCESS: Touch ID/Face ID enabled!');
+            alert('Touch ID/Face ID enabled successfully!');
+            location.reload();
+        } else {
+            console.error('VERIFICATION FAILED:', result.error);
+            alert('Failed to enable Touch ID/Face ID: ' + (result.error || 'Unknown error'));
+        }
+    } catch (error) {
+        console.error('EXCEPTION CAUGHT:');
+        console.error('Error name:', error.name);
+        console.error('Error message:', error.message);
+        console.error('Error stack:', error.stack);
+        console.error('Full error object:', error);
+        alert('Failed to enable Touch ID/Face ID: ' + error.message);
+    }
+}
+
+async function deletePasskey(credentialId) {
+    if (!confirm('Are you sure you want to remove this passkey?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch('/auth/passkey/delete', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({credential_id: credentialId})
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert('Passkey removed successfully');
+            location.reload();
+        } else {
+            alert('Failed to remove passkey: ' + (result.error || 'Unknown error'));
+        }
+    } catch (error) {
+        alert('Failed to remove passkey: ' + error.message);
+    }
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+  <h1>Profile</h1>
+  
+  <div style="margin-bottom: 30px;">
+    <h2>Account Information</h2>
+    <p><strong>Username:</strong> {{ username }}</p>
+    <p><strong>Email:</strong> {{ email }}</p>
+  </div>
+
+  <div style="margin-bottom: 30px;">
+    <h2>Touch ID / Face ID</h2>
+    <p>Enable Touch ID or Face ID to skip OTP verification on this device.</p>
+    
+    {% if passkeys %}
+      <p style="color: green;">✓ Touch ID/Face ID is enabled on this device</p>
+      {% for passkey in passkeys %}
+        <div style="margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+          <p><strong>Registered:</strong> {{ passkey.created_at.strftime('%Y-%m-%d %H:%M') if passkey.created_at else 'Unknown' }}</p>
+          <button type="button" onclick="deletePasskey('{{ passkey.credential_id }}')" style="background: #dc3545; color: white; padding: 5px 15px; border: none; border-radius: 3px; cursor: pointer;">Remove</button>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p>Touch ID/Face ID is not enabled.</p>
+      <button type="button" onclick="registerPasskey()" class="auth-btn">Enable Touch ID / Face ID</button>
+    {% endif %}
+  </div>
+
+  <p class="auth-alt">
+    <a href="{{ url_for('main.index') }}">Back to Home</a>
+  </p>
+</div>
+{% endblock %}

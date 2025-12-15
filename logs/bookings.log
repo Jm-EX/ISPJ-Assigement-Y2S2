@@ -1324,3 +1324,1122 @@
 2025-12-15 20:45:51,446 - INFO - 127.0.0.1 - - [15/Dec/2025 20:45:51] "[36mGET /static/images/3.jpg HTTP/1.1[0m" 304 -
 2025-12-15 20:45:51,449 - INFO - 127.0.0.1 - - [15/Dec/2025 20:45:51] "[36mGET /static/images/4.jpg HTTP/1.1[0m" 304 -
 2025-12-15 20:45:51,450 - INFO - 127.0.0.1 - - [15/Dec/2025 20:45:51] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:07:04,508 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001
+2025-12-15 22:07:04,508 - INFO - [33mPress CTRL+C to quit[0m
+2025-12-15 22:07:04,509 - INFO -  * Restarting with stat
+2025-12-15 22:07:04,642 - WARNING -  * Debugger is active!
+2025-12-15 22:07:04,647 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 22:07:13,530 - INFO - 127.0.0.1 - - [15/Dec/2025 22:07:13] "GET / HTTP/1.1" 200 -
+2025-12-15 22:07:13,557 - INFO - 127.0.0.1 - - [15/Dec/2025 22:07:13] "GET /static/css/Header&Footer.css HTTP/1.1" 200 -
+2025-12-15 22:07:13,559 - INFO - 127.0.0.1 - - [15/Dec/2025 22:07:13] "GET /static/images/luxury-suite.jpg HTTP/1.1" 200 -
+2025-12-15 22:07:13,560 - INFO - 127.0.0.1 - - [15/Dec/2025 22:07:13] "GET /static/images/pool.jpg HTTP/1.1" 200 -
+2025-12-15 22:07:13,561 - INFO - 127.0.0.1 - - [15/Dec/2025 22:07:13] "GET /static/css/home.css HTTP/1.1" 200 -
+2025-12-15 22:07:13,709 - INFO - 127.0.0.1 - - [15/Dec/2025 22:07:13] "GET /static/images/qrcode.png HTTP/1.1" 200 -
+2025-12-15 22:07:13,709 - INFO - 127.0.0.1 - - [15/Dec/2025 22:07:13] "GET /static/images/dining.jpg HTTP/1.1" 200 -
+2025-12-15 22:07:13,718 - INFO - 127.0.0.1 - - [15/Dec/2025 22:07:13] "GET /static/images/home-hero-bg.jpg HTTP/1.1" 200 -
+2025-12-15 22:07:13,785 - INFO - 127.0.0.1 - - [15/Dec/2025 22:07:13] "GET /static/images/home-am-bg.jpg HTTP/1.1" 200 -
+2025-12-15 22:07:14,008 - INFO - 127.0.0.1 - - [15/Dec/2025 22:07:14] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-12-15 22:07:17,198 - INFO - 127.0.0.1 - - [15/Dec/2025 22:07:17] "GET /login HTTP/1.1" 200 -
+2025-12-15 22:07:17,215 - INFO - 127.0.0.1 - - [15/Dec/2025 22:07:17] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:07:17,217 - INFO - 127.0.0.1 - - [15/Dec/2025 22:07:17] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 22:07:17,217 - INFO - 127.0.0.1 - - [15/Dec/2025 22:07:17] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:07:22,943 - INFO - Attempting to send OTP to ngisaac15@gmail.com
+2025-12-15 22:07:22,944 - INFO - Mail config - Server: smtp.gmail.com, Username: wellnest51@gmail.com, Password: ***
+2025-12-15 22:07:22,944 - INFO - Creating email message...
+2025-12-15 22:07:22,948 - INFO - Sending email via Flask-Mail...
+2025-12-15 22:07:25,889 - INFO - Email sent successfully!
+2025-12-15 22:07:25,891 - INFO - 127.0.0.1 - - [15/Dec/2025 22:07:25] "[32mPOST /login HTTP/1.1[0m" 302 -
+2025-12-15 22:07:25,904 - INFO - 127.0.0.1 - - [15/Dec/2025 22:07:25] "GET /verify-otp HTTP/1.1" 200 -
+2025-12-15 22:07:25,926 - INFO - 127.0.0.1 - - [15/Dec/2025 22:07:25] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 22:07:25,926 - INFO - 127.0.0.1 - - [15/Dec/2025 22:07:25] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:07:25,926 - INFO - 127.0.0.1 - - [15/Dec/2025 22:07:25] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:07:50,619 - INFO - 127.0.0.1 - - [15/Dec/2025 22:07:50] "[32mPOST /verify-otp HTTP/1.1[0m" 302 -
+2025-12-15 22:07:50,623 - INFO - 127.0.0.1 - - [15/Dec/2025 22:07:50] "GET /login HTTP/1.1" 200 -
+2025-12-15 22:07:50,643 - INFO - 127.0.0.1 - - [15/Dec/2025 22:07:50] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 22:07:50,643 - INFO - 127.0.0.1 - - [15/Dec/2025 22:07:50] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:07:50,643 - INFO - 127.0.0.1 - - [15/Dec/2025 22:07:50] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:07:57,571 - INFO - Attempting to send OTP to ngisaac15@gmail.com
+2025-12-15 22:07:57,571 - INFO - Mail config - Server: smtp.gmail.com, Username: wellnest51@gmail.com, Password: ***
+2025-12-15 22:07:57,571 - INFO - Creating email message...
+2025-12-15 22:07:57,575 - INFO - Sending email via Flask-Mail...
+2025-12-15 22:08:00,061 - INFO - Email sent successfully!
+2025-12-15 22:08:00,062 - INFO - 127.0.0.1 - - [15/Dec/2025 22:08:00] "[32mPOST /login HTTP/1.1[0m" 302 -
+2025-12-15 22:08:00,067 - INFO - 127.0.0.1 - - [15/Dec/2025 22:08:00] "GET /verify-otp HTTP/1.1" 200 -
+2025-12-15 22:08:00,087 - INFO - 127.0.0.1 - - [15/Dec/2025 22:08:00] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 22:08:00,088 - INFO - 127.0.0.1 - - [15/Dec/2025 22:08:00] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:08:00,088 - INFO - 127.0.0.1 - - [15/Dec/2025 22:08:00] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:08:15,150 - INFO - 127.0.0.1 - - [15/Dec/2025 22:08:15] "[32mPOST /verify-otp HTTP/1.1[0m" 302 -
+2025-12-15 22:08:15,154 - INFO - 127.0.0.1 - - [15/Dec/2025 22:08:15] "GET /login HTTP/1.1" 200 -
+2025-12-15 22:08:15,171 - INFO - 127.0.0.1 - - [15/Dec/2025 22:08:15] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 22:08:15,171 - INFO - 127.0.0.1 - - [15/Dec/2025 22:08:15] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:08:15,172 - INFO - 127.0.0.1 - - [15/Dec/2025 22:08:15] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:09:24,732 - INFO -  * Detected change in '/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py', reloading
+2025-12-15 22:09:24,808 - INFO -  * Restarting with stat
+2025-12-15 22:09:24,996 - WARNING -  * Debugger is active!
+2025-12-15 22:09:25,000 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 22:10:25,612 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001
+2025-12-15 22:10:25,612 - INFO - [33mPress CTRL+C to quit[0m
+2025-12-15 22:10:25,612 - INFO -  * Restarting with stat
+2025-12-15 22:10:25,727 - WARNING -  * Debugger is active!
+2025-12-15 22:10:25,731 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 22:10:29,254 - INFO - 127.0.0.1 - - [15/Dec/2025 22:10:29] "GET /login HTTP/1.1" 200 -
+2025-12-15 22:10:29,276 - INFO - 127.0.0.1 - - [15/Dec/2025 22:10:29] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 22:10:29,277 - INFO - 127.0.0.1 - - [15/Dec/2025 22:10:29] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:10:29,279 - INFO - 127.0.0.1 - - [15/Dec/2025 22:10:29] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:10:33,662 - INFO - Attempting to send OTP to ngisaac15@gmail.com
+2025-12-15 22:10:33,662 - INFO - Mail config - Server: smtp.gmail.com, Username: wellnest51@gmail.com, Password: ***
+2025-12-15 22:10:33,662 - INFO - Creating email message...
+2025-12-15 22:10:33,665 - INFO - Sending email via Flask-Mail...
+2025-12-15 22:10:36,858 - INFO - Email sent successfully!
+2025-12-15 22:10:36,860 - INFO - 127.0.0.1 - - [15/Dec/2025 22:10:36] "[32mPOST /login HTTP/1.1[0m" 302 -
+2025-12-15 22:10:36,872 - INFO - 127.0.0.1 - - [15/Dec/2025 22:10:36] "GET /verify-otp HTTP/1.1" 200 -
+2025-12-15 22:10:36,887 - INFO - 127.0.0.1 - - [15/Dec/2025 22:10:36] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:10:36,889 - INFO - 127.0.0.1 - - [15/Dec/2025 22:10:36] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 22:10:36,890 - INFO - 127.0.0.1 - - [15/Dec/2025 22:10:36] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:10:50,204 - INFO - 127.0.0.1 - - [15/Dec/2025 22:10:50] "[32mPOST /verify-otp HTTP/1.1[0m" 302 -
+2025-12-15 22:10:50,208 - INFO - 127.0.0.1 - - [15/Dec/2025 22:10:50] "GET /admin HTTP/1.1" 200 -
+2025-12-15 22:10:50,228 - INFO - 127.0.0.1 - - [15/Dec/2025 22:10:50] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:10:50,228 - INFO - 127.0.0.1 - - [15/Dec/2025 22:10:50] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:17:49,272 - INFO -  * Detected change in '/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_db.py', reloading
+2025-12-15 22:17:49,340 - INFO -  * Restarting with stat
+2025-12-15 22:17:49,547 - WARNING -  * Debugger is active!
+2025-12-15 22:17:49,551 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 22:18:02,652 - INFO -  * Detected change in '/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_db.py', reloading
+2025-12-15 22:18:02,721 - INFO -  * Restarting with stat
+2025-12-15 22:18:02,854 - WARNING -  * Debugger is active!
+2025-12-15 22:18:02,857 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 22:18:48,200 - INFO -  * Detected change in '/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py', reloading
+2025-12-15 22:18:48,288 - INFO -  * Restarting with stat
+2025-12-15 22:18:48,525 - WARNING -  * Debugger is active!
+2025-12-15 22:18:48,529 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 22:19:32,860 - INFO -  * Detected change in '/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py', reloading
+2025-12-15 22:19:32,919 - INFO -  * Restarting with stat
+2025-12-15 22:19:33,078 - WARNING -  * Debugger is active!
+2025-12-15 22:19:33,082 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 22:19:56,282 - INFO -  * Detected change in '/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py', reloading
+2025-12-15 22:19:56,338 - INFO -  * Restarting with stat
+2025-12-15 22:19:56,503 - WARNING -  * Debugger is active!
+2025-12-15 22:19:56,508 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 22:20:29,781 - INFO -  * Detected change in '/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py', reloading
+2025-12-15 22:20:29,839 - INFO -  * Restarting with stat
+2025-12-15 22:20:30,038 - WARNING -  * Debugger is active!
+2025-12-15 22:20:30,043 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 22:23:18,696 - INFO - 127.0.0.1 - - [15/Dec/2025 22:23:18] "[33mGET /apple-touch-icon-precomposed.png HTTP/1.1[0m" 404 -
+2025-12-15 22:23:18,698 - INFO - 127.0.0.1 - - [15/Dec/2025 22:23:18] "[33mGET /apple-touch-icon.png HTTP/1.1[0m" 404 -
+2025-12-15 22:23:18,699 - INFO - 127.0.0.1 - - [15/Dec/2025 22:23:18] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-12-15 22:23:18,724 - INFO - 127.0.0.1 - - [15/Dec/2025 22:23:18] "GET / HTTP/1.1" 200 -
+2025-12-15 22:23:23,195 - INFO - 127.0.0.1 - - [15/Dec/2025 22:23:23] "GET / HTTP/1.1" 200 -
+2025-12-15 22:23:23,197 - INFO - 127.0.0.1 - - [15/Dec/2025 22:23:23] "[33mGET /static/webauthn.js HTTP/1.1[0m" 404 -
+2025-12-15 22:23:23,208 - INFO - 127.0.0.1 - - [15/Dec/2025 22:23:23] "GET /static/css/Header&Footer.css HTTP/1.1" 200 -
+2025-12-15 22:23:23,209 - INFO - 127.0.0.1 - - [15/Dec/2025 22:23:23] "GET /static/css/home.css HTTP/1.1" 200 -
+2025-12-15 22:23:23,212 - INFO - 127.0.0.1 - - [15/Dec/2025 22:23:23] "GET /static/images/luxury-suite.jpg HTTP/1.1" 200 -
+2025-12-15 22:23:23,212 - INFO - 127.0.0.1 - - [15/Dec/2025 22:23:23] "GET /static/images/pool.jpg HTTP/1.1" 200 -
+2025-12-15 22:23:23,225 - INFO - 127.0.0.1 - - [15/Dec/2025 22:23:23] "GET /static/images/qrcode.png HTTP/1.1" 200 -
+2025-12-15 22:23:23,226 - INFO - 127.0.0.1 - - [15/Dec/2025 22:23:23] "GET /static/images/dining.jpg HTTP/1.1" 200 -
+2025-12-15 22:23:23,227 - INFO - 127.0.0.1 - - [15/Dec/2025 22:23:23] "GET /static/images/home-hero-bg.jpg HTTP/1.1" 200 -
+2025-12-15 22:23:23,227 - INFO - 127.0.0.1 - - [15/Dec/2025 22:23:23] "GET /static/images/home-am-bg.jpg HTTP/1.1" 200 -
+2025-12-15 22:23:23,239 - INFO - 127.0.0.1 - - [15/Dec/2025 22:23:23] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-12-15 22:23:23,240 - INFO - 127.0.0.1 - - [15/Dec/2025 22:23:23] "[33mGET /apple-touch-icon-precomposed.png HTTP/1.1[0m" 404 -
+2025-12-15 22:23:23,240 - INFO - 127.0.0.1 - - [15/Dec/2025 22:23:23] "[33mGET /apple-touch-icon-precomposed.png HTTP/1.1[0m" 404 -
+2025-12-15 22:23:23,241 - INFO - 127.0.0.1 - - [15/Dec/2025 22:23:23] "[33mGET /apple-touch-icon.png HTTP/1.1[0m" 404 -
+2025-12-15 22:23:23,241 - INFO - 127.0.0.1 - - [15/Dec/2025 22:23:23] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-12-15 22:23:23,291 - INFO - 127.0.0.1 - - [15/Dec/2025 22:23:23] "[33mGET /apple-touch-icon.png HTTP/1.1[0m" 404 -
+2025-12-15 22:23:31,301 - INFO - 127.0.0.1 - - [15/Dec/2025 22:23:31] "GET /login HTTP/1.1" 200 -
+2025-12-15 22:23:31,305 - INFO - 127.0.0.1 - - [15/Dec/2025 22:23:31] "[33mGET /static/style.css HTTP/1.1[0m" 404 -
+2025-12-15 22:23:31,313 - INFO - 127.0.0.1 - - [15/Dec/2025 22:23:31] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:23:31,313 - INFO - 127.0.0.1 - - [15/Dec/2025 22:23:31] "GET /static/css/auth.css HTTP/1.1" 200 -
+2025-12-15 22:23:31,316 - INFO - 127.0.0.1 - - [15/Dec/2025 22:23:31] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:23:33,388 - INFO - 127.0.0.1 - - [15/Dec/2025 22:23:33] "GET /register HTTP/1.1" 200 -
+2025-12-15 22:23:33,399 - INFO - 127.0.0.1 - - [15/Dec/2025 22:23:33] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:23:33,401 - INFO - 127.0.0.1 - - [15/Dec/2025 22:23:33] "GET /static/js/password_meter.js HTTP/1.1" 200 -
+2025-12-15 22:23:33,401 - INFO - 127.0.0.1 - - [15/Dec/2025 22:23:33] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 22:23:33,401 - INFO - 127.0.0.1 - - [15/Dec/2025 22:23:33] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:24:05,872 - INFO - 127.0.0.1 - - [15/Dec/2025 22:24:05] "[32mPOST /register HTTP/1.1[0m" 302 -
+2025-12-15 22:24:05,883 - INFO - 127.0.0.1 - - [15/Dec/2025 22:24:05] "GET /login HTTP/1.1" 200 -
+2025-12-15 22:24:05,892 - INFO - 127.0.0.1 - - [15/Dec/2025 22:24:05] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:24:05,893 - INFO - 127.0.0.1 - - [15/Dec/2025 22:24:05] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 22:24:05,894 - INFO - 127.0.0.1 - - [15/Dec/2025 22:24:05] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:24:16,149 - INFO - Attempting to send OTP to lightbornfannypro@gmail.com
+2025-12-15 22:24:16,150 - INFO - Mail config - Server: smtp.gmail.com, Username: wellnest51@gmail.com, Password: ***
+2025-12-15 22:24:16,150 - INFO - Creating email message...
+2025-12-15 22:24:16,153 - INFO - Sending email via Flask-Mail...
+2025-12-15 22:24:18,909 - INFO - Email sent successfully!
+2025-12-15 22:24:18,910 - INFO - 127.0.0.1 - - [15/Dec/2025 22:24:18] "[32mPOST /login HTTP/1.1[0m" 302 -
+2025-12-15 22:24:18,931 - INFO - 127.0.0.1 - - [15/Dec/2025 22:24:18] "GET /verify-otp HTTP/1.1" 200 -
+2025-12-15 22:24:18,948 - INFO - 127.0.0.1 - - [15/Dec/2025 22:24:18] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 22:24:18,948 - INFO - 127.0.0.1 - - [15/Dec/2025 22:24:18] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:24:18,949 - INFO - 127.0.0.1 - - [15/Dec/2025 22:24:18] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:24:36,021 - INFO - 127.0.0.1 - - [15/Dec/2025 22:24:36] "[32mPOST /verify-otp HTTP/1.1[0m" 302 -
+2025-12-15 22:24:36,030 - INFO - 127.0.0.1 - - [15/Dec/2025 22:24:36] "GET / HTTP/1.1" 200 -
+2025-12-15 22:24:36,043 - INFO - 127.0.0.1 - - [15/Dec/2025 22:24:36] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:24:36,046 - INFO - 127.0.0.1 - - [15/Dec/2025 22:24:36] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:24:36,046 - INFO - 127.0.0.1 - - [15/Dec/2025 22:24:36] "[36mGET /static/images/pool.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:24:36,047 - INFO - 127.0.0.1 - - [15/Dec/2025 22:24:36] "[36mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:24:36,047 - INFO - 127.0.0.1 - - [15/Dec/2025 22:24:36] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2025-12-15 22:24:36,047 - INFO - 127.0.0.1 - - [15/Dec/2025 22:24:36] "[36mGET /static/images/dining.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:24:36,056 - INFO - 127.0.0.1 - - [15/Dec/2025 22:24:36] "[36mGET /static/images/home-am-bg.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:24:36,056 - INFO - 127.0.0.1 - - [15/Dec/2025 22:24:36] "[36mGET /static/images/home-hero-bg.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:24:36,063 - INFO - 127.0.0.1 - - [15/Dec/2025 22:24:36] "[33mGET /apple-touch-icon-precomposed.png HTTP/1.1[0m" 404 -
+2025-12-15 22:24:36,064 - INFO - 127.0.0.1 - - [15/Dec/2025 22:24:36] "[33mGET /apple-touch-icon.png HTTP/1.1[0m" 404 -
+2025-12-15 22:24:36,064 - INFO - 127.0.0.1 - - [15/Dec/2025 22:24:36] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-12-15 22:25:09,223 - INFO - 127.0.0.1 - - [15/Dec/2025 22:25:09] "GET / HTTP/1.1" 200 -
+2025-12-15 22:25:09,237 - INFO - 127.0.0.1 - - [15/Dec/2025 22:25:09] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:25:09,238 - INFO - 127.0.0.1 - - [15/Dec/2025 22:25:09] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2025-12-15 22:25:09,240 - INFO - 127.0.0.1 - - [15/Dec/2025 22:25:09] "[36mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:25:09,241 - INFO - 127.0.0.1 - - [15/Dec/2025 22:25:09] "[36mGET /static/images/dining.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:25:09,242 - INFO - 127.0.0.1 - - [15/Dec/2025 22:25:09] "[36mGET /static/images/pool.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:25:09,242 - INFO - 127.0.0.1 - - [15/Dec/2025 22:25:09] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:25:09,246 - INFO - 127.0.0.1 - - [15/Dec/2025 22:25:09] "[36mGET /static/images/home-hero-bg.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:25:09,246 - INFO - 127.0.0.1 - - [15/Dec/2025 22:25:09] "[36mGET /static/images/home-am-bg.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:25:09,251 - INFO - 127.0.0.1 - - [15/Dec/2025 22:25:09] "[33mGET /apple-touch-icon-precomposed.png HTTP/1.1[0m" 404 -
+2025-12-15 22:25:09,252 - INFO - 127.0.0.1 - - [15/Dec/2025 22:25:09] "[33mGET /apple-touch-icon.png HTTP/1.1[0m" 404 -
+2025-12-15 22:25:09,253 - INFO - 127.0.0.1 - - [15/Dec/2025 22:25:09] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-12-15 22:25:12,141 - INFO - 127.0.0.1 - - [15/Dec/2025 22:25:12] "[33mGET /auth/profile HTTP/1.1[0m" 404 -
+2025-12-15 22:26:26,835 - INFO - 127.0.0.1 - - [15/Dec/2025 22:26:26] "GET / HTTP/1.1" 200 -
+2025-12-15 22:26:26,847 - INFO - 127.0.0.1 - - [15/Dec/2025 22:26:26] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:26:26,850 - INFO - 127.0.0.1 - - [15/Dec/2025 22:26:26] "[36mGET /static/images/dining.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:26:26,850 - INFO - 127.0.0.1 - - [15/Dec/2025 22:26:26] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2025-12-15 22:26:26,851 - INFO - 127.0.0.1 - - [15/Dec/2025 22:26:26] "[36mGET /static/images/pool.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:26:26,853 - INFO - 127.0.0.1 - - [15/Dec/2025 22:26:26] "[36mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:26:26,854 - INFO - 127.0.0.1 - - [15/Dec/2025 22:26:26] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:26:26,862 - INFO - 127.0.0.1 - - [15/Dec/2025 22:26:26] "[36mGET /static/images/home-am-bg.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:26:26,862 - INFO - 127.0.0.1 - - [15/Dec/2025 22:26:26] "[36mGET /static/images/home-hero-bg.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:26:29,078 - INFO - 127.0.0.1 - - [15/Dec/2025 22:26:29] "GET / HTTP/1.1" 200 -
+2025-12-15 22:26:29,087 - INFO - 127.0.0.1 - - [15/Dec/2025 22:26:29] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:26:29,093 - INFO - 127.0.0.1 - - [15/Dec/2025 22:26:29] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:26:29,094 - INFO - 127.0.0.1 - - [15/Dec/2025 22:26:29] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2025-12-15 22:26:29,094 - INFO - 127.0.0.1 - - [15/Dec/2025 22:26:29] "[36mGET /static/images/dining.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:26:29,095 - INFO - 127.0.0.1 - - [15/Dec/2025 22:26:29] "[36mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:26:29,095 - INFO - 127.0.0.1 - - [15/Dec/2025 22:26:29] "[36mGET /static/images/pool.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:26:29,102 - INFO - 127.0.0.1 - - [15/Dec/2025 22:26:29] "[36mGET /static/images/home-am-bg.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:26:29,103 - INFO - 127.0.0.1 - - [15/Dec/2025 22:26:29] "[36mGET /static/images/home-hero-bg.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:26:29,954 - INFO - 127.0.0.1 - - [15/Dec/2025 22:26:29] "GET / HTTP/1.1" 200 -
+2025-12-15 22:26:29,964 - INFO - 127.0.0.1 - - [15/Dec/2025 22:26:29] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:26:29,965 - INFO - 127.0.0.1 - - [15/Dec/2025 22:26:29] "[36mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:26:29,966 - INFO - 127.0.0.1 - - [15/Dec/2025 22:26:29] "[36mGET /static/images/pool.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:26:29,967 - INFO - 127.0.0.1 - - [15/Dec/2025 22:26:29] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:26:29,967 - INFO - 127.0.0.1 - - [15/Dec/2025 22:26:29] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2025-12-15 22:26:29,967 - INFO - 127.0.0.1 - - [15/Dec/2025 22:26:29] "[36mGET /static/images/dining.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:26:29,973 - INFO - 127.0.0.1 - - [15/Dec/2025 22:26:29] "[36mGET /static/images/home-hero-bg.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:26:29,974 - INFO - 127.0.0.1 - - [15/Dec/2025 22:26:29] "[36mGET /static/images/home-am-bg.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:26:31,779 - INFO - 127.0.0.1 - - [15/Dec/2025 22:26:31] "GET /profile HTTP/1.1" 200 -
+2025-12-15 22:26:31,790 - INFO - 127.0.0.1 - - [15/Dec/2025 22:26:31] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:26:31,792 - INFO - 127.0.0.1 - - [15/Dec/2025 22:26:31] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 22:26:31,792 - INFO - 127.0.0.1 - - [15/Dec/2025 22:26:31] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:26:33,627 - INFO - 127.0.0.1 - - [15/Dec/2025 22:26:33] "[33mPOST /auth/passkey/register/begin HTTP/1.1[0m" 404 -
+2025-12-15 22:27:46,684 - INFO -  * Detected change in '/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py', reloading
+2025-12-15 22:27:46,760 - INFO -  * Restarting with stat
+2025-12-15 22:27:47,000 - WARNING -  * Debugger is active!
+2025-12-15 22:27:47,004 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 22:28:03,008 - INFO - 127.0.0.1 - - [15/Dec/2025 22:28:03] "GET /profile HTTP/1.1" 200 -
+2025-12-15 22:28:03,026 - INFO - 127.0.0.1 - - [15/Dec/2025 22:28:03] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:28:03,028 - INFO - 127.0.0.1 - - [15/Dec/2025 22:28:03] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 22:28:03,029 - INFO - 127.0.0.1 - - [15/Dec/2025 22:28:03] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:28:04,208 - INFO - 127.0.0.1 - - [15/Dec/2025 22:28:04] "[33mPOST /auth/passkey/register/begin HTTP/1.1[0m" 404 -
+2025-12-15 22:28:27,324 - INFO -  * Detected change in '/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py', reloading
+2025-12-15 22:28:27,398 - INFO -  * Restarting with stat
+2025-12-15 22:28:27,614 - WARNING -  * Debugger is active!
+2025-12-15 22:28:27,618 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 22:28:48,012 - INFO - 127.0.0.1 - - [15/Dec/2025 22:28:48] "[33mPOST /auth/passkey/register/begin HTTP/1.1[0m" 404 -
+2025-12-15 22:28:50,483 - INFO - 127.0.0.1 - - [15/Dec/2025 22:28:50] "GET /profile HTTP/1.1" 200 -
+2025-12-15 22:28:50,504 - INFO - 127.0.0.1 - - [15/Dec/2025 22:28:50] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:28:50,505 - INFO - 127.0.0.1 - - [15/Dec/2025 22:28:50] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 22:28:50,505 - INFO - 127.0.0.1 - - [15/Dec/2025 22:28:50] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:28:52,074 - INFO - 127.0.0.1 - - [15/Dec/2025 22:28:52] "[33mPOST /auth/passkey/register/begin HTTP/1.1[0m" 404 -
+2025-12-15 22:29:53,960 - INFO - 127.0.0.1 - - [15/Dec/2025 22:29:53] "GET /profile HTTP/1.1" 200 -
+2025-12-15 22:29:53,969 - INFO - 127.0.0.1 - - [15/Dec/2025 22:29:53] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 22:29:53,969 - INFO - 127.0.0.1 - - [15/Dec/2025 22:29:53] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:29:53,969 - INFO - 127.0.0.1 - - [15/Dec/2025 22:29:53] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:29:55,125 - INFO - 127.0.0.1 - - [15/Dec/2025 22:29:55] "[33mPOST /auth/passkey/register/begin HTTP/1.1[0m" 404 -
+2025-12-15 22:30:09,538 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001
+2025-12-15 22:30:09,538 - INFO - [33mPress CTRL+C to quit[0m
+2025-12-15 22:30:09,538 - INFO -  * Restarting with stat
+2025-12-15 22:30:09,673 - WARNING -  * Debugger is active!
+2025-12-15 22:30:09,676 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 22:30:12,963 - INFO - 127.0.0.1 - - [15/Dec/2025 22:30:12] "GET /profile HTTP/1.1" 200 -
+2025-12-15 22:30:12,984 - INFO - 127.0.0.1 - - [15/Dec/2025 22:30:12] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 22:30:12,985 - INFO - 127.0.0.1 - - [15/Dec/2025 22:30:12] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:30:12,985 - INFO - 127.0.0.1 - - [15/Dec/2025 22:30:12] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:34:30,210 - INFO - 127.0.0.1 - - [15/Dec/2025 22:34:30] "GET /profile HTTP/1.1" 200 -
+2025-12-15 22:34:30,222 - INFO - 127.0.0.1 - - [15/Dec/2025 22:34:30] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 22:34:30,223 - INFO - 127.0.0.1 - - [15/Dec/2025 22:34:30] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:34:30,223 - INFO - 127.0.0.1 - - [15/Dec/2025 22:34:30] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:34:32,680 - INFO - 127.0.0.1 - - [15/Dec/2025 22:34:32] "[32mGET /logout HTTP/1.1[0m" 302 -
+2025-12-15 22:34:32,696 - INFO - 127.0.0.1 - - [15/Dec/2025 22:34:32] "GET / HTTP/1.1" 200 -
+2025-12-15 22:34:32,708 - INFO - 127.0.0.1 - - [15/Dec/2025 22:34:32] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2025-12-15 22:34:32,712 - INFO - 127.0.0.1 - - [15/Dec/2025 22:34:32] "[36mGET /static/images/dining.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:34:32,712 - INFO - 127.0.0.1 - - [15/Dec/2025 22:34:32] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:34:32,712 - INFO - 127.0.0.1 - - [15/Dec/2025 22:34:32] "[36mGET /static/images/pool.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:34:32,712 - INFO - 127.0.0.1 - - [15/Dec/2025 22:34:32] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:34:32,713 - INFO - 127.0.0.1 - - [15/Dec/2025 22:34:32] "[36mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:34:32,720 - INFO - 127.0.0.1 - - [15/Dec/2025 22:34:32] "[36mGET /static/images/home-am-bg.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:34:32,721 - INFO - 127.0.0.1 - - [15/Dec/2025 22:34:32] "[36mGET /static/images/home-hero-bg.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:34:34,209 - INFO - 127.0.0.1 - - [15/Dec/2025 22:34:34] "GET /login HTTP/1.1" 200 -
+2025-12-15 22:34:34,220 - INFO - 127.0.0.1 - - [15/Dec/2025 22:34:34] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:34:34,221 - INFO - 127.0.0.1 - - [15/Dec/2025 22:34:34] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 22:34:34,221 - INFO - 127.0.0.1 - - [15/Dec/2025 22:34:34] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:34:44,439 - INFO - Attempting to send OTP to lightbornfannypro@gmail.com
+2025-12-15 22:34:44,439 - INFO - Mail config - Server: smtp.gmail.com, Username: wellnest51@gmail.com, Password: ***
+2025-12-15 22:34:44,439 - INFO - Creating email message...
+2025-12-15 22:34:44,443 - INFO - Sending email via Flask-Mail...
+2025-12-15 22:34:47,073 - INFO - Email sent successfully!
+2025-12-15 22:34:47,075 - INFO - 127.0.0.1 - - [15/Dec/2025 22:34:47] "[32mPOST /login HTTP/1.1[0m" 302 -
+2025-12-15 22:34:47,097 - INFO - 127.0.0.1 - - [15/Dec/2025 22:34:47] "GET /verify-otp HTTP/1.1" 200 -
+2025-12-15 22:34:47,114 - INFO - 127.0.0.1 - - [15/Dec/2025 22:34:47] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 22:34:47,114 - INFO - 127.0.0.1 - - [15/Dec/2025 22:34:47] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:34:47,116 - INFO - 127.0.0.1 - - [15/Dec/2025 22:34:47] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:35:07,705 - INFO - 127.0.0.1 - - [15/Dec/2025 22:35:07] "[32mPOST /verify-otp HTTP/1.1[0m" 302 -
+2025-12-15 22:35:07,714 - INFO - 127.0.0.1 - - [15/Dec/2025 22:35:07] "GET / HTTP/1.1" 200 -
+2025-12-15 22:35:07,727 - INFO - 127.0.0.1 - - [15/Dec/2025 22:35:07] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:35:07,730 - INFO - 127.0.0.1 - - [15/Dec/2025 22:35:07] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2025-12-15 22:35:07,731 - INFO - 127.0.0.1 - - [15/Dec/2025 22:35:07] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:35:07,731 - INFO - 127.0.0.1 - - [15/Dec/2025 22:35:07] "[36mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:35:07,731 - INFO - 127.0.0.1 - - [15/Dec/2025 22:35:07] "[36mGET /static/images/pool.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:35:07,731 - INFO - 127.0.0.1 - - [15/Dec/2025 22:35:07] "[36mGET /static/images/dining.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:35:07,737 - INFO - 127.0.0.1 - - [15/Dec/2025 22:35:07] "[36mGET /static/images/home-am-bg.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:35:07,737 - INFO - 127.0.0.1 - - [15/Dec/2025 22:35:07] "[36mGET /static/images/home-hero-bg.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:35:10,290 - INFO - 127.0.0.1 - - [15/Dec/2025 22:35:10] "GET /profile HTTP/1.1" 200 -
+2025-12-15 22:35:10,302 - INFO - 127.0.0.1 - - [15/Dec/2025 22:35:10] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:35:10,303 - INFO - 127.0.0.1 - - [15/Dec/2025 22:35:10] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 22:35:10,303 - INFO - 127.0.0.1 - - [15/Dec/2025 22:35:10] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:35:12,846 - INFO - 127.0.0.1 - - [15/Dec/2025 22:35:12] "[33mPOST /auth/passkey/register/begin HTTP/1.1[0m" 404 -
+2025-12-15 22:35:43,688 - INFO - 127.0.0.1 - - [15/Dec/2025 22:35:43] "GET / HTTP/1.1" 200 -
+2025-12-15 22:35:43,700 - INFO - 127.0.0.1 - - [15/Dec/2025 22:35:43] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:35:43,704 - INFO - 127.0.0.1 - - [15/Dec/2025 22:35:43] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2025-12-15 22:35:43,704 - INFO - 127.0.0.1 - - [15/Dec/2025 22:35:43] "[36mGET /static/images/pool.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:35:43,704 - INFO - 127.0.0.1 - - [15/Dec/2025 22:35:43] "[36mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:35:43,860 - INFO - 127.0.0.1 - - [15/Dec/2025 22:35:43] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:35:43,860 - INFO - 127.0.0.1 - - [15/Dec/2025 22:35:43] "[36mGET /static/images/dining.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:35:43,865 - INFO - 127.0.0.1 - - [15/Dec/2025 22:35:43] "[36mGET /static/images/home-hero-bg.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:35:43,867 - INFO - 127.0.0.1 - - [15/Dec/2025 22:35:43] "[36mGET /static/images/home-am-bg.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:35:44,026 - INFO - 127.0.0.1 - - [15/Dec/2025 22:35:44] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-12-15 22:35:46,749 - INFO - 127.0.0.1 - - [15/Dec/2025 22:35:46] "GET /login HTTP/1.1" 200 -
+2025-12-15 22:35:46,763 - INFO - 127.0.0.1 - - [15/Dec/2025 22:35:46] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:35:46,767 - INFO - 127.0.0.1 - - [15/Dec/2025 22:35:46] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 22:35:46,767 - INFO - 127.0.0.1 - - [15/Dec/2025 22:35:46] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:35:55,802 - INFO - 127.0.0.1 - - [15/Dec/2025 22:35:55] "[32mPOST /login HTTP/1.1[0m" 302 -
+2025-12-15 22:35:55,806 - INFO - 127.0.0.1 - - [15/Dec/2025 22:35:55] "GET /login HTTP/1.1" 200 -
+2025-12-15 22:35:55,822 - INFO - 127.0.0.1 - - [15/Dec/2025 22:35:55] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:35:55,822 - INFO - 127.0.0.1 - - [15/Dec/2025 22:35:55] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 22:35:55,823 - INFO - 127.0.0.1 - - [15/Dec/2025 22:35:55] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:36:05,580 - INFO - Attempting to send OTP to lightbornfannypro@gmail.com
+2025-12-15 22:36:05,580 - INFO - Mail config - Server: smtp.gmail.com, Username: wellnest51@gmail.com, Password: ***
+2025-12-15 22:36:05,580 - INFO - Creating email message...
+2025-12-15 22:36:05,584 - INFO - Sending email via Flask-Mail...
+2025-12-15 22:36:08,191 - INFO - Email sent successfully!
+2025-12-15 22:36:08,193 - INFO - 127.0.0.1 - - [15/Dec/2025 22:36:08] "[32mPOST /login HTTP/1.1[0m" 302 -
+2025-12-15 22:36:08,199 - INFO - 127.0.0.1 - - [15/Dec/2025 22:36:08] "GET /verify-otp HTTP/1.1" 200 -
+2025-12-15 22:36:08,214 - INFO - 127.0.0.1 - - [15/Dec/2025 22:36:08] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:36:08,218 - INFO - 127.0.0.1 - - [15/Dec/2025 22:36:08] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 22:36:08,218 - INFO - 127.0.0.1 - - [15/Dec/2025 22:36:08] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:36:09,335 - INFO - 127.0.0.1 - - [15/Dec/2025 22:36:09] "[32mGET /logout HTTP/1.1[0m" 302 -
+2025-12-15 22:36:09,343 - INFO - 127.0.0.1 - - [15/Dec/2025 22:36:09] "GET / HTTP/1.1" 200 -
+2025-12-15 22:36:09,352 - INFO - 127.0.0.1 - - [15/Dec/2025 22:36:09] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:36:09,353 - INFO - 127.0.0.1 - - [15/Dec/2025 22:36:09] "[36mGET /static/images/dining.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:36:09,354 - INFO - 127.0.0.1 - - [15/Dec/2025 22:36:09] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2025-12-15 22:36:09,355 - INFO - 127.0.0.1 - - [15/Dec/2025 22:36:09] "[36mGET /static/images/pool.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:36:09,356 - INFO - 127.0.0.1 - - [15/Dec/2025 22:36:09] "[36mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:36:09,357 - INFO - 127.0.0.1 - - [15/Dec/2025 22:36:09] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:36:09,363 - INFO - 127.0.0.1 - - [15/Dec/2025 22:36:09] "[36mGET /static/images/home-hero-bg.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:36:09,363 - INFO - 127.0.0.1 - - [15/Dec/2025 22:36:09] "[36mGET /static/images/home-am-bg.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:36:29,004 - INFO - 127.0.0.1 - - [15/Dec/2025 22:36:29] "[32mPOST /verify-otp HTTP/1.1[0m" 302 -
+2025-12-15 22:36:29,008 - INFO - 127.0.0.1 - - [15/Dec/2025 22:36:29] "GET / HTTP/1.1" 200 -
+2025-12-15 22:36:29,026 - INFO - 127.0.0.1 - - [15/Dec/2025 22:36:29] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2025-12-15 22:36:29,028 - INFO - 127.0.0.1 - - [15/Dec/2025 22:36:29] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:36:29,030 - INFO - 127.0.0.1 - - [15/Dec/2025 22:36:29] "[36mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:36:29,030 - INFO - 127.0.0.1 - - [15/Dec/2025 22:36:29] "[36mGET /static/images/pool.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:36:29,092 - INFO - 127.0.0.1 - - [15/Dec/2025 22:36:29] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:36:29,093 - INFO - 127.0.0.1 - - [15/Dec/2025 22:36:29] "[36mGET /static/images/home-hero-bg.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:36:29,095 - INFO - 127.0.0.1 - - [15/Dec/2025 22:36:29] "[36mGET /static/images/home-am-bg.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:36:29,097 - INFO - 127.0.0.1 - - [15/Dec/2025 22:36:29] "[36mGET /static/images/dining.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:36:32,774 - INFO - 127.0.0.1 - - [15/Dec/2025 22:36:32] "GET /profile HTTP/1.1" 200 -
+2025-12-15 22:36:32,789 - INFO - 127.0.0.1 - - [15/Dec/2025 22:36:32] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:36:32,791 - INFO - 127.0.0.1 - - [15/Dec/2025 22:36:32] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 22:36:32,791 - INFO - 127.0.0.1 - - [15/Dec/2025 22:36:32] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:36:34,242 - INFO - 127.0.0.1 - - [15/Dec/2025 22:36:34] "[33mPOST /auth/passkey/register/begin HTTP/1.1[0m" 404 -
+2025-12-15 22:37:17,139 - INFO - 127.0.0.1 - - [15/Dec/2025 22:37:17] "GET /profile HTTP/1.1" 200 -
+2025-12-15 22:37:17,153 - INFO - 127.0.0.1 - - [15/Dec/2025 22:37:17] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 22:37:17,153 - INFO - 127.0.0.1 - - [15/Dec/2025 22:37:17] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:37:17,154 - INFO - 127.0.0.1 - - [15/Dec/2025 22:37:17] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:37:18,692 - INFO - 127.0.0.1 - - [15/Dec/2025 22:37:18] "[33mPOST /auth/passkey/register/begin HTTP/1.1[0m" 404 -
+2025-12-15 22:37:28,042 - INFO - 127.0.0.1 - - [15/Dec/2025 22:37:28] "[33mPOST /auth/passkey/register/begin HTTP/1.1[0m" 404 -
+2025-12-15 22:38:14,644 - INFO -  * Detected change in '/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py', reloading
+2025-12-15 22:38:14,721 - INFO -  * Restarting with stat
+2025-12-15 22:38:14,935 - WARNING -  * Debugger is active!
+2025-12-15 22:38:14,939 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 22:38:32,046 - INFO - 127.0.0.1 - - [15/Dec/2025 22:38:32] "[33mGET /profile HTTP/1.1[0m" 404 -
+2025-12-15 22:38:35,559 - INFO - 127.0.0.1 - - [15/Dec/2025 22:38:35] "[33mGET /verify-otp HTTP/1.1[0m" 404 -
+2025-12-15 22:38:36,346 - INFO - 127.0.0.1 - - [15/Dec/2025 22:38:36] "[33mGET /verify-otp HTTP/1.1[0m" 404 -
+2025-12-15 22:38:38,398 - INFO - 127.0.0.1 - - [15/Dec/2025 22:38:38] "[33mGET /profile HTTP/1.1[0m" 404 -
+2025-12-15 22:39:11,409 - INFO -  * Detected change in '/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py', reloading
+2025-12-15 22:39:11,476 - INFO -  * Restarting with stat
+2025-12-15 22:39:11,707 - WARNING -  * Debugger is active!
+2025-12-15 22:39:11,712 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 22:39:38,937 - INFO -  * Detected change in '/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py', reloading
+2025-12-15 22:39:38,995 - INFO -  * Restarting with stat
+2025-12-15 22:39:39,151 - WARNING -  * Debugger is active!
+2025-12-15 22:39:39,155 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 22:40:00,546 - INFO - 127.0.0.1 - - [15/Dec/2025 22:40:00] "[33mGET /profile HTTP/1.1[0m" 404 -
+2025-12-15 22:40:01,150 - INFO - 127.0.0.1 - - [15/Dec/2025 22:40:01] "[33mGET /profile HTTP/1.1[0m" 404 -
+2025-12-15 22:40:01,421 - INFO - 127.0.0.1 - - [15/Dec/2025 22:40:01] "[33mGET /profile HTTP/1.1[0m" 404 -
+2025-12-15 22:40:01,623 - INFO - 127.0.0.1 - - [15/Dec/2025 22:40:01] "[33mGET /profile HTTP/1.1[0m" 404 -
+2025-12-15 22:40:04,867 - INFO - 127.0.0.1 - - [15/Dec/2025 22:40:04] "[33mGET /logout HTTP/1.1[0m" 404 -
+2025-12-15 22:40:43,654 - INFO -  * Detected change in '/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py', reloading
+2025-12-15 22:40:43,717 - INFO -  * Restarting with stat
+2025-12-15 22:40:43,940 - WARNING -  * Debugger is active!
+2025-12-15 22:40:43,944 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 22:41:22,296 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001
+2025-12-15 22:41:22,296 - INFO - [33mPress CTRL+C to quit[0m
+2025-12-15 22:41:22,297 - INFO -  * Restarting with stat
+2025-12-15 22:41:22,431 - WARNING -  * Debugger is active!
+2025-12-15 22:41:22,435 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 22:41:24,638 - INFO - 127.0.0.1 - - [15/Dec/2025 22:41:24] "[33mGET /logout HTTP/1.1[0m" 404 -
+2025-12-15 22:41:25,289 - INFO - 127.0.0.1 - - [15/Dec/2025 22:41:25] "[33mGET /logout HTTP/1.1[0m" 404 -
+2025-12-15 22:41:25,429 - INFO - 127.0.0.1 - - [15/Dec/2025 22:41:25] "[33mGET /logout HTTP/1.1[0m" 404 -
+2025-12-15 22:41:25,564 - INFO - 127.0.0.1 - - [15/Dec/2025 22:41:25] "[33mGET /logout HTTP/1.1[0m" 404 -
+2025-12-15 22:41:29,007 - INFO - 127.0.0.1 - - [15/Dec/2025 22:41:29] "GET / HTTP/1.1" 200 -
+2025-12-15 22:41:29,030 - INFO - 127.0.0.1 - - [15/Dec/2025 22:41:29] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2025-12-15 22:41:29,030 - INFO - 127.0.0.1 - - [15/Dec/2025 22:41:29] "[36mGET /static/images/pool.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:41:29,031 - INFO - 127.0.0.1 - - [15/Dec/2025 22:41:29] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:41:29,032 - INFO - 127.0.0.1 - - [15/Dec/2025 22:41:29] "[36mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:41:29,072 - INFO - 127.0.0.1 - - [15/Dec/2025 22:41:29] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:41:29,073 - INFO - 127.0.0.1 - - [15/Dec/2025 22:41:29] "[36mGET /static/images/dining.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:41:29,075 - INFO - 127.0.0.1 - - [15/Dec/2025 22:41:29] "[36mGET /static/images/home-hero-bg.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:41:29,076 - INFO - 127.0.0.1 - - [15/Dec/2025 22:41:29] "[36mGET /static/images/home-am-bg.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:41:31,186 - INFO - 127.0.0.1 - - [15/Dec/2025 22:41:31] "[32mGET /auth/logout HTTP/1.1[0m" 302 -
+2025-12-15 22:41:31,188 - INFO - 127.0.0.1 - - [15/Dec/2025 22:41:31] "GET / HTTP/1.1" 200 -
+2025-12-15 22:41:31,198 - INFO - 127.0.0.1 - - [15/Dec/2025 22:41:31] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:41:31,198 - INFO - 127.0.0.1 - - [15/Dec/2025 22:41:31] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2025-12-15 22:41:31,199 - INFO - 127.0.0.1 - - [15/Dec/2025 22:41:31] "[36mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:41:31,200 - INFO - 127.0.0.1 - - [15/Dec/2025 22:41:31] "[36mGET /static/images/pool.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:41:31,242 - INFO - 127.0.0.1 - - [15/Dec/2025 22:41:31] "[36mGET /static/images/dining.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:41:31,242 - INFO - 127.0.0.1 - - [15/Dec/2025 22:41:31] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:41:33,265 - INFO - 127.0.0.1 - - [15/Dec/2025 22:41:33] "GET /auth/login HTTP/1.1" 200 -
+2025-12-15 22:41:33,280 - INFO - 127.0.0.1 - - [15/Dec/2025 22:41:33] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 22:41:33,280 - INFO - 127.0.0.1 - - [15/Dec/2025 22:41:33] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:41:33,280 - INFO - 127.0.0.1 - - [15/Dec/2025 22:41:33] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:41:41,836 - INFO - Attempting to send OTP to lightbornfannypro@gmail.com
+2025-12-15 22:41:41,836 - INFO - Mail config - Server: smtp.gmail.com, Username: wellnest51@gmail.com, Password: ***
+2025-12-15 22:41:41,836 - INFO - Creating email message...
+2025-12-15 22:41:41,839 - INFO - Sending email via Flask-Mail...
+2025-12-15 22:41:45,066 - INFO - Email sent successfully!
+2025-12-15 22:41:45,068 - INFO - 127.0.0.1 - - [15/Dec/2025 22:41:45] "[32mPOST /auth/login HTTP/1.1[0m" 302 -
+2025-12-15 22:41:45,079 - INFO - 127.0.0.1 - - [15/Dec/2025 22:41:45] "GET /auth/verify-otp HTTP/1.1" 200 -
+2025-12-15 22:41:45,092 - INFO - 127.0.0.1 - - [15/Dec/2025 22:41:45] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 22:41:45,093 - INFO - 127.0.0.1 - - [15/Dec/2025 22:41:45] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:41:45,093 - INFO - 127.0.0.1 - - [15/Dec/2025 22:41:45] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:42:06,982 - INFO - 127.0.0.1 - - [15/Dec/2025 22:42:06] "[32mPOST /auth/verify-otp HTTP/1.1[0m" 302 -
+2025-12-15 22:42:06,984 - INFO - 127.0.0.1 - - [15/Dec/2025 22:42:06] "GET /auth/verify-otp HTTP/1.1" 200 -
+2025-12-15 22:42:06,992 - INFO - 127.0.0.1 - - [15/Dec/2025 22:42:06] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 22:42:06,992 - INFO - 127.0.0.1 - - [15/Dec/2025 22:42:06] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:42:06,992 - INFO - 127.0.0.1 - - [15/Dec/2025 22:42:06] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:42:18,313 - INFO - 127.0.0.1 - - [15/Dec/2025 22:42:18] "[32mPOST /auth/verify-otp HTTP/1.1[0m" 302 -
+2025-12-15 22:42:18,316 - INFO - 127.0.0.1 - - [15/Dec/2025 22:42:18] "GET / HTTP/1.1" 200 -
+2025-12-15 22:42:18,338 - INFO - 127.0.0.1 - - [15/Dec/2025 22:42:18] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2025-12-15 22:42:18,339 - INFO - 127.0.0.1 - - [15/Dec/2025 22:42:18] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:42:18,339 - INFO - 127.0.0.1 - - [15/Dec/2025 22:42:18] "[36mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:42:18,341 - INFO - 127.0.0.1 - - [15/Dec/2025 22:42:18] "[36mGET /static/images/pool.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:42:18,389 - INFO - 127.0.0.1 - - [15/Dec/2025 22:42:18] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:42:18,389 - INFO - 127.0.0.1 - - [15/Dec/2025 22:42:18] "[36mGET /static/images/dining.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:42:18,392 - INFO - 127.0.0.1 - - [15/Dec/2025 22:42:18] "[36mGET /static/images/home-hero-bg.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:42:18,393 - INFO - 127.0.0.1 - - [15/Dec/2025 22:42:18] "[36mGET /static/images/home-am-bg.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:42:20,921 - INFO - 127.0.0.1 - - [15/Dec/2025 22:42:20] "GET /auth/profile HTTP/1.1" 200 -
+2025-12-15 22:42:20,936 - INFO - 127.0.0.1 - - [15/Dec/2025 22:42:20] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:42:20,937 - INFO - 127.0.0.1 - - [15/Dec/2025 22:42:20] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 22:42:20,938 - INFO - 127.0.0.1 - - [15/Dec/2025 22:42:20] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:42:22,532 - ERROR - Passkey registration begin error: 'str' object has no attribute 'value'
+2025-12-15 22:42:22,533 - INFO - 127.0.0.1 - - [15/Dec/2025 22:42:22] "[35m[1mPOST /auth/passkey/register/begin HTTP/1.1[0m" 500 -
+2025-12-15 22:42:53,104 - INFO -  * Detected change in '/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py', reloading
+2025-12-15 22:42:53,183 - INFO -  * Restarting with stat
+2025-12-15 22:42:53,394 - WARNING -  * Debugger is active!
+2025-12-15 22:42:53,399 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 22:43:14,033 - INFO - 127.0.0.1 - - [15/Dec/2025 22:43:14] "GET /auth/profile HTTP/1.1" 200 -
+2025-12-15 22:43:14,053 - INFO - 127.0.0.1 - - [15/Dec/2025 22:43:14] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:43:14,055 - INFO - 127.0.0.1 - - [15/Dec/2025 22:43:14] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 22:43:14,056 - INFO - 127.0.0.1 - - [15/Dec/2025 22:43:14] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:43:15,331 - ERROR - Passkey registration begin error: 'str' object has no attribute 'value'
+2025-12-15 22:43:15,332 - INFO - 127.0.0.1 - - [15/Dec/2025 22:43:15] "[35m[1mPOST /auth/passkey/register/begin HTTP/1.1[0m" 500 -
+2025-12-15 22:43:29,527 - INFO - 127.0.0.1 - - [15/Dec/2025 22:43:29] "GET / HTTP/1.1" 200 -
+2025-12-15 22:43:29,535 - INFO - 127.0.0.1 - - [15/Dec/2025 22:43:29] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:43:29,536 - INFO - 127.0.0.1 - - [15/Dec/2025 22:43:29] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2025-12-15 22:43:29,536 - INFO - 127.0.0.1 - - [15/Dec/2025 22:43:29] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:43:29,536 - INFO - 127.0.0.1 - - [15/Dec/2025 22:43:29] "[36mGET /static/images/dining.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:43:29,539 - INFO - 127.0.0.1 - - [15/Dec/2025 22:43:29] "[36mGET /static/images/pool.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:43:29,541 - INFO - 127.0.0.1 - - [15/Dec/2025 22:43:29] "[36mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:43:29,551 - INFO - 127.0.0.1 - - [15/Dec/2025 22:43:29] "[36mGET /static/images/home-hero-bg.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:43:29,551 - INFO - 127.0.0.1 - - [15/Dec/2025 22:43:29] "[36mGET /static/images/home-am-bg.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:43:29,558 - INFO - 127.0.0.1 - - [15/Dec/2025 22:43:29] "[33mGET /apple-touch-icon-precomposed.png HTTP/1.1[0m" 404 -
+2025-12-15 22:43:29,559 - INFO - 127.0.0.1 - - [15/Dec/2025 22:43:29] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-12-15 22:43:29,559 - INFO - 127.0.0.1 - - [15/Dec/2025 22:43:29] "[33mGET /apple-touch-icon.png HTTP/1.1[0m" 404 -
+2025-12-15 22:43:32,892 - INFO - 127.0.0.1 - - [15/Dec/2025 22:43:32] "GET /auth/login HTTP/1.1" 200 -
+2025-12-15 22:43:32,903 - INFO - 127.0.0.1 - - [15/Dec/2025 22:43:32] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 22:43:32,904 - INFO - 127.0.0.1 - - [15/Dec/2025 22:43:32] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:43:32,904 - INFO - 127.0.0.1 - - [15/Dec/2025 22:43:32] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:43:41,131 - INFO - Attempting to send OTP to lightbornfannypro@gmail.com
+2025-12-15 22:43:41,132 - INFO - Mail config - Server: smtp.gmail.com, Username: wellnest51@gmail.com, Password: ***
+2025-12-15 22:43:41,132 - INFO - Creating email message...
+2025-12-15 22:43:41,136 - INFO - Sending email via Flask-Mail...
+2025-12-15 22:43:43,603 - INFO - Email sent successfully!
+2025-12-15 22:43:43,606 - INFO - 127.0.0.1 - - [15/Dec/2025 22:43:43] "[32mPOST /auth/login HTTP/1.1[0m" 302 -
+2025-12-15 22:43:43,626 - INFO - 127.0.0.1 - - [15/Dec/2025 22:43:43] "GET /auth/verify-otp HTTP/1.1" 200 -
+2025-12-15 22:43:43,637 - INFO - 127.0.0.1 - - [15/Dec/2025 22:43:43] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:43:43,640 - INFO - 127.0.0.1 - - [15/Dec/2025 22:43:43] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 22:43:43,641 - INFO - 127.0.0.1 - - [15/Dec/2025 22:43:43] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:44:13,908 - INFO - 127.0.0.1 - - [15/Dec/2025 22:44:13] "[32mPOST /auth/verify-otp HTTP/1.1[0m" 302 -
+2025-12-15 22:44:13,918 - INFO - 127.0.0.1 - - [15/Dec/2025 22:44:13] "GET / HTTP/1.1" 200 -
+2025-12-15 22:44:13,931 - INFO - 127.0.0.1 - - [15/Dec/2025 22:44:13] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:44:13,933 - INFO - 127.0.0.1 - - [15/Dec/2025 22:44:13] "[36mGET /static/images/dining.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:44:13,933 - INFO - 127.0.0.1 - - [15/Dec/2025 22:44:13] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2025-12-15 22:44:13,934 - INFO - 127.0.0.1 - - [15/Dec/2025 22:44:13] "[36mGET /static/images/pool.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:44:13,935 - INFO - 127.0.0.1 - - [15/Dec/2025 22:44:13] "[36mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:44:13,935 - INFO - 127.0.0.1 - - [15/Dec/2025 22:44:13] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:44:13,944 - INFO - 127.0.0.1 - - [15/Dec/2025 22:44:13] "[36mGET /static/images/home-hero-bg.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:44:13,944 - INFO - 127.0.0.1 - - [15/Dec/2025 22:44:13] "[36mGET /static/images/home-am-bg.jpg HTTP/1.1[0m" 304 -
+2025-12-15 22:44:13,952 - INFO - 127.0.0.1 - - [15/Dec/2025 22:44:13] "[33mGET /apple-touch-icon-precomposed.png HTTP/1.1[0m" 404 -
+2025-12-15 22:44:13,952 - INFO - 127.0.0.1 - - [15/Dec/2025 22:44:13] "[33mGET /apple-touch-icon.png HTTP/1.1[0m" 404 -
+2025-12-15 22:44:13,953 - INFO - 127.0.0.1 - - [15/Dec/2025 22:44:13] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-12-15 22:44:15,581 - INFO - 127.0.0.1 - - [15/Dec/2025 22:44:15] "GET /auth/profile HTTP/1.1" 200 -
+2025-12-15 22:44:15,593 - INFO - 127.0.0.1 - - [15/Dec/2025 22:44:15] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:44:15,594 - INFO - 127.0.0.1 - - [15/Dec/2025 22:44:15] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 22:44:15,594 - INFO - 127.0.0.1 - - [15/Dec/2025 22:44:15] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:44:17,476 - ERROR - Passkey registration begin error: 'str' object has no attribute 'value'
+2025-12-15 22:44:17,477 - INFO - 127.0.0.1 - - [15/Dec/2025 22:44:17] "[35m[1mPOST /auth/passkey/register/begin HTTP/1.1[0m" 500 -
+2025-12-15 22:44:39,204 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001
+2025-12-15 22:44:39,204 - INFO - [33mPress CTRL+C to quit[0m
+2025-12-15 22:44:39,204 - INFO -  * Restarting with stat
+2025-12-15 22:44:39,343 - WARNING -  * Debugger is active!
+2025-12-15 22:44:39,347 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 22:44:45,561 - INFO - 127.0.0.1 - - [15/Dec/2025 22:44:45] "GET /auth/profile HTTP/1.1" 200 -
+2025-12-15 22:44:45,577 - INFO - 127.0.0.1 - - [15/Dec/2025 22:44:45] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:44:45,577 - INFO - 127.0.0.1 - - [15/Dec/2025 22:44:45] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 22:44:45,577 - INFO - 127.0.0.1 - - [15/Dec/2025 22:44:45] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:44:47,756 - ERROR - Passkey registration begin error: 'str' object has no attribute 'value'
+2025-12-15 22:44:47,758 - INFO - 127.0.0.1 - - [15/Dec/2025 22:44:47] "[35m[1mPOST /auth/passkey/register/begin HTTP/1.1[0m" 500 -
+2025-12-15 22:45:08,098 - ERROR - Passkey registration begin error: 'str' object has no attribute 'value'
+2025-12-15 22:45:08,099 - INFO - 127.0.0.1 - - [15/Dec/2025 22:45:08] "[35m[1mPOST /auth/passkey/register/begin HTTP/1.1[0m" 500 -
+2025-12-15 22:45:12,519 - INFO - 127.0.0.1 - - [15/Dec/2025 22:45:12] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:45:12,520 - INFO - 127.0.0.1 - - [15/Dec/2025 22:45:12] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 22:45:12,524 - INFO - 127.0.0.1 - - [15/Dec/2025 22:45:12] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-12-15 22:45:35,819 - INFO -  * Detected change in '/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py', reloading
+2025-12-15 22:45:35,897 - INFO -  * Restarting with stat
+2025-12-15 22:45:36,085 - WARNING -  * Debugger is active!
+2025-12-15 22:45:36,089 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 22:45:52,227 - INFO -  * Detected change in '/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py', reloading
+2025-12-15 22:45:52,296 - INFO -  * Restarting with stat
+2025-12-15 22:45:52,487 - WARNING -  * Debugger is active!
+2025-12-15 22:45:52,491 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 22:48:16,118 - INFO - 127.0.0.1 - - [15/Dec/2025 22:48:16] "GET /auth/profile HTTP/1.1" 200 -
+2025-12-15 22:48:16,139 - INFO - 127.0.0.1 - - [15/Dec/2025 22:48:16] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:48:16,139 - INFO - 127.0.0.1 - - [15/Dec/2025 22:48:16] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 22:48:16,140 - INFO - 127.0.0.1 - - [15/Dec/2025 22:48:16] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:48:17,843 - INFO - 127.0.0.1 - - [15/Dec/2025 22:48:17] "GET /auth/profile HTTP/1.1" 200 -
+2025-12-15 22:48:17,854 - INFO - 127.0.0.1 - - [15/Dec/2025 22:48:17] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 22:48:17,855 - INFO - 127.0.0.1 - - [15/Dec/2025 22:48:17] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:48:17,856 - INFO - 127.0.0.1 - - [15/Dec/2025 22:48:17] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:48:18,791 - INFO - 127.0.0.1 - - [15/Dec/2025 22:48:18] "POST /auth/passkey/register/begin HTTP/1.1" 200 -
+2025-12-15 22:48:27,556 - INFO - 127.0.0.1 - - [15/Dec/2025 22:48:27] "POST /auth/passkey/register/begin HTTP/1.1" 200 -
+2025-12-15 22:48:38,143 - INFO - 127.0.0.1 - - [15/Dec/2025 22:48:38] "POST /auth/passkey/register/begin HTTP/1.1" 200 -
+2025-12-15 22:48:42,680 - ERROR - Passkey registration error: Credential missing required rawId
+2025-12-15 22:48:42,681 - INFO - 127.0.0.1 - - [15/Dec/2025 22:48:42] "[31m[1mPOST /auth/passkey/register/complete HTTP/1.1[0m" 400 -
+2025-12-15 22:49:55,470 - INFO -  * Detected change in '/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py', reloading
+2025-12-15 22:49:55,547 - INFO -  * Restarting with stat
+2025-12-15 22:49:55,761 - WARNING -  * Debugger is active!
+2025-12-15 22:49:55,765 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 22:50:04,851 - INFO -  * Detected change in '/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py', reloading
+2025-12-15 22:50:04,926 - INFO -  * Restarting with stat
+2025-12-15 22:50:05,088 - WARNING -  * Debugger is active!
+2025-12-15 22:50:05,092 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 22:51:02,548 - INFO - 127.0.0.1 - - [15/Dec/2025 22:51:02] "GET /auth/profile HTTP/1.1" 200 -
+2025-12-15 22:51:02,569 - INFO - 127.0.0.1 - - [15/Dec/2025 22:51:02] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 22:51:02,570 - INFO - 127.0.0.1 - - [15/Dec/2025 22:51:02] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:51:02,570 - INFO - 127.0.0.1 - - [15/Dec/2025 22:51:02] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:51:03,776 - INFO - 127.0.0.1 - - [15/Dec/2025 22:51:03] "POST /auth/passkey/register/begin HTTP/1.1" 200 -
+2025-12-15 22:51:09,933 - INFO - Received credential: {'id': 'i-mGBPBoaFybcFiAJh3m6U2f_LM', 'rawId': 'i-mGBPBoaFybcFiAJh3m6U2f_LM', 'type': 'public-key', 'response': {'clientDataJSON': 'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiZ214bUNwNUtjX0dDWmVsLWd2SlRacWJHYkR1cnV2T0hNQnlwTUsxLXNyTG1iakM0NEh2VDRDSFFzRVAzbXpzSnNyemVlUmJUOTNVX2tqcnFJNGVPYXciLCJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0OjUwMDEiLCJjcm9zc09yaWdpbiI6ZmFsc2V9', 'attestationObject': 'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YViYSZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NdAAAAAPv8MAcVTk7MjAtuAgVX170AFIvphgTwaGhcm3BYgCYd5ulNn_yzpQECAyYgASFYIKrAr5JBwqjNmkMXmafhpEy4jifguUEU5EWmrp5DcL3zIlggG59bnE3Axj4IIA4gQYdmBwgq80x7z8V1D-VTv2u1kvM'}}
+2025-12-15 22:51:09,933 - INFO - Credential keys: dict_keys(['id', 'rawId', 'type', 'response'])
+2025-12-15 22:51:09,933 - ERROR - Passkey registration error: Credential missing required rawId
+2025-12-15 22:51:09,933 - INFO - 127.0.0.1 - - [15/Dec/2025 22:51:09] "[31m[1mPOST /auth/passkey/register/complete HTTP/1.1[0m" 400 -
+2025-12-15 22:51:16,569 - INFO - 127.0.0.1 - - [15/Dec/2025 22:51:16] "GET /auth/profile HTTP/1.1" 200 -
+2025-12-15 22:51:16,578 - INFO - 127.0.0.1 - - [15/Dec/2025 22:51:16] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 22:51:16,578 - INFO - 127.0.0.1 - - [15/Dec/2025 22:51:16] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:51:16,579 - INFO - 127.0.0.1 - - [15/Dec/2025 22:51:16] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:51:17,725 - INFO - 127.0.0.1 - - [15/Dec/2025 22:51:17] "POST /auth/passkey/register/begin HTTP/1.1" 200 -
+2025-12-15 22:51:22,320 - INFO - Received credential: {'id': 'cDK3RSyIk4cLzFkGTE26zZAD1SU', 'rawId': 'cDK3RSyIk4cLzFkGTE26zZAD1SU', 'type': 'public-key', 'response': {'clientDataJSON': 'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiRE12ckI1X0JMa01hREU5WkZBX3ZqNm5UbG1ZaDc0Q0plQkk3NXJRM1JYNzBvcThOMWtGT3kxNDBUeWJlanpGLUZfY1prR00yUURGeV9TSlU1WFVZUlEiLCJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0OjUwMDEiLCJjcm9zc09yaWdpbiI6ZmFsc2V9', 'attestationObject': 'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YViYSZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NdAAAAAPv8MAcVTk7MjAtuAgVX170AFHAyt0UsiJOHC8xZBkxNus2QA9UlpQECAyYgASFYIPxlfzUr7U5FblqV1VsSG0XUSaVIRBsKyFUo1iahzILfIlggUaBG04T4hMWodFMfM5T54Q3tqGKlT7lrXGquRER3mO0'}}
+2025-12-15 22:51:22,320 - INFO - Credential keys: dict_keys(['id', 'rawId', 'type', 'response'])
+2025-12-15 22:51:22,320 - ERROR - Passkey registration error: Credential missing required rawId
+2025-12-15 22:51:22,321 - INFO - 127.0.0.1 - - [15/Dec/2025 22:51:22] "[31m[1mPOST /auth/passkey/register/complete HTTP/1.1[0m" 400 -
+2025-12-15 22:52:54,165 - INFO - 127.0.0.1 - - [15/Dec/2025 22:52:54] "POST /auth/passkey/register/begin HTTP/1.1" 200 -
+2025-12-15 22:52:59,309 - INFO - Received credential: {'id': '6K6gXTGRUdk8Q92PiR3AI9Xm1bU', 'rawId': '6K6gXTGRUdk8Q92PiR3AI9Xm1bU', 'type': 'public-key', 'response': {'clientDataJSON': 'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiaF9BWHNjaEVSWWFST0pwem9zVWRLTklpQi1RVGhFdjFDYkUxS2dKZHUtZWl4RW1ybkc1RzgtV0NfYnJCa2VTcUQ2a3ZzU3I4VHdRLUtSU0VDZ0NaR1EiLCJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0OjUwMDEiLCJjcm9zc09yaWdpbiI6ZmFsc2V9', 'attestationObject': 'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YViYSZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NdAAAAAPv8MAcVTk7MjAtuAgVX170AFOiuoF0xkVHZPEPdj4kdwCPV5tW1pQECAyYgASFYIDnY5fKUXWGyDXNAThTj8s2h90B_yAHrhpp8qFVX6PYdIlggmLOhmcpF0d84LxVMRx2GZdFC3-Qh8OuAfZsFWxivf5U'}}
+2025-12-15 22:52:59,310 - INFO - Credential keys: dict_keys(['id', 'rawId', 'type', 'response'])
+2025-12-15 22:52:59,310 - ERROR - Passkey registration error: Credential missing required rawId
+2025-12-15 22:52:59,310 - INFO - 127.0.0.1 - - [15/Dec/2025 22:52:59] "[31m[1mPOST /auth/passkey/register/complete HTTP/1.1[0m" 400 -
+2025-12-15 22:53:04,267 - INFO - 127.0.0.1 - - [15/Dec/2025 22:53:04] "GET /auth/profile HTTP/1.1" 200 -
+2025-12-15 22:53:04,277 - INFO - 127.0.0.1 - - [15/Dec/2025 22:53:04] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:53:04,277 - INFO - 127.0.0.1 - - [15/Dec/2025 22:53:04] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 22:53:04,278 - INFO - 127.0.0.1 - - [15/Dec/2025 22:53:04] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:53:16,308 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001
+2025-12-15 22:53:16,309 - INFO - [33mPress CTRL+C to quit[0m
+2025-12-15 22:53:16,309 - INFO -  * Restarting with stat
+2025-12-15 22:53:16,445 - WARNING -  * Debugger is active!
+2025-12-15 22:53:16,450 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 22:53:18,109 - INFO - 127.0.0.1 - - [15/Dec/2025 22:53:18] "GET /auth/profile HTTP/1.1" 200 -
+2025-12-15 22:53:18,132 - INFO - 127.0.0.1 - - [15/Dec/2025 22:53:18] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:53:18,132 - INFO - 127.0.0.1 - - [15/Dec/2025 22:53:18] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:53:18,133 - INFO - 127.0.0.1 - - [15/Dec/2025 22:53:18] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 22:53:19,510 - INFO - 127.0.0.1 - - [15/Dec/2025 22:53:19] "POST /auth/passkey/register/begin HTTP/1.1" 200 -
+2025-12-15 22:53:24,237 - INFO - Received credential: {'id': 'bnGDWluImj052WOdH6Nw7H1I6TE', 'rawId': 'bnGDWluImj052WOdH6Nw7H1I6TE', 'type': 'public-key', 'response': {'clientDataJSON': 'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiSS10WjFfVzVCWGktRWN5N0hsVlo2MWI0SV9XblMtZ1h0ZXlZd280ZlhJMjdoSTJWRldCazRzZWVDdEpsMTdIcnlxTWVTT0tNSUc5ZUNLRTF0cEc2amciLCJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0OjUwMDEiLCJjcm9zc09yaWdpbiI6ZmFsc2V9', 'attestationObject': 'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YViYSZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NdAAAAAPv8MAcVTk7MjAtuAgVX170AFG5xg1pbiJo9OdljnR-jcOx9SOkxpQECAyYgASFYIO2GN_5nrm8jtSDgz23eKDZRW9NHMWTNarB7ANW_UuaNIlggXC6V6Srg_mXxilNx2yP77NjQkaF1QjXgysGCzc1ITtU'}}
+2025-12-15 22:53:24,237 - INFO - Credential keys: dict_keys(['id', 'rawId', 'type', 'response'])
+2025-12-15 22:53:24,237 - ERROR - Passkey registration error: Credential missing required rawId
+2025-12-15 22:53:24,238 - INFO - 127.0.0.1 - - [15/Dec/2025 22:53:24] "[31m[1mPOST /auth/passkey/register/complete HTTP/1.1[0m" 400 -
+2025-12-15 22:56:15,196 - INFO - 127.0.0.1 - - [15/Dec/2025 22:56:15] "POST /auth/passkey/register/begin HTTP/1.1" 200 -
+2025-12-15 22:56:20,525 - INFO - Received credential: {'id': 'Gn79XEjvVOfuVnjn5X03Nk-ryHQ', 'rawId': 'Gn79XEjvVOfuVnjn5X03Nk-ryHQ', 'type': 'public-key', 'response': {'clientDataJSON': 'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiX1pCdm1NOTlidnpyclo2Rk1XUm9LaHg3SGhwbkhyM3I5WlliOFF4ZUNxWWZLZmpscUliUGdGc3dDcmM1VXlndzJmZHctUGVwT0ozSzh0UkNPTGlsdUEiLCJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0OjUwMDEiLCJjcm9zc09yaWdpbiI6ZmFsc2V9', 'attestationObject': 'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YViYSZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NdAAAAAPv8MAcVTk7MjAtuAgVX170AFBp-_VxI71Tn7lZ45-V9NzZPq8h0pQECAyYgASFYIMeTHvVtOXpMWI45InP0E1Og94MvoSNYjLielBpjnwoIIlgglyVuP0VfDFrFWwYkn3x2ewLiV9OPZMxKxqK1K4pWKxA'}}
+2025-12-15 22:56:20,525 - INFO - Credential keys: dict_keys(['id', 'rawId', 'type', 'response'])
+2025-12-15 22:56:20,525 - ERROR - Passkey registration error: Credential missing required rawId
+2025-12-15 22:56:20,526 - INFO - 127.0.0.1 - - [15/Dec/2025 22:56:20] "[31m[1mPOST /auth/passkey/register/complete HTTP/1.1[0m" 400 -
+2025-12-15 22:57:18,407 - INFO -  * Detected change in '/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py', reloading
+2025-12-15 22:57:18,465 - INFO -  * Restarting with stat
+2025-12-15 22:57:18,714 - WARNING -  * Debugger is active!
+2025-12-15 22:57:18,718 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 22:57:50,320 - INFO - 127.0.0.1 - - [15/Dec/2025 22:57:50] "GET /auth/profile HTTP/1.1" 200 -
+2025-12-15 22:57:50,341 - INFO - 127.0.0.1 - - [15/Dec/2025 22:57:50] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 22:57:50,342 - INFO - 127.0.0.1 - - [15/Dec/2025 22:57:50] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 22:57:50,342 - INFO - 127.0.0.1 - - [15/Dec/2025 22:57:50] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 22:57:51,241 - INFO - 127.0.0.1 - - [15/Dec/2025 22:57:51] "POST /auth/passkey/register/begin HTTP/1.1" 200 -
+2025-12-15 22:57:56,420 - INFO - Received credential data
+2025-12-15 22:57:56,420 - ERROR - Passkey registration error: Credential missing required rawId
+2025-12-15 22:57:56,424 - ERROR - Traceback: Traceback (most recent call last):
+  File "/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py", line 584, in passkey_register_complete
+    verification = verify_registration_response(
+        credential={
+    ...<10 lines>...
+        expected_rp_id=request.host.split(':')[0],
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/webauthn/registration/verify_registration_response.py", line 102, in verify_registration_response
+    credential = parse_registration_credential_json(credential)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/webauthn/helpers/parse_registration_credential_json.py", line 36, in parse_registration_credential_json
+    raise InvalidJSONStructure("Credential missing required rawId")
+webauthn.helpers.exceptions.InvalidJSONStructure: Credential missing required rawId
+
+2025-12-15 22:57:56,424 - INFO - 127.0.0.1 - - [15/Dec/2025 22:57:56] "[31m[1mPOST /auth/passkey/register/complete HTTP/1.1[0m" 400 -
+2025-12-15 22:59:01,518 - INFO -  * Detected change in '/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py', reloading
+2025-12-15 22:59:01,568 - INFO -  * Restarting with stat
+2025-12-15 22:59:01,801 - WARNING -  * Debugger is active!
+2025-12-15 22:59:01,805 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 22:59:42,375 - INFO - 127.0.0.1 - - [15/Dec/2025 22:59:42] "POST /auth/passkey/register/begin HTTP/1.1" 200 -
+2025-12-15 22:59:47,135 - INFO - === PASSKEY REGISTRATION DEBUG ===
+2025-12-15 22:59:47,136 - INFO - Credential received: {
+  "id": "6snuYIKiAN10aPiifdFgm3cWo1U",
+  "rawId": "6snuYIKiAN10aPiifdFgm3cWo1U",
+  "type": "public-key",
+  "response": {
+    "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoicUJuUF9BRUhWUXJDMzluYWNGT0JVNUtTNWlORV9JaHVGdk41WkIxMlY2cW5scFNoV0RmdUttb253aGdEQlNuUmFrOUNtdUN6MzRraTF1X1lwOVlnZnciLCJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0OjUwMDEiLCJjcm9zc09yaWdpbiI6ZmFsc2V9",
+    "attestationObject": "o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YViYSZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NdAAAAAPv8MAcVTk7MjAtuAgVX170AFOrJ7mCCogDddGj4on3RYJt3FqNVpQECAyYgASFYIOblq69xxYykErsd_n2ZHo5vOcxoDKL_RfXEF5YSMXI8IlggAl9r84Nubr-3sXg9RK9aGajNMK44wgQOwTHg9TSTVyA"
+  }
+}
+2025-12-15 22:59:47,136 - INFO - Credential type: <class 'dict'>
+2025-12-15 22:59:47,136 - INFO - Credential keys: ['id', 'rawId', 'type', 'response']
+2025-12-15 22:59:47,136 - INFO - Looking for credential ID...
+2025-12-15 22:59:47,136 - INFO - credential.get('rawId'): 6snuYIKiAN10aPiifdFgm3cWo1U
+2025-12-15 22:59:47,136 - INFO - credential.get('id'): 6snuYIKiAN10aPiifdFgm3cWo1U
+2025-12-15 22:59:47,136 - ERROR - Passkey registration error: Credential missing required rawId
+2025-12-15 22:59:47,140 - ERROR - Traceback: Traceback (most recent call last):
+  File "/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py", line 593, in passkey_register_complete
+    verification = verify_registration_response(
+        credential={
+    ...<10 lines>...
+        expected_rp_id=request.host.split(':')[0],
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/webauthn/registration/verify_registration_response.py", line 102, in verify_registration_response
+    credential = parse_registration_credential_json(credential)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/webauthn/helpers/parse_registration_credential_json.py", line 36, in parse_registration_credential_json
+    raise InvalidJSONStructure("Credential missing required rawId")
+webauthn.helpers.exceptions.InvalidJSONStructure: Credential missing required rawId
+
+2025-12-15 22:59:47,141 - INFO - 127.0.0.1 - - [15/Dec/2025 22:59:47] "[31m[1mPOST /auth/passkey/register/complete HTTP/1.1[0m" 400 -
+2025-12-15 23:00:26,740 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001
+2025-12-15 23:00:26,740 - INFO - [33mPress CTRL+C to quit[0m
+2025-12-15 23:00:26,741 - INFO -  * Restarting with stat
+2025-12-15 23:00:26,882 - WARNING -  * Debugger is active!
+2025-12-15 23:00:26,886 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 23:00:33,950 - INFO - 127.0.0.1 - - [15/Dec/2025 23:00:33] "POST /auth/passkey/register/begin HTTP/1.1" 200 -
+2025-12-15 23:00:38,359 - INFO - 127.0.0.1 - - [15/Dec/2025 23:00:38] "GET /auth/profile HTTP/1.1" 200 -
+2025-12-15 23:00:38,382 - INFO - 127.0.0.1 - - [15/Dec/2025 23:00:38] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 23:00:38,382 - INFO - 127.0.0.1 - - [15/Dec/2025 23:00:38] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 23:00:38,382 - INFO - 127.0.0.1 - - [15/Dec/2025 23:00:38] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 23:00:39,614 - INFO - 127.0.0.1 - - [15/Dec/2025 23:00:39] "POST /auth/passkey/register/begin HTTP/1.1" 200 -
+2025-12-15 23:00:44,368 - INFO - === PASSKEY REGISTRATION DEBUG ===
+2025-12-15 23:00:44,369 - INFO - Credential received: {
+  "id": "Bfv6lU7Oh8aLnrgzkJMTVP3SAls",
+  "rawId": "Bfv6lU7Oh8aLnrgzkJMTVP3SAls",
+  "type": "public-key",
+  "response": {
+    "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoidnNWaC1SR1BzUFYwbmY5UURZYmYtbXNUa0pHak1fZ3N5bUsxWmxUZWRsZ0piV1hMWDBLN0xwbkViMGFxaXlfdVo5RFlBZlRWRXE3cTZoRmpJWFZBNlEiLCJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0OjUwMDEiLCJjcm9zc09yaWdpbiI6ZmFsc2V9",
+    "attestationObject": "o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YViYSZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NdAAAAAPv8MAcVTk7MjAtuAgVX170AFAX7-pVOzofGi564M5CTE1T90gJbpQECAyYgASFYIDgzQ1CIULb4Wu_9z0cy_SsiHHXITtCEGBn2pgBieI5DIlgg-K1d5oBcArPmg9iDtSGlJ3VmdXL_mp9YgZP8m_ujy5g"
+  }
+}
+2025-12-15 23:00:44,369 - INFO - Credential type: <class 'dict'>
+2025-12-15 23:00:44,369 - INFO - Credential keys: ['id', 'rawId', 'type', 'response']
+2025-12-15 23:00:44,369 - INFO - Looking for credential ID...
+2025-12-15 23:00:44,369 - INFO - credential.get('rawId'): Bfv6lU7Oh8aLnrgzkJMTVP3SAls
+2025-12-15 23:00:44,369 - INFO - credential.get('id'): Bfv6lU7Oh8aLnrgzkJMTVP3SAls
+2025-12-15 23:00:44,369 - ERROR - Passkey registration error: Credential missing required rawId
+2025-12-15 23:00:44,373 - ERROR - Traceback: Traceback (most recent call last):
+  File "/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py", line 593, in passkey_register_complete
+    verification = verify_registration_response(
+        credential={
+    ...<10 lines>...
+        expected_rp_id=request.host.split(':')[0],
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/webauthn/registration/verify_registration_response.py", line 102, in verify_registration_response
+    credential = parse_registration_credential_json(credential)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/webauthn/helpers/parse_registration_credential_json.py", line 36, in parse_registration_credential_json
+    raise InvalidJSONStructure("Credential missing required rawId")
+webauthn.helpers.exceptions.InvalidJSONStructure: Credential missing required rawId
+
+2025-12-15 23:00:44,373 - INFO - 127.0.0.1 - - [15/Dec/2025 23:00:44] "[31m[1mPOST /auth/passkey/register/complete HTTP/1.1[0m" 400 -
+2025-12-15 23:02:00,608 - INFO -  * Detected change in '/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py', reloading
+2025-12-15 23:02:00,681 - INFO -  * Restarting with stat
+2025-12-15 23:02:00,932 - WARNING -  * Debugger is active!
+2025-12-15 23:02:00,936 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 23:02:35,019 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001
+2025-12-15 23:02:35,019 - INFO - [33mPress CTRL+C to quit[0m
+2025-12-15 23:02:35,020 - INFO -  * Restarting with stat
+2025-12-15 23:02:35,161 - WARNING -  * Debugger is active!
+2025-12-15 23:02:35,165 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 23:02:44,758 - INFO - 127.0.0.1 - - [15/Dec/2025 23:02:44] "POST /auth/passkey/register/begin HTTP/1.1" 200 -
+2025-12-15 23:02:49,812 - INFO - === PASSKEY REGISTER COMPLETE ENDPOINT HIT ===
+2025-12-15 23:02:49,812 - INFO - Session user_id: 2
+2025-12-15 23:02:49,812 - INFO - Session passkey_challenge: wh9nI3VoyrVKYAzMlW9YYNmh5lWZYgEWZmF5_gDxEQnDJf443cIv8rxlRScEmmtBeLyPGvT7No3TqK6YtWJejA
+2025-12-15 23:02:49,813 - INFO - === PASSKEY REGISTRATION DEBUG ===
+2025-12-15 23:02:49,813 - INFO - Credential received: {
+  "id": "Mpgaqy5dicbpFenAEEKH7O9iWkI",
+  "rawId": "Mpgaqy5dicbpFenAEEKH7O9iWkI",
+  "type": "public-key",
+  "response": {
+    "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoid2g5bkkzVm95clZLWUF6TWxXOVlZTm1oNWxXWllnRVdabUY1X2dEeEVRbkRKZjQ0M2NJdjhyeGxSU2NFbW10QmVMeVBHdlQ3Tm8zVHFLNll0V0plakEiLCJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0OjUwMDEiLCJjcm9zc09yaWdpbiI6ZmFsc2V9",
+    "attestationObject": "o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YViYSZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NdAAAAAPv8MAcVTk7MjAtuAgVX170AFDKYGqsuXYnG6RXpwBBCh-zvYlpCpQECAyYgASFYIN-sSPClCxTe9sarm4PKj6qJok8CnXUJttmPHTbeMEKuIlggVqbMy4MwIXCHS9Ro4DJ6s-vK4tH0mt6bKXI8wUJ9_yQ"
+  }
+}
+2025-12-15 23:02:49,813 - INFO - Credential type: <class 'dict'>
+2025-12-15 23:02:49,813 - INFO - Credential keys: ['id', 'rawId', 'type', 'response']
+2025-12-15 23:02:49,813 - INFO - Looking for credential ID...
+2025-12-15 23:02:49,813 - INFO - credential.get('rawId'): Mpgaqy5dicbpFenAEEKH7O9iWkI
+2025-12-15 23:02:49,813 - INFO - credential.get('id'): Mpgaqy5dicbpFenAEEKH7O9iWkI
+2025-12-15 23:02:49,813 - ERROR - Passkey registration error: Credential missing required rawId
+2025-12-15 23:02:49,816 - ERROR - Traceback: Traceback (most recent call last):
+  File "/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py", line 599, in passkey_register_complete
+    verification = verify_registration_response(
+        credential={
+    ...<10 lines>...
+        expected_rp_id=request.host.split(':')[0],
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/webauthn/registration/verify_registration_response.py", line 102, in verify_registration_response
+    credential = parse_registration_credential_json(credential)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/webauthn/helpers/parse_registration_credential_json.py", line 36, in parse_registration_credential_json
+    raise InvalidJSONStructure("Credential missing required rawId")
+webauthn.helpers.exceptions.InvalidJSONStructure: Credential missing required rawId
+
+2025-12-15 23:02:49,816 - INFO - 127.0.0.1 - - [15/Dec/2025 23:02:49] "[31m[1mPOST /auth/passkey/register/complete HTTP/1.1[0m" 400 -
+2025-12-15 23:02:59,579 - INFO - 127.0.0.1 - - [15/Dec/2025 23:02:59] "GET / HTTP/1.1" 200 -
+2025-12-15 23:02:59,581 - INFO - 127.0.0.1 - - [15/Dec/2025 23:02:59] "[33mGET /static/webauthn.js HTTP/1.1[0m" 404 -
+2025-12-15 23:02:59,592 - INFO - 127.0.0.1 - - [15/Dec/2025 23:02:59] "GET /static/css/home.css HTTP/1.1" 200 -
+2025-12-15 23:02:59,592 - INFO - 127.0.0.1 - - [15/Dec/2025 23:02:59] "GET /static/css/Header&Footer.css HTTP/1.1" 200 -
+2025-12-15 23:02:59,598 - INFO - 127.0.0.1 - - [15/Dec/2025 23:02:59] "GET /static/images/luxury-suite.jpg HTTP/1.1" 200 -
+2025-12-15 23:02:59,599 - INFO - 127.0.0.1 - - [15/Dec/2025 23:02:59] "GET /static/images/pool.jpg HTTP/1.1" 200 -
+2025-12-15 23:02:59,612 - INFO - 127.0.0.1 - - [15/Dec/2025 23:02:59] "GET /static/images/dining.jpg HTTP/1.1" 200 -
+2025-12-15 23:02:59,614 - INFO - 127.0.0.1 - - [15/Dec/2025 23:02:59] "GET /static/images/qrcode.png HTTP/1.1" 200 -
+2025-12-15 23:03:02,008 - INFO - 127.0.0.1 - - [15/Dec/2025 23:03:02] "GET /static/images/home-hero-bg.jpg HTTP/1.1" 200 -
+2025-12-15 23:03:02,008 - INFO - 127.0.0.1 - - [15/Dec/2025 23:03:02] "GET /static/images/home-am-bg.jpg HTTP/1.1" 200 -
+2025-12-15 23:03:02,014 - INFO - 127.0.0.1 - - [15/Dec/2025 23:03:02] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-12-15 23:03:03,055 - INFO - 127.0.0.1 - - [15/Dec/2025 23:03:03] "[33mGET /apple-touch-icon-precomposed.png HTTP/1.1[0m" 404 -
+2025-12-15 23:03:03,145 - INFO - 127.0.0.1 - - [15/Dec/2025 23:03:03] "[33mGET /apple-touch-icon.png HTTP/1.1[0m" 404 -
+2025-12-15 23:03:07,393 - INFO - 127.0.0.1 - - [15/Dec/2025 23:03:07] "GET /auth/login HTTP/1.1" 200 -
+2025-12-15 23:03:07,403 - INFO - 127.0.0.1 - - [15/Dec/2025 23:03:07] "GET /static/css/auth.css HTTP/1.1" 200 -
+2025-12-15 23:03:07,403 - INFO - 127.0.0.1 - - [15/Dec/2025 23:03:07] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 23:03:07,404 - INFO - 127.0.0.1 - - [15/Dec/2025 23:03:07] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 23:03:20,200 - INFO - Attempting to send OTP to lightbornfannypro@gmail.com
+2025-12-15 23:03:20,200 - INFO - Mail config - Server: smtp.gmail.com, Username: wellnest51@gmail.com, Password: ***
+2025-12-15 23:03:20,200 - INFO - Creating email message...
+2025-12-15 23:03:20,203 - INFO - Sending email via Flask-Mail...
+2025-12-15 23:03:24,539 - INFO - Email sent successfully!
+2025-12-15 23:03:24,541 - INFO - 127.0.0.1 - - [15/Dec/2025 23:03:24] "[32mPOST /auth/login HTTP/1.1[0m" 302 -
+2025-12-15 23:03:24,562 - INFO - 127.0.0.1 - - [15/Dec/2025 23:03:24] "GET /auth/verify-otp HTTP/1.1" 200 -
+2025-12-15 23:03:24,582 - INFO - 127.0.0.1 - - [15/Dec/2025 23:03:24] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 23:03:24,582 - INFO - 127.0.0.1 - - [15/Dec/2025 23:03:24] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 23:03:24,582 - INFO - 127.0.0.1 - - [15/Dec/2025 23:03:24] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 23:03:36,680 - INFO - 127.0.0.1 - - [15/Dec/2025 23:03:36] "[32mPOST /auth/verify-otp HTTP/1.1[0m" 302 -
+2025-12-15 23:03:36,688 - INFO - 127.0.0.1 - - [15/Dec/2025 23:03:36] "GET / HTTP/1.1" 200 -
+2025-12-15 23:03:36,700 - INFO - 127.0.0.1 - - [15/Dec/2025 23:03:36] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 23:03:36,705 - INFO - 127.0.0.1 - - [15/Dec/2025 23:03:36] "[36mGET /static/images/dining.jpg HTTP/1.1[0m" 304 -
+2025-12-15 23:03:36,705 - INFO - 127.0.0.1 - - [15/Dec/2025 23:03:36] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2025-12-15 23:03:36,707 - INFO - 127.0.0.1 - - [15/Dec/2025 23:03:36] "[36mGET /static/images/pool.jpg HTTP/1.1[0m" 304 -
+2025-12-15 23:03:36,707 - INFO - 127.0.0.1 - - [15/Dec/2025 23:03:36] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 23:03:36,708 - INFO - 127.0.0.1 - - [15/Dec/2025 23:03:36] "[36mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 304 -
+2025-12-15 23:03:36,714 - INFO - 127.0.0.1 - - [15/Dec/2025 23:03:36] "[36mGET /static/images/home-am-bg.jpg HTTP/1.1[0m" 304 -
+2025-12-15 23:03:36,714 - INFO - 127.0.0.1 - - [15/Dec/2025 23:03:36] "[36mGET /static/images/home-hero-bg.jpg HTTP/1.1[0m" 304 -
+2025-12-15 23:03:38,358 - INFO - 127.0.0.1 - - [15/Dec/2025 23:03:38] "GET /auth/profile HTTP/1.1" 200 -
+2025-12-15 23:03:38,372 - INFO - 127.0.0.1 - - [15/Dec/2025 23:03:38] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 23:03:38,373 - INFO - 127.0.0.1 - - [15/Dec/2025 23:03:38] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 23:03:38,373 - INFO - 127.0.0.1 - - [15/Dec/2025 23:03:38] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 23:03:39,676 - INFO - 127.0.0.1 - - [15/Dec/2025 23:03:39] "POST /auth/passkey/register/begin HTTP/1.1" 200 -
+2025-12-15 23:03:47,469 - INFO - 127.0.0.1 - - [15/Dec/2025 23:03:47] "POST /auth/passkey/register/begin HTTP/1.1" 200 -
+2025-12-15 23:04:16,838 - INFO - 127.0.0.1 - - [15/Dec/2025 23:04:16] "POST /auth/passkey/register/begin HTTP/1.1" 200 -
+2025-12-15 23:05:09,412 - INFO -  * Detected change in '/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py', reloading
+2025-12-15 23:05:09,482 - INFO -  * Restarting with stat
+2025-12-15 23:05:09,721 - WARNING -  * Debugger is active!
+2025-12-15 23:05:09,725 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 23:05:20,827 - INFO -  * Detected change in '/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py', reloading
+2025-12-15 23:05:20,895 - INFO -  * Restarting with stat
+2025-12-15 23:05:21,056 - WARNING -  * Debugger is active!
+2025-12-15 23:05:21,060 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 23:05:40,218 - INFO -  * Detected change in '/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py', reloading
+2025-12-15 23:05:40,277 - INFO -  * Restarting with stat
+2025-12-15 23:05:40,446 - WARNING -  * Debugger is active!
+2025-12-15 23:05:40,450 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 23:05:50,524 - INFO -  * Detected change in '/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py', reloading
+2025-12-15 23:05:50,598 - INFO -  * Restarting with stat
+2025-12-15 23:05:50,755 - WARNING -  * Debugger is active!
+2025-12-15 23:05:50,759 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 23:06:11,727 - INFO - 127.0.0.1 - - [15/Dec/2025 23:06:11] "GET /auth/profile HTTP/1.1" 200 -
+2025-12-15 23:06:11,747 - INFO - 127.0.0.1 - - [15/Dec/2025 23:06:11] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 23:06:11,747 - INFO - 127.0.0.1 - - [15/Dec/2025 23:06:11] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 23:06:11,756 - INFO - 127.0.0.1 - - [15/Dec/2025 23:06:11] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 23:06:12,843 - INFO - 127.0.0.1 - - [15/Dec/2025 23:06:12] "POST /auth/passkey/register/begin HTTP/1.1" 200 -
+2025-12-15 23:06:45,200 - INFO -  * Detected change in '/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py', reloading
+2025-12-15 23:06:45,253 - INFO -  * Restarting with stat
+2025-12-15 23:06:45,436 - WARNING -  * Debugger is active!
+2025-12-15 23:06:45,441 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 23:06:57,345 - INFO - 127.0.0.1 - - [15/Dec/2025 23:06:57] "POST /auth/passkey/register/begin HTTP/1.1" 200 -
+2025-12-15 23:06:59,552 - INFO - 127.0.0.1 - - [15/Dec/2025 23:06:59] "GET /auth/profile HTTP/1.1" 200 -
+2025-12-15 23:06:59,577 - INFO - 127.0.0.1 - - [15/Dec/2025 23:06:59] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 23:06:59,578 - INFO - 127.0.0.1 - - [15/Dec/2025 23:06:59] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 23:06:59,578 - INFO - 127.0.0.1 - - [15/Dec/2025 23:06:59] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 23:07:00,545 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:00] "POST /auth/passkey/register/begin HTTP/1.1" 200 -
+2025-12-15 23:07:09,752 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001
+2025-12-15 23:07:09,752 - INFO - [33mPress CTRL+C to quit[0m
+2025-12-15 23:07:09,753 - INFO -  * Restarting with stat
+2025-12-15 23:07:09,898 - WARNING -  * Debugger is active!
+2025-12-15 23:07:09,901 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 23:07:11,962 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:11] "POST /auth/passkey/register/begin HTTP/1.1" 200 -
+2025-12-15 23:07:14,152 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:14] "GET /auth/profile HTTP/1.1" 200 -
+2025-12-15 23:07:14,173 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:14] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 23:07:14,175 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:14] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 23:07:14,176 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:14] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 23:07:15,261 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:15] "POST /auth/passkey/register/begin HTTP/1.1" 200 -
+2025-12-15 23:07:25,238 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:25] "POST /auth/passkey/register/begin HTTP/1.1" 200 -
+2025-12-15 23:07:28,304 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:28] "GET /auth/profile HTTP/1.1" 200 -
+2025-12-15 23:07:28,320 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:28] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 23:07:28,321 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:28] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 23:07:28,322 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:28] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 23:07:28,871 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:28] "GET /auth/profile HTTP/1.1" 200 -
+2025-12-15 23:07:28,884 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:28] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 23:07:28,884 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:28] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 23:07:28,884 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:28] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 23:07:29,107 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:29] "GET /auth/profile HTTP/1.1" 200 -
+2025-12-15 23:07:29,121 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:29] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 23:07:29,121 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:29] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 23:07:29,121 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:29] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 23:07:29,350 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:29] "GET /auth/profile HTTP/1.1" 200 -
+2025-12-15 23:07:29,364 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:29] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 23:07:29,364 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:29] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 23:07:29,365 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:29] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 23:07:29,519 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:29] "GET /auth/profile HTTP/1.1" 200 -
+2025-12-15 23:07:29,533 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:29] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 23:07:29,534 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:29] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 23:07:29,534 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:29] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 23:07:30,742 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:30] "POST /auth/passkey/register/begin HTTP/1.1" 200 -
+2025-12-15 23:07:47,926 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:47] "GET / HTTP/1.1" 200 -
+2025-12-15 23:07:47,936 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:47] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 23:07:47,941 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:47] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2025-12-15 23:07:47,941 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:47] "[36mGET /static/images/dining.jpg HTTP/1.1[0m" 304 -
+2025-12-15 23:07:47,942 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:47] "[36mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 304 -
+2025-12-15 23:07:47,943 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:47] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 23:07:47,943 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:47] "[36mGET /static/images/pool.jpg HTTP/1.1[0m" 304 -
+2025-12-15 23:07:47,950 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:47] "[36mGET /static/images/home-am-bg.jpg HTTP/1.1[0m" 304 -
+2025-12-15 23:07:47,950 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:47] "[36mGET /static/images/home-hero-bg.jpg HTTP/1.1[0m" 304 -
+2025-12-15 23:07:51,563 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:51] "GET /auth/profile HTTP/1.1" 200 -
+2025-12-15 23:07:51,572 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:51] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 23:07:51,574 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:51] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 23:07:51,574 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:51] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 23:07:53,474 - INFO - 127.0.0.1 - - [15/Dec/2025 23:07:53] "POST /auth/passkey/register/begin HTTP/1.1" 200 -
+2025-12-15 23:09:53,225 - INFO -  * Detected change in '/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py', reloading
+2025-12-15 23:09:53,285 - INFO -  * Restarting with stat
+2025-12-15 23:09:53,529 - WARNING -  * Debugger is active!
+2025-12-15 23:09:53,533 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 23:10:26,809 - INFO -  * Detected change in '/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py', reloading
+2025-12-15 23:10:26,882 - INFO -  * Restarting with stat
+2025-12-15 23:10:27,030 - WARNING -  * Debugger is active!
+2025-12-15 23:10:27,034 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 23:11:03,315 - INFO - 127.0.0.1 - - [15/Dec/2025 23:11:03] "GET /auth/profile HTTP/1.1" 200 -
+2025-12-15 23:11:03,332 - INFO - 127.0.0.1 - - [15/Dec/2025 23:11:03] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 23:11:03,332 - INFO - 127.0.0.1 - - [15/Dec/2025 23:11:03] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 23:11:03,332 - INFO - 127.0.0.1 - - [15/Dec/2025 23:11:03] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 23:11:08,558 - INFO - 127.0.0.1 - - [15/Dec/2025 23:11:08] "POST /auth/passkey/register/begin HTTP/1.1" 200 -
+2025-12-15 23:11:32,370 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001
+2025-12-15 23:11:32,370 - INFO - [33mPress CTRL+C to quit[0m
+2025-12-15 23:11:32,370 - INFO -  * Restarting with stat
+2025-12-15 23:11:32,506 - WARNING -  * Debugger is active!
+2025-12-15 23:11:32,510 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 23:11:37,794 - INFO - 127.0.0.1 - - [15/Dec/2025 23:11:37] "GET / HTTP/1.1" 200 -
+2025-12-15 23:11:37,805 - INFO - 127.0.0.1 - - [15/Dec/2025 23:11:37] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2025-12-15 23:11:37,807 - INFO - 127.0.0.1 - - [15/Dec/2025 23:11:37] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 23:11:37,812 - INFO - 127.0.0.1 - - [15/Dec/2025 23:11:37] "[36mGET /static/images/pool.jpg HTTP/1.1[0m" 304 -
+2025-12-15 23:11:37,814 - INFO - 127.0.0.1 - - [15/Dec/2025 23:11:37] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 23:11:37,814 - INFO - 127.0.0.1 - - [15/Dec/2025 23:11:37] "[36mGET /static/images/home-am-bg.jpg HTTP/1.1[0m" 304 -
+2025-12-15 23:11:37,815 - INFO - 127.0.0.1 - - [15/Dec/2025 23:11:37] "[36mGET /static/images/home-hero-bg.jpg HTTP/1.1[0m" 304 -
+2025-12-15 23:11:37,815 - INFO - 127.0.0.1 - - [15/Dec/2025 23:11:37] "[36mGET /static/images/dining.jpg HTTP/1.1[0m" 304 -
+2025-12-15 23:11:37,816 - INFO - 127.0.0.1 - - [15/Dec/2025 23:11:37] "[36mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 304 -
+2025-12-15 23:11:37,905 - INFO - 127.0.0.1 - - [15/Dec/2025 23:11:37] "[33mGET /apple-touch-icon-precomposed.png HTTP/1.1[0m" 404 -
+2025-12-15 23:11:37,905 - INFO - 127.0.0.1 - - [15/Dec/2025 23:11:37] "[33mGET /apple-touch-icon.png HTTP/1.1[0m" 404 -
+2025-12-15 23:11:37,906 - INFO - 127.0.0.1 - - [15/Dec/2025 23:11:37] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-12-15 23:11:39,939 - INFO - 127.0.0.1 - - [15/Dec/2025 23:11:39] "GET /auth/profile HTTP/1.1" 200 -
+2025-12-15 23:11:39,951 - INFO - 127.0.0.1 - - [15/Dec/2025 23:11:39] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 23:11:39,952 - INFO - 127.0.0.1 - - [15/Dec/2025 23:11:39] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 23:11:39,952 - INFO - 127.0.0.1 - - [15/Dec/2025 23:11:39] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 23:11:41,324 - INFO - 127.0.0.1 - - [15/Dec/2025 23:11:41] "POST /auth/passkey/register/begin HTTP/1.1" 200 -
+2025-12-15 23:11:46,340 - INFO - Received credential: {'id': '6ZWiQ01wFQ85UK_7utn1vNYuuRU', 'rawId': '6ZWiQ01wFQ85UK_7utn1vNYuuRU', 'type': 'public-key', 'response': {'clientDataJSON': 'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiXzVnVUpIOEVMMFZTNjQzNUtnMUU3R2RaLTdRQ09lM00xeTdvSEJ5Q3ZpNkZCWFFBTEJmbjZqS0pMMkNIZmRvZTJybklLUnFEWUR4X1MzR2F4T01pSkEiLCJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0OjUwMDEiLCJjcm9zc09yaWdpbiI6ZmFsc2V9', 'attestationObject': 'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YViYSZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NdAAAAAPv8MAcVTk7MjAtuAgVX170AFOmVokNNcBUPOVCv-7rZ9bzWLrkVpQECAyYgASFYINDZMDgpCGEkBfM49RX19xETMW1KDvjCuA4JXYiU4ZWvIlgg-TmebkGI0ahrMtQYMPsEnSnzMYYg8wi2oL3jDKWPxUI'}}
+2025-12-15 23:11:46,340 - INFO - Credential keys: dict_keys(['id', 'rawId', 'type', 'response'])
+2025-12-15 23:11:46,340 - ERROR - Passkey registration error: Credential missing required rawId
+2025-12-15 23:11:46,340 - INFO - 127.0.0.1 - - [15/Dec/2025 23:11:46] "[31m[1mPOST /auth/passkey/register/complete HTTP/1.1[0m" 400 -
+2025-12-15 23:12:29,955 - INFO -  * Detected change in '/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py', reloading
+2025-12-15 23:12:30,021 - INFO -  * Restarting with stat
+2025-12-15 23:12:30,241 - WARNING -  * Debugger is active!
+2025-12-15 23:12:30,246 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 23:13:39,804 - INFO -  * Detected change in '/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py', reloading
+2025-12-15 23:13:39,858 - INFO -  * Restarting with stat
+2025-12-15 23:13:40,108 - WARNING -  * Debugger is active!
+2025-12-15 23:13:40,112 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 23:13:52,208 - INFO -  * Detected change in '/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py', reloading
+2025-12-15 23:13:52,266 - INFO -  * Restarting with stat
+2025-12-15 23:13:52,432 - WARNING -  * Debugger is active!
+2025-12-15 23:13:52,436 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 23:14:17,302 - INFO - 127.0.0.1 - - [15/Dec/2025 23:14:17] "GET /auth/profile HTTP/1.1" 200 -
+2025-12-15 23:14:17,322 - INFO - 127.0.0.1 - - [15/Dec/2025 23:14:17] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 23:14:17,322 - INFO - 127.0.0.1 - - [15/Dec/2025 23:14:17] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 23:14:17,322 - INFO - 127.0.0.1 - - [15/Dec/2025 23:14:17] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 23:14:18,490 - INFO - 127.0.0.1 - - [15/Dec/2025 23:14:18] "POST /auth/passkey/register/begin HTTP/1.1" 200 -
+2025-12-15 23:14:23,456 - INFO - Received credential: {'id': '_iQ8S307s9W_hx8_IrxUjtaarOA', 'rawId': '_iQ8S307s9W_hx8_IrxUjtaarOA', 'type': 'public-key', 'response': {'clientDataJSON': 'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoicUcwSFV5ZWp4UXBDT19pb3lNUmc1Tnh5aHlaTzV0cUY2eE1IYlBtMm1JcFhnUENyTWQ2YmxoVVUxT3o4YklsT3RlVE5wNGdVZDllb3pGZkl1SkY4emciLCJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0OjUwMDEiLCJjcm9zc09yaWdpbiI6ZmFsc2V9', 'attestationObject': 'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YViYSZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NdAAAAAPv8MAcVTk7MjAtuAgVX170AFP4kPEt9O7PVv4cfPyK8VI7WmqzgpQECAyYgASFYIH-x7Vpu6nkyl828F6nOrQfWkz0qb-eutEhmfWBiAx5LIlggSWoYg6603LsgaAA3Qw1jnn2tb3wdUekxnn_B5nSuJZw'}}
+2025-12-15 23:14:23,456 - INFO - Credential keys: dict_keys(['id', 'rawId', 'type', 'response'])
+2025-12-15 23:14:23,456 - ERROR - Passkey registration error: Credential missing required rawId
+2025-12-15 23:14:23,457 - INFO - 127.0.0.1 - - [15/Dec/2025 23:14:23] "[31m[1mPOST /auth/passkey/register/complete HTTP/1.1[0m" 400 -
+2025-12-15 23:15:30,199 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001
+2025-12-15 23:15:30,199 - INFO - [33mPress CTRL+C to quit[0m
+2025-12-15 23:15:30,200 - INFO -  * Restarting with stat
+2025-12-15 23:15:30,337 - WARNING -  * Debugger is active!
+2025-12-15 23:15:30,341 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 23:15:32,737 - INFO - 127.0.0.1 - - [15/Dec/2025 23:15:32] "GET /auth/profile HTTP/1.1" 200 -
+2025-12-15 23:15:32,758 - INFO - 127.0.0.1 - - [15/Dec/2025 23:15:32] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 23:15:32,759 - INFO - 127.0.0.1 - - [15/Dec/2025 23:15:32] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 23:15:32,759 - INFO - 127.0.0.1 - - [15/Dec/2025 23:15:32] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 23:15:34,384 - INFO -  * Detected change in '/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py', reloading
+2025-12-15 23:15:34,448 - INFO -  * Restarting with stat
+2025-12-15 23:15:34,597 - WARNING -  * Debugger is active!
+2025-12-15 23:15:34,601 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 23:15:35,166 - INFO - 127.0.0.1 - - [15/Dec/2025 23:15:35] "POST /auth/passkey/register/begin HTTP/1.1" 200 -
+2025-12-15 23:15:38,820 - INFO - Received credential: {'id': '4VWLuCNAZ1RgXeC7MGzRAsYEf-o', 'rawId': '4VWLuCNAZ1RgXeC7MGzRAsYEf-o', 'type': 'public-key', 'response': {'clientDataJSON': 'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiUmVMR3ZoWVFiV3hLcXpibjBfVVViWEhWWUpZVzEwZHFDUXp1RjZXYnVrX3gyZTFDeUYxeHUwU0k1YUdxa0h3R0FmeUJESmJWMEdWcXhmLUF2X1oyN3ciLCJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0OjUwMDEiLCJjcm9zc09yaWdpbiI6ZmFsc2V9', 'attestationObject': 'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YViYSZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NdAAAAAPv8MAcVTk7MjAtuAgVX170AFOFVi7gjQGdUYF3guzBs0QLGBH_qpQECAyYgASFYIO4rjWzUF0KbjUZtxgFHaS5_jh80xh_hi_ylpPv5uIveIlggAlmrqL5xVLeP7M1G_28t9F_OMRkyUZjMbSKvosebjWs'}}
+2025-12-15 23:15:38,820 - INFO - Credential keys: dict_keys(['id', 'rawId', 'type', 'response'])
+2025-12-15 23:15:38,820 - ERROR - Passkey registration error: Credential missing required rawId
+2025-12-15 23:15:38,822 - ERROR - Full traceback: Traceback (most recent call last):
+  File "/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py", line 594, in passkey_register_complete
+    verification = verify_registration_response(
+        credential={
+    ...<10 lines>...
+        expected_rp_id=rp_id,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/webauthn/registration/verify_registration_response.py", line 102, in verify_registration_response
+    credential = parse_registration_credential_json(credential)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/webauthn/helpers/parse_registration_credential_json.py", line 36, in parse_registration_credential_json
+    raise InvalidJSONStructure("Credential missing required rawId")
+webauthn.helpers.exceptions.InvalidJSONStructure: Credential missing required rawId
+
+2025-12-15 23:15:38,823 - INFO - 127.0.0.1 - - [15/Dec/2025 23:15:38] "[31m[1mPOST /auth/passkey/register/complete HTTP/1.1[0m" 400 -
+2025-12-15 23:16:59,291 - INFO -  * Detected change in '/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py', reloading
+2025-12-15 23:16:59,368 - INFO -  * Restarting with stat
+2025-12-15 23:16:59,586 - WARNING -  * Debugger is active!
+2025-12-15 23:16:59,590 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 23:17:16,466 - INFO - 127.0.0.1 - - [15/Dec/2025 23:17:16] "POST /auth/passkey/register/begin HTTP/1.1" 200 -
+2025-12-15 23:17:20,643 - INFO - Received credential: {'id': '1WUDnK6-LjVDaiGTeRD7JxLEn6Q', 'rawId': '1WUDnK6-LjVDaiGTeRD7JxLEn6Q', 'type': 'public-key', 'response': {'clientDataJSON': 'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiUkdEZmE3ZUgtUFN6ZHE2V1hOYVhjanRRcjlvZ3FQcE1paWVNcXVUNU43QncyZDJyWkN2RzBDWGxBZzBSV0Y5QkcwcnE1WFBzZ1FNVHNXYlRod050Z3ciLCJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0OjUwMDEiLCJjcm9zc09yaWdpbiI6ZmFsc2V9', 'attestationObject': 'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YViYSZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NdAAAAAPv8MAcVTk7MjAtuAgVX170AFNVlA5yuvi41Q2ohk3kQ-ycSxJ-kpQECAyYgASFYIAjIliy-SNxodClHWpIAmIL_Y4-hU4SYHHWbvL8Fttf6Ilggl-ZPKTYeqzSJ_HCMSAE-1GW54WSFWKzf7kl7uFe7vkc'}}
+2025-12-15 23:17:20,643 - INFO - Credential keys: dict_keys(['id', 'rawId', 'type', 'response'])
+2025-12-15 23:17:20,643 - ERROR - Passkey registration error: Credential missing required rawId
+2025-12-15 23:17:20,646 - ERROR - Full traceback: Traceback (most recent call last):
+  File "/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py", line 603, in passkey_register_complete
+    verification = verify_registration_response(
+        credential={
+    ...<10 lines>...
+        expected_rp_id=rp_id,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/webauthn/registration/verify_registration_response.py", line 102, in verify_registration_response
+    credential = parse_registration_credential_json(credential)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/webauthn/helpers/parse_registration_credential_json.py", line 36, in parse_registration_credential_json
+    raise InvalidJSONStructure("Credential missing required rawId")
+webauthn.helpers.exceptions.InvalidJSONStructure: Credential missing required rawId
+
+2025-12-15 23:17:20,647 - INFO - 127.0.0.1 - - [15/Dec/2025 23:17:20] "[31m[1mPOST /auth/passkey/register/complete HTTP/1.1[0m" 400 -
+2025-12-15 23:17:53,002 - INFO -  * Detected change in '/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py', reloading
+2025-12-15 23:17:53,074 - INFO -  * Restarting with stat
+2025-12-15 23:17:53,298 - WARNING -  * Debugger is active!
+2025-12-15 23:17:53,302 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 23:18:02,380 - INFO -  * Detected change in '/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py', reloading
+2025-12-15 23:18:02,452 - INFO -  * Restarting with stat
+2025-12-15 23:18:02,662 - WARNING -  * Debugger is active!
+2025-12-15 23:18:02,667 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 23:18:21,060 - INFO - 127.0.0.1 - - [15/Dec/2025 23:18:21] "GET /auth/profile HTTP/1.1" 200 -
+2025-12-15 23:18:21,081 - INFO - 127.0.0.1 - - [15/Dec/2025 23:18:21] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 23:18:21,082 - INFO - 127.0.0.1 - - [15/Dec/2025 23:18:21] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 23:18:21,083 - INFO - 127.0.0.1 - - [15/Dec/2025 23:18:21] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 23:18:22,254 - INFO - 127.0.0.1 - - [15/Dec/2025 23:18:22] "POST /auth/passkey/register/begin HTTP/1.1" 200 -
+2025-12-15 23:18:26,848 - INFO - Received credential: {'id': 'rLFNmjJ3JxtA2Q7DvDINiVSvATI', 'rawId': 'rLFNmjJ3JxtA2Q7DvDINiVSvATI', 'type': 'public-key', 'response': {'clientDataJSON': 'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiR0FHbXdPUk9WU1VFWDU4WUZyMVVtSU9WLWxSdzhGUndmdkxSQ0lxNW1VdVVVMG8tUlZCeDZ5ZjJPYTYyVU1pMGwyN3JwWFdfQjNfd2hRbjV4ajgySUEiLCJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0OjUwMDEiLCJjcm9zc09yaWdpbiI6ZmFsc2V9', 'attestationObject': 'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YViYSZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NdAAAAAPv8MAcVTk7MjAtuAgVX170AFKyxTZoydycbQNkOw7wyDYlUrwEypQECAyYgASFYIKKHwceDCEki5nTDg3efQ4cbhxD7bY8D7iF4BacvBGo9IlgghdY9b3JdZtrWAhxIQ5hsSCxYeK08LAPqRV1CwdgB1Ro'}}
+2025-12-15 23:18:26,848 - INFO - Credential keys: dict_keys(['id', 'rawId', 'type', 'response'])
+2025-12-15 23:18:26,851 - ERROR - Passkey registration error: Credential missing required rawId
+2025-12-15 23:18:26,852 - ERROR - Full traceback: Traceback (most recent call last):
+  File "/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py", line 616, in passkey_register_complete
+    verification = verify_registration_response(
+        credential={
+    ...<10 lines>...
+        expected_rp_id=rp_id,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/webauthn/registration/verify_registration_response.py", line 102, in verify_registration_response
+    credential = parse_registration_credential_json(credential)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/webauthn/helpers/parse_registration_credential_json.py", line 36, in parse_registration_credential_json
+    raise InvalidJSONStructure("Credential missing required rawId")
+webauthn.helpers.exceptions.InvalidJSONStructure: Credential missing required rawId
+
+2025-12-15 23:18:26,853 - INFO - 127.0.0.1 - - [15/Dec/2025 23:18:26] "[31m[1mPOST /auth/passkey/register/complete HTTP/1.1[0m" 400 -
+2025-12-15 23:18:56,077 - INFO -  * Detected change in '/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py', reloading
+2025-12-15 23:18:56,150 - INFO -  * Restarting with stat
+2025-12-15 23:18:56,300 - WARNING -  * Debugger is active!
+2025-12-15 23:18:56,304 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 23:19:49,352 - INFO - 127.0.0.1 - - [15/Dec/2025 23:19:49] "GET /auth/profile HTTP/1.1" 200 -
+2025-12-15 23:19:49,370 - INFO - 127.0.0.1 - - [15/Dec/2025 23:19:49] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 23:19:49,370 - INFO - 127.0.0.1 - - [15/Dec/2025 23:19:49] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 23:19:49,370 - INFO - 127.0.0.1 - - [15/Dec/2025 23:19:49] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 23:19:50,990 - INFO - 127.0.0.1 - - [15/Dec/2025 23:19:50] "POST /auth/passkey/register/begin HTTP/1.1" 200 -
+2025-12-15 23:19:55,073 - INFO - Received credential: {'id': 'RjsePJ8872AFnZvD7VPnP_sptLo', 'rawId': 'RjsePJ8872AFnZvD7VPnP_sptLo', 'type': 'public-key', 'response': {'clientDataJSON': 'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoicnBKT1N1MXhlX2gyVkQ4Q0FLUUt0LVc5WWxPODNHNjBUV2U2SWVVLWhhSFNHZmxFV2tHeElKSFVjMV9uQmtrNjlGc3pfRE96UzYzbjZVV2R5YW02aVEiLCJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0OjUwMDEiLCJjcm9zc09yaWdpbiI6ZmFsc2V9', 'attestationObject': 'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YViYSZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NdAAAAAPv8MAcVTk7MjAtuAgVX170AFEY7HjyfPO9gBZ2bw-1T5z_7KbS6pQECAyYgASFYIFoocD2_mu-qLw7UQQDMtEHezeIfGUHokdaKUT9BYqZkIlgg3sfzSdYX3EGtLdBKA7_8cvjipwqTvJpQ3SBXCTA100k'}}
+2025-12-15 23:19:55,073 - INFO - Credential keys: dict_keys(['id', 'rawId', 'type', 'response'])
+2025-12-15 23:19:55,075 - ERROR - Passkey registration error: Credential missing required rawId
+2025-12-15 23:19:55,076 - ERROR - Full traceback: Traceback (most recent call last):
+  File "/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py", line 616, in passkey_register_complete
+    verification = verify_registration_response(
+        credential={
+    ...<10 lines>...
+        expected_rp_id=rp_id,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/webauthn/registration/verify_registration_response.py", line 102, in verify_registration_response
+    credential = parse_registration_credential_json(credential)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/webauthn/helpers/parse_registration_credential_json.py", line 36, in parse_registration_credential_json
+    raise InvalidJSONStructure("Credential missing required rawId")
+webauthn.helpers.exceptions.InvalidJSONStructure: Credential missing required rawId
+
+2025-12-15 23:19:55,077 - INFO - 127.0.0.1 - - [15/Dec/2025 23:19:55] "[31m[1mPOST /auth/passkey/register/complete HTTP/1.1[0m" 400 -
+2025-12-15 23:20:22,796 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001
+2025-12-15 23:20:22,796 - INFO - [33mPress CTRL+C to quit[0m
+2025-12-15 23:20:22,796 - INFO -  * Restarting with stat
+2025-12-15 23:20:22,932 - WARNING -  * Debugger is active!
+2025-12-15 23:20:22,936 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 23:20:26,630 - INFO - 127.0.0.1 - - [15/Dec/2025 23:20:26] "GET /auth/profile HTTP/1.1" 200 -
+2025-12-15 23:20:26,649 - INFO - 127.0.0.1 - - [15/Dec/2025 23:20:26] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 23:20:26,652 - INFO - 127.0.0.1 - - [15/Dec/2025 23:20:26] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 23:20:26,653 - INFO - 127.0.0.1 - - [15/Dec/2025 23:20:26] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 23:20:27,425 - INFO - 127.0.0.1 - - [15/Dec/2025 23:20:27] "POST /auth/passkey/register/begin HTTP/1.1" 200 -
+2025-12-15 23:20:31,678 - INFO - Received credential: {'id': '2URLXVRtXcfYMhaNa-j_bs3bxog', 'rawId': '2URLXVRtXcfYMhaNa-j_bs3bxog', 'type': 'public-key', 'response': {'clientDataJSON': 'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoid3FHdWRYakMwMlllNzRfRzlRWkxYYjdYcGRXY2lqMWlSLUFYZ2NqUU5VblFOdlI3NUx2MWM5SFk5ZmlDWHBZVC1ZQ2VjTWR0ai1NUExhVUtIdU9tWGciLCJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0OjUwMDEiLCJjcm9zc09yaWdpbiI6ZmFsc2V9', 'attestationObject': 'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YViYSZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NdAAAAAPv8MAcVTk7MjAtuAgVX170AFNlES11UbV3H2DIWjWvo_27N28aIpQECAyYgASFYIMCDxOC5s-7o9a2-V-kRFXPRmRa_jFIGr2IOnhADRo5ZIlggMiJ02h35TTAFa83RBUTGfRRJOJnLAdgXuAEcn35DvrE'}}
+2025-12-15 23:20:31,678 - INFO - Credential keys: dict_keys(['id', 'rawId', 'type', 'response'])
+2025-12-15 23:20:31,680 - ERROR - Passkey registration error: Credential missing required rawId
+2025-12-15 23:20:31,681 - ERROR - Full traceback: Traceback (most recent call last):
+  File "/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py", line 616, in passkey_register_complete
+    verification = verify_registration_response(
+        credential={
+    ...<10 lines>...
+        expected_rp_id=rp_id,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/webauthn/registration/verify_registration_response.py", line 102, in verify_registration_response
+    credential = parse_registration_credential_json(credential)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/webauthn/helpers/parse_registration_credential_json.py", line 36, in parse_registration_credential_json
+    raise InvalidJSONStructure("Credential missing required rawId")
+webauthn.helpers.exceptions.InvalidJSONStructure: Credential missing required rawId
+
+2025-12-15 23:20:31,681 - INFO - 127.0.0.1 - - [15/Dec/2025 23:20:31] "[31m[1mPOST /auth/passkey/register/complete HTTP/1.1[0m" 400 -
+2025-12-15 23:21:24,429 - INFO -  * Detected change in '/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py', reloading
+2025-12-15 23:21:24,500 - INFO -  * Restarting with stat
+2025-12-15 23:21:24,745 - WARNING -  * Debugger is active!
+2025-12-15 23:21:24,750 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 23:21:37,692 - INFO - 127.0.0.1 - - [15/Dec/2025 23:21:37] "GET /auth/profile HTTP/1.1" 200 -
+2025-12-15 23:21:37,707 - INFO - 127.0.0.1 - - [15/Dec/2025 23:21:37] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 23:21:37,708 - INFO - 127.0.0.1 - - [15/Dec/2025 23:21:37] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 23:21:37,710 - INFO - 127.0.0.1 - - [15/Dec/2025 23:21:37] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 23:21:38,696 - INFO - 127.0.0.1 - - [15/Dec/2025 23:21:38] "POST /auth/passkey/register/begin HTTP/1.1" 200 -
+2025-12-15 23:21:43,026 - INFO - Received credential: {'id': 'Rzt1yJpY_t1Fd2L-Pvs_nn7VYyc', 'rawId': 'Rzt1yJpY_t1Fd2L-Pvs_nn7VYyc', 'type': 'public-key', 'response': {'clientDataJSON': 'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoidDRUU19Tb0dfMTdmRFZ3Sk1ZTV9kdklLQ0xlVk5xUXJMOGJQVWxqSHUtREZ0NVdkVVVRVlRGTzU0X3ZGQ24wZTl1NXppS0xBMUpMQW9vdFViVkNTLUEiLCJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0OjUwMDEiLCJjcm9zc09yaWdpbiI6ZmFsc2V9', 'attestationObject': 'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YViYSZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NdAAAAAPv8MAcVTk7MjAtuAgVX170AFEc7dciaWP7dRXdi_j77P55-1WMnpQECAyYgASFYIIsAvKqqyNwd-iecHEYaQY4dmBRbYsmCOSGUHQnzrQs0IlggKVv9jNElvRstF1pwLgjHATmFP4M2LPDD1CFFB8P_u2M'}}
+2025-12-15 23:21:43,026 - INFO - Credential keys: dict_keys(['id', 'rawId', 'type', 'response'])
+2025-12-15 23:21:43,031 - INFO - 127.0.0.1 - - [15/Dec/2025 23:21:43] "POST /auth/passkey/register/complete HTTP/1.1" 200 -
+2025-12-15 23:21:45,340 - INFO - 127.0.0.1 - - [15/Dec/2025 23:21:45] "GET /auth/profile HTTP/1.1" 200 -
+2025-12-15 23:21:45,355 - INFO - 127.0.0.1 - - [15/Dec/2025 23:21:45] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 23:21:45,355 - INFO - 127.0.0.1 - - [15/Dec/2025 23:21:45] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 23:21:45,356 - INFO - 127.0.0.1 - - [15/Dec/2025 23:21:45] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 23:21:50,460 - INFO - 127.0.0.1 - - [15/Dec/2025 23:21:50] "[32mGET /auth/logout HTTP/1.1[0m" 302 -
+2025-12-15 23:21:50,474 - INFO - 127.0.0.1 - - [15/Dec/2025 23:21:50] "GET / HTTP/1.1" 200 -
+2025-12-15 23:21:50,485 - INFO - 127.0.0.1 - - [15/Dec/2025 23:21:50] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 23:21:50,487 - INFO - 127.0.0.1 - - [15/Dec/2025 23:21:50] "[36mGET /static/images/dining.jpg HTTP/1.1[0m" 304 -
+2025-12-15 23:21:50,488 - INFO - 127.0.0.1 - - [15/Dec/2025 23:21:50] "[36mGET /static/images/pool.jpg HTTP/1.1[0m" 304 -
+2025-12-15 23:21:50,488 - INFO - 127.0.0.1 - - [15/Dec/2025 23:21:50] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 23:21:50,488 - INFO - 127.0.0.1 - - [15/Dec/2025 23:21:50] "[36mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 304 -
+2025-12-15 23:21:50,488 - INFO - 127.0.0.1 - - [15/Dec/2025 23:21:50] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2025-12-15 23:21:50,498 - INFO - 127.0.0.1 - - [15/Dec/2025 23:21:50] "[36mGET /static/images/home-am-bg.jpg HTTP/1.1[0m" 304 -
+2025-12-15 23:21:50,499 - INFO - 127.0.0.1 - - [15/Dec/2025 23:21:50] "[36mGET /static/images/home-hero-bg.jpg HTTP/1.1[0m" 304 -
+2025-12-15 23:21:50,506 - INFO - 127.0.0.1 - - [15/Dec/2025 23:21:50] "[33mGET /apple-touch-icon-precomposed.png HTTP/1.1[0m" 404 -
+2025-12-15 23:21:50,507 - INFO - 127.0.0.1 - - [15/Dec/2025 23:21:50] "[33mGET /apple-touch-icon.png HTTP/1.1[0m" 404 -
+2025-12-15 23:21:50,507 - INFO - 127.0.0.1 - - [15/Dec/2025 23:21:50] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-12-15 23:21:52,352 - INFO - 127.0.0.1 - - [15/Dec/2025 23:21:52] "GET /auth/login HTTP/1.1" 200 -
+2025-12-15 23:21:52,354 - INFO - 127.0.0.1 - - [15/Dec/2025 23:21:52] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 23:21:52,366 - INFO - 127.0.0.1 - - [15/Dec/2025 23:21:52] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 23:21:52,367 - INFO - 127.0.0.1 - - [15/Dec/2025 23:21:52] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 23:21:52,368 - INFO - 127.0.0.1 - - [15/Dec/2025 23:21:52] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 23:22:11,237 - INFO - 127.0.0.1 - - [15/Dec/2025 23:22:11] "[32mPOST /auth/login HTTP/1.1[0m" 302 -
+2025-12-15 23:22:11,248 - INFO - 127.0.0.1 - - [15/Dec/2025 23:22:11] "GET /auth/verify-passkey HTTP/1.1" 200 -
+2025-12-15 23:22:11,268 - INFO - 127.0.0.1 - - [15/Dec/2025 23:22:11] "[36mGET /static/css/auth.css HTTP/1.1[0m" 304 -
+2025-12-15 23:22:11,270 - INFO - 127.0.0.1 - - [15/Dec/2025 23:22:11] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 23:22:11,270 - INFO - 127.0.0.1 - - [15/Dec/2025 23:22:11] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 23:22:11,277 - INFO - 127.0.0.1 - - [15/Dec/2025 23:22:11] "POST /auth/passkey/authenticate/begin HTTP/1.1" 200 -
+2025-12-15 23:22:16,049 - ERROR - Passkey authentication error: Credential missing required rawId
+2025-12-15 23:22:16,050 - INFO - 127.0.0.1 - - [15/Dec/2025 23:22:16] "[31m[1mPOST /auth/passkey/authenticate/complete HTTP/1.1[0m" 400 -
+2025-12-15 23:23:12,590 - INFO -  * Detected change in '/Users/isaac/Desktop/NYP_Y2_S2/ISPJ/ISPJ-Assigement-Y2S2-Main/app/auth_routes.py', reloading
+2025-12-15 23:23:12,668 - INFO -  * Restarting with stat
+2025-12-15 23:23:12,910 - WARNING -  * Debugger is active!
+2025-12-15 23:23:12,914 - INFO -  * Debugger PIN: 890-517-084
+2025-12-15 23:23:37,534 - INFO - 127.0.0.1 - - [15/Dec/2025 23:23:37] "POST /auth/passkey/authenticate/begin HTTP/1.1" 200 -
+2025-12-15 23:23:42,275 - INFO - 127.0.0.1 - - [15/Dec/2025 23:23:42] "POST /auth/passkey/authenticate/complete HTTP/1.1" 200 -
+2025-12-15 23:23:42,285 - INFO - 127.0.0.1 - - [15/Dec/2025 23:23:42] "[32mGET /auth/passkey/login-complete HTTP/1.1[0m" 302 -
+2025-12-15 23:23:42,303 - INFO - 127.0.0.1 - - [15/Dec/2025 23:23:42] "GET / HTTP/1.1" 200 -
+2025-12-15 23:23:42,322 - INFO - 127.0.0.1 - - [15/Dec/2025 23:23:42] "[36mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 304 -
+2025-12-15 23:23:42,326 - INFO - 127.0.0.1 - - [15/Dec/2025 23:23:42] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 23:23:42,329 - INFO - 127.0.0.1 - - [15/Dec/2025 23:23:42] "[36mGET /static/images/dining.jpg HTTP/1.1[0m" 304 -
+2025-12-15 23:23:42,330 - INFO - 127.0.0.1 - - [15/Dec/2025 23:23:42] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2025-12-15 23:23:42,330 - INFO - 127.0.0.1 - - [15/Dec/2025 23:23:42] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 23:23:42,330 - INFO - 127.0.0.1 - - [15/Dec/2025 23:23:42] "[36mGET /static/images/pool.jpg HTTP/1.1[0m" 304 -
+2025-12-15 23:23:42,339 - INFO - 127.0.0.1 - - [15/Dec/2025 23:23:42] "[36mGET /static/images/home-am-bg.jpg HTTP/1.1[0m" 304 -
+2025-12-15 23:23:42,339 - INFO - 127.0.0.1 - - [15/Dec/2025 23:23:42] "[36mGET /static/images/home-hero-bg.jpg HTTP/1.1[0m" 304 -
+2025-12-15 23:23:42,351 - INFO - 127.0.0.1 - - [15/Dec/2025 23:23:42] "[33mGET /apple-touch-icon-precomposed.png HTTP/1.1[0m" 404 -
+2025-12-15 23:23:42,352 - INFO - 127.0.0.1 - - [15/Dec/2025 23:23:42] "[33mGET /apple-touch-icon.png HTTP/1.1[0m" 404 -
+2025-12-15 23:23:42,353 - INFO - 127.0.0.1 - - [15/Dec/2025 23:23:42] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-12-15 23:23:47,146 - INFO - 127.0.0.1 - - [15/Dec/2025 23:23:47] "[32mGET /auth/logout HTTP/1.1[0m" 302 -
+2025-12-15 23:23:47,153 - INFO - 127.0.0.1 - - [15/Dec/2025 23:23:47] "GET / HTTP/1.1" 200 -
+2025-12-15 23:23:47,166 - INFO - 127.0.0.1 - - [15/Dec/2025 23:23:47] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2025-12-15 23:23:47,168 - INFO - 127.0.0.1 - - [15/Dec/2025 23:23:47] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2025-12-15 23:23:47,168 - INFO - 127.0.0.1 - - [15/Dec/2025 23:23:47] "[36mGET /static/images/pool.jpg HTTP/1.1[0m" 304 -
+2025-12-15 23:23:47,168 - INFO - 127.0.0.1 - - [15/Dec/2025 23:23:47] "[36mGET /static/images/dining.jpg HTTP/1.1[0m" 304 -
+2025-12-15 23:23:47,169 - INFO - 127.0.0.1 - - [15/Dec/2025 23:23:47] "[36mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 304 -
+2025-12-15 23:23:47,169 - INFO - 127.0.0.1 - - [15/Dec/2025 23:23:47] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2025-12-15 23:23:47,176 - INFO - 127.0.0.1 - - [15/Dec/2025 23:23:47] "[36mGET /static/images/home-am-bg.jpg HTTP/1.1[0m" 304 -
+2025-12-15 23:23:47,176 - INFO - 127.0.0.1 - - [15/Dec/2025 23:23:47] "[36mGET /static/images/home-hero-bg.jpg HTTP/1.1[0m" 304 -
+2025-12-15 23:23:47,184 - INFO - 127.0.0.1 - - [15/Dec/2025 23:23:47] "[33mGET /apple-touch-icon-precomposed.png HTTP/1.1[0m" 404 -
+2025-12-15 23:23:47,184 - INFO - 127.0.0.1 - - [15/Dec/2025 23:23:47] "[33mGET /apple-touch-icon.png HTTP/1.1[0m" 404 -
+2025-12-15 23:23:47,185 - INFO - 127.0.0.1 - - [15/Dec/2025 23:23:47] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -

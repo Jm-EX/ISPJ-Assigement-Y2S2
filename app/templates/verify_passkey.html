@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Verify Touch ID / Face ID{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+<script>
+async function authenticateWithPasskey() {
+    try {
+        const response = await fetch('/auth/passkey/authenticate/begin', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({username: '{{ username }}'})
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Failed to start authentication');
+        }
+        
+        const options = await response.json();
+        
+        options.challenge = Uint8Array.from(atob(options.challenge.replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0));
+        
+        if (options.allowCredentials) {
+            options.allowCredentials = options.allowCredentials.map(cred => ({
+                ...cred,
+                id: Uint8Array.from(atob(cred.id.replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0))
+            }));
+        }
+        
+        const credential = await navigator.credentials.get({publicKey: options});
+        
+        const credentialData = {
+            id: credential.id,
+            rawId: btoa(String.fromCharCode(...new Uint8Array(credential.rawId))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, ''),
+            type: credential.type,
+            response: {
+                clientDataJSON: btoa(String.fromCharCode(...new Uint8Array(credential.response.clientDataJSON))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, ''),
+                authenticatorData: btoa(String.fromCharCode(...new Uint8Array(credential.response.authenticatorData))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, ''),
+                signature: btoa(String.fromCharCode(...new Uint8Array(credential.response.signature))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
+            }
+        };
+        
+        const verifyResponse = await fetch('/auth/passkey/authenticate/complete', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(credentialData)
+        });
+        
+        const result = await verifyResponse.json();
+        
+        if (result.success) {
+            window.location.href = '/auth/passkey/login-complete';
+        } else {
+            alert('Authentication failed: ' + (result.error || 'Unknown error'));
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Authentication failed: ' + error.message);
+    }
+}
+
+window.onload = function() {
+    authenticateWithPasskey();
+};
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+  <h1>Verify with Touch ID / Face ID</h1>
+  
+  <p>Use Touch ID or Face ID to complete your login.</p>
+  
+  <button type="button" onclick="authenticateWithPasskey()" class="auth-btn">Use Touch ID / Face ID</button>
+  
+  <p class="auth-alt">
+    <a href="{{ url_for('auth.use_otp_instead') }}">Use OTP instead</a>
+  </p>
+</div>
+{% endblock %}

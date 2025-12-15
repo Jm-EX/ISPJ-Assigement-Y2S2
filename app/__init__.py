@@ -8,7 +8,12 @@ def create_app():
     app = Flask(__name__)
 
     app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-secret-key-change-me")
-    app.config["AUTH_DB_PATH"] = os.environ.get("AUTH_DB_PATH") or os.path.join(app.instance_path, "auth.sqlite")
+    
+    app.config["MYSQL_HOST"] = os.environ.get("MYSQL_HOST", "localhost")
+    app.config["MYSQL_PORT"] = int(os.environ.get("MYSQL_PORT", 3306))
+    app.config["MYSQL_USER"] = os.environ.get("MYSQL_USER", "root")
+    app.config["MYSQL_PASSWORD"] = os.environ.get("MYSQL_PASSWORD", "")
+    app.config["MYSQL_DATABASE"] = os.environ.get("MYSQL_DATABASE", "ispj_hotel")
 
     app.config["MAIL_SERVER"] = os.environ.get("SMTP_SERVER")
     app.config["MAIL_PORT"] = int(os.environ.get("SMTP_PORT", 587))
