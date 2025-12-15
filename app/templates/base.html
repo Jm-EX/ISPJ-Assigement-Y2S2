@@ -17,17 +17,17 @@
             <nav class="main-nav">
                 <a href="#">Explore resorts</a>
                 <a href="{{ url_for('main.book_room') }}">Book a room</a>
-                <a href="#">Offers</a>
-                <a href="#">Entertainment</a>
-                <a href="#">Dining</a>
-                <a href="#">Pools</a>
-                <a href="#">Casino</a>
-                <a href="#">Spas & salons</a>
-                <a href="#">Meetings & events</a>
-                <a href="#">Rewards</a>
-                <a href="#">Nightlife</a>
-                <a href="#">Shopping</a>
-                <a href="#">Golf</a>
+                <a href="/other">Offers</a>
+                <a href="/other">Entertainment</a>
+                <a href="/other">Dining</a>
+                <a href="/other">Pools</a>
+                <a href="/other">Casino</a>
+                <a href="/other">Spas & salons</a>
+                <a href="/other">Meetings & events</a>
+                <a href="/other">Rewards</a>
+                <a href="/other">Nightlife</a>
+                <a href="/other">Shopping</a>
+                <a href="/other">Golf</a>
             </nav>
         </div>
 
@@ -41,8 +41,6 @@
                 <a href="{{ url_for('auth.login_get') }}" class="btn">Sign in</a>
                 <a href="{{ url_for('auth.register_get') }}" class="btn">Register</a>
             {% endif %}
-            <a href="#" class="icon">🔍</a>
-            <a href="#" class="icon">🛒</a>
         </div>
     </div>
 </header>
@@ -112,7 +110,7 @@
 
         <div class="footer-col qr">
             <h4>Get the app</h4>
-            <img src="{{ url_for('static', filename='img/qr.png') }}" alt="QR Code">
+            <img src="{{ url_for('static', filename='images/qrcode.png') }}" alt="QR Code">
         </div>
     </div>
 

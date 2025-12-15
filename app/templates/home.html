@@ -3,6 +3,83 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<h1>Welcome</h1>
-<p>This is the index page.</p>
+<head>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+</head>
+
+
+<div class="home-page-hero">
+    <div class="home-page-hero-overlay">
+        <h1 class="home-page-hero-title">Experience Unforgettable Luxury</h1>
+        <p class="home-page-hero-subtitle">World-class amenities, breathtaking views, and exclusive offers</p>
+        <a href="{{ url_for('main.book_room') }}" class="home-page-button">Book Your Stay</a>
+    </div>
+</div>
+
+<section class="home-page-offers">
+    <h2 class="home-page-section-title">Exclusive Offers</h2>
+    <div class="home-page-offers-grid">
+        <div class="home-page-offer-card">
+            <img src="{{ url_for('static', filename='images/luxury-suite.jpg') }}" alt="Luxury Suite">
+            <h3>Luxury Suite</h3>
+            <p>Panoramic views with premium amenities and private balcony.</p>
+            <a href="{{ url_for('main.book_room') }}" class="home-page-button">Book Now</a>
+        </div>
+        <div class="home-page-offer-card">
+            <img src="{{ url_for('static', filename='images/pool.jpg') }}" alt="Infinity Pool">
+            <!-- Photo by Pixabay: https://www.pexels.com/photo/blue-lounger-beside-swimming-pool-221457/ -->
+            <h3>Infinity Pool</h3>
+            <p>Relax in our rooftop pool with stunning city views.</p>
+            <a href="{{ url_for('main.book_room') }}" class="home-page-button">Book Now</a>
+        </div>
+        <div class="home-page-offer-card">
+            <img src="{{ url_for('static', filename='images/dining.jpg') }}" alt="Fine Dining">
+            <!-- Photo by Kyle Roxas: https://www.pexels.com/photo/cooked-dish-on-ceramic-plates-2122294/ -->
+            <h3>Fine Dining</h3>
+            <p>Indulge in world-class cuisine at our award-winning restaurants.</p>
+            <a href="{{ url_for('main.book_room') }}" class="home-page-button">Book Now</a>
+        </div>
+    </div>
+</section>
+
+<section class="home-page-amenities">
+    <h2 class="home-page-section-title">Hotel Amenities</h2>
+    <div class="home-page-amenities-grid">
+        <div class="home-page-amenity-card">
+            <i class="fas fa-wifi"></i>
+            <h4>Free WiFi</h4>
+            <p>High-speed internet access throughout the property</p>
+        </div>
+        <div class="home-page-amenity-card">
+            <i class="fas fa-swimming-pool"></i>
+            <h4>Infinity Pool</h4>
+            <p>Rooftop pool with stunning city views</p>
+        </div>
+        <div class="home-page-amenity-card">
+            <i class="fas fa-dumbbell"></i>
+            <h4>Fitness Center</h4>
+            <p>24/7 access to state-of-the-art equipment</p>
+        </div>
+        <div class="home-page-amenity-card">
+            <i class="fas fa-spa"></i>
+            <h4>Spa & Wellness</h4>
+            <p>Relax and rejuvenate with premium spa services</p>
+        </div>
+        <div class="home-page-amenity-card">
+            <i class="fas fa-utensils"></i>
+            <h4>Fine Dining</h4>
+            <p>Award-winning restaurants on-site</p>
+        </div>
+    </div>
+</section>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<section class="home-page-about">
+    <h2 class="home-page-section-title">About Our Resort</h2>
+    <p class="home-page-about-text">
+        Nestled in the heart of the city, our resort offers a blend of modern luxury and timeless elegance.
+        From exquisite rooms to world-class dining, every detail is curated for an unforgettable stay.
+    </p>
+    <a href="{{ url_for('main.book_room') }}" class="home-page-button">Explore Rooms</a>
+</section>
 {% endblock %}

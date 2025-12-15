@@ -2,11 +2,12 @@
 
 {% block title %}Login{% endblock %}
 
-{% block head %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
-{% endblock %}
 
 {% block content %}
+<head>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+</head>
+
 <div class="auth-container">
   <h1>Login</h1>
 

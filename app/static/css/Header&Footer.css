@@ -11,6 +11,10 @@ body {
     color: white;
     padding: 12px 0;
     border-bottom: 1px solid #222;
+    top: 0;
+    left: 0;
+    position: sticky;
+    z-index: 9999;
 }
 
 .header-container {

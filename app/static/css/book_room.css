@@ -23,6 +23,7 @@
   position: relative;
   background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
               url('/static/images/hotel-lobby.jpg') center/cover no-repeat;
+              /* Photo by Vika Glitter: https://www.pexels.com/photo/comfort-room-area-3315291/ */
   color: white;
   padding: 120px 20px 80px;
   text-align: center;
