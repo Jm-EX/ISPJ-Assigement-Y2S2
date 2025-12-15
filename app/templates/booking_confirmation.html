@@ -1,0 +1,57 @@
+<!-- app/templates/booking_confirmation.html -->
+{% extends "base.html" %}
+
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/booking.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="confirmation-container">
+
+   <div class="confirmation-card">
+        <div class="confirmation-icon" style="font-size: 4rem; color: #4CAF50; margin-bottom: 1.5rem;">✓</div>
+        <h1>Booking Confirmed!</h1>
+        <p style="color: #666; margin-bottom: 2rem;">Thank you for choosing our hotel. Your booking has been confirmed.</p>
+        
+        <div class="booking-details" style="text-align: left; margin: 2rem 0; padding: 1.5rem; background: #f8f9fa; border-radius: 8px;">
+            <h3 style="margin-top: 0; color: #2c3e50;">Booking Details</h3>
+            <div class="detail-item">
+                <span class="detail-label">Booking Reference:</span>
+                <span class="detail-value">#{{ '%06d' % range(100000, 999999) | random }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Guest Name:</span>
+                <span class="detail-value">{{ booking.guest_name }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Room Type:</span>
+                <span class="detail-value">{{ booking.room_type }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Check-in:</span>
+                <span class="detail-value">{{ booking.check_in }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Check-out:</span>
+                <span class="detail-value">{{ booking.check_out }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Nights:</span>
+                <span class="detail-value">{{ booking.nights }}</span>
+            </div>
+            <div class="detail-item" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #ddd;">
+                <span class="detail-label" style="font-size: 1.1rem;">Total Amount:</span>
+                <span class="detail-value" style="font-size: 1.2rem; font-weight: bold;">${{ '%.2f'|format(booking.total_price) }}</span>
+            </div>
+        </div>
+        
+        <p style="margin-bottom: 2rem;">A confirmation email has been sent to <strong>{{ booking.email }}</strong>.</p>
+        
+        <div class="confirmation-actions" style="display: flex; gap: 1rem; justify-content: center;">
+            <a href="{{ url_for('main.index') }}" class="btn btn-primary" style="text-decoration: none;">Back to Home</a>
+            <button onclick="window.print()" class="btn" style="background: #f0f0f0; color: #333;">Print Confirmation</button>
+        </div>
+    </div>
+</div>
+{% endblock %}

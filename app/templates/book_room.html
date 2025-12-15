@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% block title %}Luxury Hotel & Resort | Book Your Stay{% endblock %}
+{% block content %}
+<div id="book-room-content">
+  <header class="booking-hero">
+    <div class="hero-content">
+      <h1>Your Extraordinary Getaway Awaits</h1>
+      <p>Discover luxury accommodations and exclusive offers</p>
+    </div>
+    
+    <div class="booking-widget">
+      <form class="booking-form" method="get" action="{{ url_for('main.book_room') }}">
+        <div class="form-group">
+          <label for="checkin">CHECK IN</label>
+          <input type="date" id="checkin" name="checkin" required>
+        </div>
+        <div class="form-group">
+          <label for="checkout">CHECK OUT</label>
+          <input type="date" id="checkout" name="checkout" required>
+        </div>
+        <div class="form-group">
+          <label for="guests">GUESTS</label>
+          <select id="guests" name="guests">
+            <option value="1">1 Guest</option>
+            <option value="2" selected>2 Guests</option>
+            <option value="3">3 Guests</option>
+            <option value="4">4+ Guests</option>
+          </select>
+        </div>
+        <button type="submit" class="search-btn">FIND ROOMS</button>
+      </form>
+    </div>
+  </header>
+  <section class="room-categories">
+    <h2>ROOM TYPES</h2>
+    <div class="category-filters">
+      <button class="filter-btn active" data-category="all">All Rooms</button>
+      <button class="filter-btn" data-category="suite">Suites</button>
+      <button class="filter-btn" data-category="premium">Premium</button>
+      <button class="filter-btn" data-category="luxury">Luxury</button>
+    </div>
+    <div class="room-grid">
+      <!-- Room 1 -->
+      <article class="room-card" data-category="luxury">
+        <div class="room-image">
+          <img src="{{ url_for('static', filename='images/luxury-suite.jpg') }}" alt="Luxury Suite">
+          <div class="room-badge">BEST VALUE</div>
+        </div>
+        <div class="room-details">
+          <h3>Luxury Suite</h3>
+          <p class="room-description">Elegant suite with panoramic city views, separate living area, and premium amenities.</p>
+          <div class="room-features">
+            <span>2 Guests</span>
+            <span>1 King Bed</span>
+            <span>55 m²</span>
+          </div>
+          <div class="room-footer">
+            <p class="price">From <span>$299</span> / night</p>
+            <a href="{{ url_for('main.book_room_confirm', room_type='Luxury Suite') }}" class="book-now">BOOK NOW</a>
+          </div>
+        </div>
+      </article>
+      <!-- Room 2 -->
+      <article class="room-card" data-category="premium">
+        <div class="room-image">
+          <img src="{{ url_for('static', filename='images/deluxe-room.jpg') }}" alt="Deluxe Room">
+        </div>
+        <div class="room-details">
+          <h3>Deluxe Room</h3>
+          <p class="room-description">Spacious room with modern amenities and stunning city or garden views.</p>
+          <div class="room-features">
+            <span>2 Guests</span>
+            <span>1 King or 2 Queens</span>
+            <span>42 m²</span>
+          </div>
+          <div class="room-footer">
+            <p class="price">From <span>$229</span> / night</p>
+            <a href="{{ url_for('main.book_room_confirm', room_type='Deluxe Room') }}" class="book-now">BOOK NOW</a>
+          </div>
+        </div>
+      </article>
+      <!-- Room 3 -->
+      <article class="room-card" data-category="suite">
+        <div class="room-image">
+          <img src="{{ url_for('static', filename='images/executive-suite.jpg') }}" alt="Executive Suite">
+          <div class="room-badge">POPULAR</div>
+        </div>
+        <div class="room-details">
+          <h3>Executive Suite</h3>
+          <p class="room-description">Luxurious suite with separate living area, work desk, and premium amenities.</p>
+          <div class="room-features">
+            <span>2-4 Guests</span>
+            <span>1 King Bed + Sofa Bed</span>
+            <span>65 m²</span>
+          </div>
+          <div class="room-footer">
+            <p class="price">From <span>$399</span> / night</p>
+            <a href="{{ url_for('main.book_room_confirm', room_type='Executive Suite') }}" class="book-now">BOOK NOW</a>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+  <section class="hotel-features">
+    <h2>HOTEL AMENITIES</h2>
+    <div class="features-grid">
+      <div class="feature">
+        <i class="fas fa-wifi"></i>
+        <h4>Free WiFi</h4>
+        <p>High-speed internet access throughout the property</p>
+      </div>
+      <div class="feature">
+        <i class="fas fa-swimming-pool"></i>
+        <h4>Infinity Pool</h4>
+        <p>Rooftop pool with stunning city views</p>
+      </div>
+      <div class="feature">
+        <i class="fas fa-dumbbell"></i>
+        <h4>Fitness Center</h4>
+        <p>24/7 access to state-of-the-art equipment</p>
+      </div>
+      <div class="feature">
+        <i class="fas fa-utensils"></i>
+        <h4>Fine Dining</h4>
+        <p>Award-winning restaurants on-site</p>
+      </div>
+    </div>
+  </section>
+</div>
+<!-- Add Font Awesome and Google Fonts -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/book_room.css') }}">
+<script>
+// Add filter functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const filterButtons = document.querySelectorAll('.filter-btn');
+  
+  filterButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      // Remove active class from all buttons
+      filterButtons.forEach(btn => btn.classList.remove('active'));
+      // Add active class to clicked button
+      this.classList.add('active');
+      
+      const category = this.getAttribute('data-category');
+      const rooms = document.querySelectorAll('.room-card');
+      
+      rooms.forEach(room => {
+        if (category === 'all' || room.getAttribute('data-category') === category) {
+          room.style.display = 'block';
+        } else {
+          room.style.display = 'none';
+        }
+      });
+    });
+  });
+});
+</script>
+{% endblock %}
