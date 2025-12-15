@@ -36,6 +36,10 @@ def index():
 def book_room():
     return render_template("book_room.html")
 
+@main.route("/other")
+def others():
+    return render_template("other.html")
+
 # =========================
 # Helpers
 # =========================
