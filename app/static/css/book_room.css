@@ -2,10 +2,11 @@
 #book-room-content {
   --primary: #1a1a2e;
   --secondary: #16213e;
-  --accent: #e94560;
+  --accent: #0b0d2c; /* updated color */
   --light: #f8f9fa;
   --dark: #0f3460;
   --text: #333;
+  --text-light: #6c757d;
   --text-light: #6c757d;
   font-family: 'Montserrat', sans-serif;
   color: var(--text);
@@ -108,7 +109,7 @@
   height: 48px;
 }
 #book-room-content .search-btn:hover {
-  background-color: #d13a56;
+  background-color: #060933;
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(233, 69, 96, 0.3);
 }
