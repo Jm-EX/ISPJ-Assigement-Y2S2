@@ -5,8 +5,14 @@
 {% block content %}
 <head>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
-</head>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+    #resort-map { height: 500px; width: 100%; margin-bottom: 50px; }
+</style>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
+</head>
 
 <div class="home-page-hero">
     <div class="home-page-hero-overlay">
@@ -27,14 +33,12 @@
         </div>
         <div class="home-page-offer-card">
             <img src="{{ url_for('static', filename='images/pool.jpg') }}" alt="Infinity Pool">
-            <!-- Photo by Pixabay: https://www.pexels.com/photo/blue-lounger-beside-swimming-pool-221457/ -->
             <h3>Infinity Pool</h3>
             <p>Relax in our rooftop pool with stunning city views.</p>
             <a href="{{ url_for('main.book_room') }}" class="home-page-button">Book Now</a>
         </div>
         <div class="home-page-offer-card">
             <img src="{{ url_for('static', filename='images/dining.jpg') }}" alt="Fine Dining">
-            <!-- Photo by Kyle Roxas: https://www.pexels.com/photo/cooked-dish-on-ceramic-plates-2122294/ -->
             <h3>Fine Dining</h3>
             <p>Indulge in world-class cuisine at our award-winning restaurants.</p>
             <a href="{{ url_for('main.book_room') }}" class="home-page-button">Book Now</a>
@@ -74,12 +78,81 @@
 </section>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-<section class="home-page-about">
-    <h2 class="home-page-section-title">About Our Resort</h2>
-    <p class="home-page-about-text">
-        Nestled in the heart of the city, our resort offers a blend of modern luxury and timeless elegance.
-        From exquisite rooms to world-class dining, every detail is curated for an unforgettable stay.
-    </p>
-    <a href="{{ url_for('main.book_room') }}" class="home-page-button">Explore Rooms</a>
+<!-- MAP + CAROUSEL SECTION -->
+<section class="home-page-map-carousel">
+    <h2 class="home-page-section-title" id="section-title">Our Resort Locations</h2>
+    <div class="map-carousel-wrapper">
+        <!-- Left: Map -->
+        <div class="map-card">
+            <div id="resort-map"></div>
+        </div>
+
+        <!-- Right: Carousel -->
+        <div class="carousel-card">
+            <div id="resortCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <img src="{{ url_for('static', filename='images/resort1.jpg') }}" class="d-block w-100" alt="Resort 1">
+                        <!-- Photo by Thorsten technoman: https://www.pexels.com/photo/view-of-tourist-resort-338504/ -->
+                        <div class="carousel-caption d-none d-md-block">
+                            <h5>Upper Thomson resort</h5>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <img src="{{ url_for('static', filename='images/resort2.jpg') }}" class="d-block w-100" alt="Resort 2">
+                        <!-- Photo by Pixabay: https://www.pexels.com/photo/orange-lounges-near-swimming-pool-261169/ -->
+                        <div class="carousel-caption d-none d-md-block">
+                            <h5>Pulau Tekong Resort</h5>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <img src="{{ url_for('static', filename='images/resort3.jpg') }}" class="d-block w-100" alt="Resort 3">
+                        <!-- Photo by Boonkong Boonpeng: https://www.pexels.com/photo/body-of-water-near-buildings-1134176/ -->
+                        <div class="carousel-caption d-none d-md-block">
+                            <h5 >Toa Payoh resort</h5>
+                        </div>
+                    </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#resortCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#resortCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+        </div>
+    </div>
 </section>
+
+<section class="home-page-about"> 
+    <h2 class="home-page-section-title">About Our Resort</h2> 
+    <p class="home-page-about-text"> Nestled in the heart of the city, our resort offers a blend of modern luxury and timeless elegance. From exquisite rooms to world-class dining, every detail is curated for an unforgettable stay. </p> 
+    <a href="{{ url_for('main.book_room') }}" class="home-page-button">Explore Rooms</a> 
+</section>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    var map = L.map('resort-map').setView([20, 0], 2);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+    }).addTo(map);
+
+    var resorts = {{ resorts|tojson }};
+    resorts.forEach(function(resort) {
+        L.marker([resort.lat, resort.lng]).addTo(map)
+            .bindPopup(resort.name);
+    });
+
+    map.locate({setView: true, maxZoom: 12});
+    map.on('locationfound', function(e) {
+        L.marker(e.latlng).addTo(map).bindPopup("You are here").openPopup();
+        L.circle(e.latlng, e.accuracy / 2).addTo(map);
+    });
+    map.on('locationerror', function(e) { console.log(e.message); });
+</script>
+
 {% endblock %}
