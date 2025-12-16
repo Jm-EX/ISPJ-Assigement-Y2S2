@@ -49,6 +49,9 @@ from app.auth_db import (
     increment_otp_attempts,
     update_passkey_sign_count,
     update_user_password,
+    log_security_event,
+    set_totp_secret,
+    get_totp_secret,
 )
 
 
@@ -194,6 +197,7 @@ def login_post():
 
     user = get_user_by_username(username)
     if user is None or not check_password_hash(user["password_hash"], password):
+        log_security_event(None, username, 'login_failed', 'Invalid credentials')
         flash("Invalid username or password.", "error")
         return redirect(url_for("auth.login_get"))
 
@@ -265,16 +269,15 @@ def use_otp_instead():
         return redirect(url_for("auth.login_get"))
     
     user_id = session.pop("pending_login_user_id")
-    session.pop("pending_login_username", None)
+    username = session.pop("pending_login_username")
     
     user = get_user_by_id(user_id)
     if not user:
-        flash("User not found.", "error")
         return redirect(url_for("auth.login_get"))
     
     otp_code = f"{secrets.randbelow(1_000_000):06d}"
     otp_expires = datetime.now(timezone.utc) + timedelta(minutes=5)
-
+    
     otp_token = secrets.token_urlsafe(32)
     create_otp_challenge(
         token=otp_token,
@@ -282,19 +285,124 @@ def use_otp_instead():
         otp_hash=generate_password_hash(otp_code),
         expires_at=otp_expires.isoformat(),
     )
-
+    
     session["otp_token"] = otp_token
-
-    sent = _send_otp_email(user["email"], otp_code)
-    if sent:
-        flash("OTP sent to your email.", "success")
-    else:
-        flash(
-            "OTP email sending is not configured yet; check server logs for the OTP (dev mode).",
-            "error",
-        )
-
+    
+    msg = Message(
+        subject="Your OTP Code",
+        sender=current_app.config["SMTP_FROM"],
+        recipients=[user["email"]],
+    )
+    msg.body = f"Your OTP code is: {otp_code}\n\nThis code will expire in 5 minutes."
+    mail.send(msg)
+    
+    flash("OTP sent to your email.", "success")
     return redirect(url_for("auth.verify_otp_get"))
+
+
+@auth.get("/setup-totp")
+def setup_totp_get():
+    if not session.get("pending_totp_user_id"):
+        return redirect(url_for("auth.login_get"))
+    
+    user_id = session["pending_totp_user_id"]
+    user = get_user_by_id(user_id)
+    
+    import pyotp
+    totp_secret = pyotp.random_base32()
+    set_totp_secret(user_id, totp_secret)
+    
+    totp_uri = pyotp.totp.TOTP(totp_secret).provisioning_uri(
+        name=user["username"],
+        issuer_name="ISPJ Hotel"
+    )
+    
+    import qrcode
+    import io
+    import base64
+    
+    qr = qrcode.QRCode(version=1, box_size=10, border=5)
+    qr.add_data(totp_uri)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="black", back_color="white")
+    
+    buffer = io.BytesIO()
+    img.save(buffer, format='PNG')
+    qr_code_base64 = base64.b64encode(buffer.getvalue()).decode()
+    
+    return render_template("setup_totp.html", qr_code=qr_code_base64, secret=totp_secret)
+
+
+@auth.post("/setup-totp")
+def setup_totp_post():
+    if not session.get("pending_totp_user_id"):
+        return redirect(url_for("auth.login_get"))
+    
+    user_id = session["pending_totp_user_id"]
+    totp_code = request.form.get("totp_code", "").strip()
+    
+    totp_secret = get_totp_secret(user_id)
+    if not totp_secret:
+        flash("TOTP setup error. Please try again.", "error")
+        return redirect(url_for("auth.login_get"))
+    
+    import pyotp
+    totp = pyotp.TOTP(totp_secret)
+    
+    if not totp.verify(totp_code):
+        flash("Invalid TOTP code. Please try again.", "error")
+        return render_template("setup_totp.html", qr_code="", secret=totp_secret)
+    
+    user = get_user_by_id(user_id)
+    session.pop("pending_totp_user_id", None)
+    
+    session["user_id"] = int(user["id"])
+    session["username"] = user["username"]
+    session["is_admin"] = bool(user["is_admin"])
+    
+    log_security_event(user["id"], user["username"], 'login_success', 'TOTP setup completed')
+    
+    flash("Microsoft Authenticator setup successful!", "success")
+    return redirect(url_for("admin.portal"))
+
+
+@auth.get("/verify-totp")
+def verify_totp_get():
+    if not session.get("pending_totp_user_id"):
+        return redirect(url_for("auth.login_get"))
+    return render_template("verify_totp.html")
+
+
+@auth.post("/verify-totp")
+def verify_totp_post():
+    if not session.get("pending_totp_user_id"):
+        return redirect(url_for("auth.login_get"))
+    
+    user_id = session["pending_totp_user_id"]
+    totp_code = request.form.get("totp_code", "").strip()
+    
+    totp_secret = get_totp_secret(user_id)
+    if not totp_secret:
+        flash("TOTP not set up. Please contact administrator.", "error")
+        return redirect(url_for("auth.login_get"))
+    
+    import pyotp
+    totp = pyotp.TOTP(totp_secret)
+    
+    if not totp.verify(totp_code):
+        flash("Invalid TOTP code. Please try again.", "error")
+        return redirect(url_for("auth.verify_totp_get"))
+    
+    user = get_user_by_id(user_id)
+    session.pop("pending_totp_user_id", None)
+    
+    session["user_id"] = int(user["id"])
+    session["username"] = user["username"]
+    session["is_admin"] = bool(user["is_admin"])
+    
+    log_security_event(user["id"], user["username"], 'login_success', 'TOTP verification successful')
+    
+    return redirect(url_for("admin.portal"))
 
 
 @auth.get("/verify-otp")
@@ -356,9 +464,23 @@ def verify_otp_post():
     delete_otp_challenge(otp_token)
     session.pop("otp_token", None)
 
+    # Check if this is Admin1! and requires TOTP
+    if user["username"] == "Admin1!":
+        totp_secret = get_totp_secret(user["id"])
+        if not totp_secret:
+            # First time - need to set up TOTP
+            session["pending_totp_user_id"] = user["id"]
+            return redirect(url_for("auth.setup_totp_get"))
+        else:
+            # TOTP already set up - verify it
+            session["pending_totp_user_id"] = user["id"]
+            return redirect(url_for("auth.verify_totp_get"))
+
     session["user_id"] = int(user["id"])
     session["username"] = user["username"]
     session["is_admin"] = bool(user["is_admin"])
+    
+    log_security_event(user["id"], user["username"], 'login_success', 'OTP verification successful')
 
     if session.get("is_admin"):
         return redirect(url_for("admin.portal"))

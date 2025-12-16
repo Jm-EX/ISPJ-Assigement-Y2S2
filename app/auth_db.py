@@ -1,7 +1,6 @@
 import pymysql
 from datetime import datetime
-
-from flask import current_app, g
+from flask import current_app, g, request
 from werkzeug.security import generate_password_hash
 
 
@@ -82,6 +81,21 @@ def init_db(app):
                 credential_id TEXT NOT NULL,
                 public_key TEXT NOT NULL,
                 sign_count INT NOT NULL DEFAULT 0,
+                created_at DATETIME NOT NULL,
+                FOREIGN KEY (user_id) REFERENCES users (id)
+            )
+            """
+        )
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS security_logs (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT,
+                username VARCHAR(255),
+                event_type VARCHAR(255) NOT NULL,
+                ip_address VARCHAR(255),
+                user_agent TEXT,
+                details TEXT,
                 created_at DATETIME NOT NULL,
                 FOREIGN KEY (user_id) REFERENCES users (id)
             )
@@ -239,7 +253,7 @@ def update_user_password(user_id: int, password_hash: str):
     db = get_db()
     cursor = db.cursor()
     cursor.execute(
-        "UPDATE users SET password_hash = %s WHERE id = %s", (password_hash, int(user_id))
+        "UPDATE users SET password_hash = %s WHERE id = %s", (password_hash, user_id)
     )
 
 
@@ -288,3 +302,134 @@ def delete_passkey_credential(credential_id: str):
     cursor.execute(
         "DELETE FROM passkey_credentials WHERE credential_id = %s", (credential_id,)
     )
+
+
+def log_security_event(user_id, username, event_type, details=None):
+    db = get_db()
+    cursor = db.cursor()
+    ip_address = request.remote_addr if request else None
+    user_agent = request.headers.get('User-Agent') if request else None
+    cursor.execute(
+        """
+        INSERT INTO security_logs (user_id, username, event_type, ip_address, user_agent, details, created_at)
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
+        """,
+        (user_id, username, event_type, ip_address, user_agent, details, datetime.utcnow())
+    )
+
+
+def get_security_logs(limit=100):
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute(
+        "SELECT * FROM security_logs ORDER BY created_at DESC LIMIT %s",
+        (limit,)
+    )
+    return cursor.fetchall()
+
+
+def get_login_stats():
+    db = get_db()
+    cursor = db.cursor()
+    
+    cursor.execute(
+        "SELECT COUNT(*) as count FROM security_logs WHERE event_type = 'login_success'"
+    )
+    successful_logins = cursor.fetchone()['count']
+    
+    cursor.execute(
+        "SELECT COUNT(*) as count FROM security_logs WHERE event_type = 'login_failed'"
+    )
+    failed_logins = cursor.fetchone()['count']
+    
+    cursor.execute(
+        "SELECT COUNT(*) as count FROM security_logs WHERE event_type = 'account_locked'"
+    )
+    account_lockouts = cursor.fetchone()['count']
+    
+    cursor.execute(
+        "SELECT COUNT(*) as count FROM users"
+    )
+    total_users = cursor.fetchone()['count']
+    
+    return {
+        'successful_logins': successful_logins,
+        'failed_logins': failed_logins,
+        'account_lockouts': account_lockouts,
+        'total_users': total_users
+    }
+
+
+def get_all_users():
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("SELECT id, username, email, is_admin, role, permissions, created_at FROM users ORDER BY created_at DESC")
+    users = cursor.fetchall()
+    import json
+    for user in users:
+        if user.get('permissions'):
+            try:
+                user['permissions'] = json.loads(user['permissions'])
+            except:
+                user['permissions'] = {}
+        else:
+            user['permissions'] = {}
+    return users
+
+
+def delete_user(user_id: int):
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("DELETE FROM users WHERE id = %s", (user_id,))
+
+
+def create_sub_admin(username: str, email: str, password_hash: str, role: str, permissions: dict):
+    db = get_db()
+    cursor = db.cursor()
+    import json
+    cursor.execute(
+        """
+        INSERT INTO users (username, email, password_hash, is_admin, role, permissions, created_at)
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
+        """,
+        (username, email, password_hash, True, role, json.dumps(permissions), datetime.utcnow())
+    )
+    return cursor.lastrowid
+
+
+def update_user_role(user_id: int, role: str, permissions: dict):
+    db = get_db()
+    cursor = db.cursor()
+    import json
+    cursor.execute(
+        "UPDATE users SET role = %s, permissions = %s WHERE id = %s",
+        (role, json.dumps(permissions), user_id)
+    )
+
+
+def get_user_permissions(user_id: int):
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("SELECT role, permissions FROM users WHERE id = %s", (user_id,))
+    result = cursor.fetchone()
+    if result and result.get('permissions'):
+        import json
+        try:
+            result['permissions'] = json.loads(result['permissions'])
+        except:
+            result['permissions'] = {}
+    return result
+
+
+def set_totp_secret(user_id: int, totp_secret: str):
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("UPDATE users SET totp_secret = %s WHERE id = %s", (totp_secret, user_id))
+
+
+def get_totp_secret(user_id: int):
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("SELECT totp_secret FROM users WHERE id = %s", (user_id,))
+    result = cursor.fetchone()
+    return result['totp_secret'] if result else None

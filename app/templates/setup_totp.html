@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Setup Microsoft Authenticator{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="auth-container" style="max-width: 600px;">
+  <h1>Setup Microsoft Authenticator</h1>
+  <p style="color: #666; margin-bottom: 24px;">Scan the QR code with Microsoft Authenticator app to enable two-factor authentication.</p>
+
+  {% if qr_code %}
+  <div style="text-align: center; margin: 24px 0;">
+    <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code" style="max-width: 300px; border: 2px solid #e0e0e0; border-radius: 12px; padding: 16px;">
+  </div>
+
+  <div style="background: #f8f9fa; padding: 16px; border-radius: 8px; margin: 16px 0;">
+    <p style="font-size: 14px; color: #666; margin-bottom: 8px;"><strong>Manual Entry:</strong></p>
+    <p style="font-family: monospace; font-size: 14px; color: #333; word-break: break-all;">{{ secret }}</p>
+  </div>
+  {% endif %}
+
+  <div style="background: #e3f2fd; padding: 16px; border-radius: 8px; margin: 16px 0;">
+    <p style="font-size: 14px; color: #1976d2; margin: 0;"><strong>Instructions:</strong></p>
+    <ol style="font-size: 14px; color: #1976d2; margin: 8px 0 0 0; padding-left: 20px;">
+      <li>Open Microsoft Authenticator app</li>
+      <li>Tap "Add account" → "Other account"</li>
+      <li>Scan the QR code above</li>
+      <li>Enter the 6-digit code below to verify</li>
+    </ol>
+  </div>
+
+  <form method="post" action="{{ url_for('auth.setup_totp_post') }}" class="auth-form">
+    <label for="totp_code">Enter 6-digit code from Microsoft Authenticator</label>
+    <input id="totp_code" name="totp_code" type="text" pattern="[0-9]{6}" maxlength="6" required autofocus>
+
+    <button type="submit" class="auth-btn">Verify & Complete Setup</button>
+  </form>
+</div>
+{% endblock %}
