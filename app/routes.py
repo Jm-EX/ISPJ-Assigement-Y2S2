@@ -25,12 +25,22 @@ main = Blueprint('main', __name__)
 stripe.api_key = 'sk_test_51SeUJR2OsU80dT1Yw27XKOVnYeA8JgICdgfkNgRo5wZ2n5TuEXi3IFLffC1bsSm8UAgchYJFvkrAw8BF72rWxtyE00MY1LodZ7'
 
 # =========================
+# Resort locaiton
+# =========================
+resorts = [
+    {"name": "Pulau Tekong Resort", "lat": 1.40412, "lng": 104.05001},
+    {"name": "Toa Payoh Resort", "lat": 1.3325, "lng": 103.8500},
+    {"name": "Upper Thomson Resort", "lat": 1.3636, "lng": 103.8143},
+]
+
+
+# =========================
 # Pages
 # =========================
 
 @main.route("/")
 def index():
-    return render_template("home.html")
+    return render_template("home.html", resorts=resorts)
 
 @main.route("/book")
 def book_room():
