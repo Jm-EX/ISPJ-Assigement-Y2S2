@@ -265,24 +265,32 @@
           <label style="display: block; font-weight: 600; margin-bottom: 8px;">Permissions</label>
           <div style="display: grid; gap: 8px;">
             <label style="display: flex; align-items: center; gap: 8px;">
-              <input type="checkbox" id="perm_view_users" checked>
-              <span>View Users</span>
+              <input type="checkbox" id="perm_view_bookings">
+              <span>View Bookings</span>
             </label>
             <label style="display: flex; align-items: center; gap: 8px;">
-              <input type="checkbox" id="perm_delete_users">
-              <span>Delete Users</span>
+              <input type="checkbox" id="perm_modify_bookings">
+              <span>Modify Bookings</span>
             </label>
             <label style="display: flex; align-items: center; gap: 8px;">
-              <input type="checkbox" id="perm_view_logs" checked>
-              <span>View Security Logs</span>
+              <input type="checkbox" id="perm_view_guest_profiles">
+              <span>View Guest Profiles</span>
             </label>
             <label style="display: flex; align-items: center; gap: 8px;">
-              <input type="checkbox" id="perm_manage_bookings">
-              <span>Manage Bookings</span>
+              <input type="checkbox" id="perm_add_guest_notes">
+              <span>Add Guest Notes</span>
             </label>
             <label style="display: flex; align-items: center; gap: 8px;">
-              <input type="checkbox" id="perm_create_sub_admins">
-              <span>Create Sub-Admins</span>
+              <input type="checkbox" id="perm_update_room_status">
+              <span>Update Room Status</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px;">
+              <input type="checkbox" id="perm_delete_user">
+              <span>Delete User</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px;">
+              <input type="checkbox" id="perm_view_active_sessions">
+              <span>View Active Sessions</span>
             </label>
           </div>
         </div>
@@ -310,6 +318,7 @@
           <th>Role</th>
           <th>Permissions</th>
           <th>Created At</th>
+          <th>Last Login</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -330,22 +339,24 @@
           </td>
           <td style="font-size: 12px;">
             {% if user.permissions %}
-              {% if user.permissions.view_users %}<span class="badge" style="background: #e8f5e9; color: #2e7d32; margin: 2px;">View Users</span>{% endif %}
-              {% if user.permissions.delete_users %}<span class="badge" style="background: #ffebee; color: #c62828; margin: 2px;">Delete Users</span>{% endif %}
-              {% if user.permissions.view_logs %}<span class="badge" style="background: #e3f2fd; color: #1976d2; margin: 2px;">View Logs</span>{% endif %}
-              {% if user.permissions.manage_bookings %}<span class="badge" style="background: #f3e5f5; color: #7b1fa2; margin: 2px;">Manage Bookings</span>{% endif %}
-              {% if user.permissions.create_sub_admins %}<span class="badge" style="background: #fff3e0; color: #e65100; margin: 2px;">Create Sub-Admins</span>{% endif %}
+              {% if user.permissions.view_bookings %}<span class="badge" style="background: #e8f5e9; color: #2e7d32; margin: 2px;">View Bookings</span>{% endif %}
+              {% if user.permissions.modify_bookings %}<span class="badge" style="background: #ffebee; color: #c62828; margin: 2px;">Modify Bookings</span>{% endif %}
+              {% if user.permissions.view_guest_profiles %}<span class="badge" style="background: #e3f2fd; color: #1976d2; margin: 2px;">View Guest Profiles</span>{% endif %}
+              {% if user.permissions.add_guest_notes %}<span class="badge" style="background: #f3e5f5; color: #7b1fa2; margin: 2px;">Add Guest Notes</span>{% endif %}
+              {% if user.permissions.update_room_status %}<span class="badge" style="background: #fff3e0; color: #e65100; margin: 2px;">Update Room Status</span>{% endif %}
+              {% if user.permissions.delete_user %}<span class="badge" style="background: #ffcdd2; color: #b71c1c; margin: 2px;">Delete User</span>{% endif %}
             {% else %}
               <span style="color: #999;">-</span>
             {% endif %}
           </td>
           <td class="timestamp">{{ user.created_at.strftime('%Y-%m-%d %H:%M') if user.created_at else 'N/A' }}</td>
+          <td class="timestamp">{{ user.last_login.strftime('%Y-%m-%d %H:%M') if user.last_login else 'Never' }}</td>
           <td>
             <button 
               class="btn-delete" 
               onclick="deleteUser({{ user.id }}, '{{ user.username }}')"
-              {% if user.id == session.get('user_id') %}disabled{% endif %}>
-              {% if user.id == session.get('user_id') %}You{% else %}Delete{% endif %}
+              {% if user.id == session.get('user_id') or user.username == 'Admin1!' %}disabled{% endif %}>
+              {% if user.id == session.get('user_id') %}You{% elif user.username == 'Admin1!' %}Master{% else %}Delete{% endif %}
             </button>
           </td>
         </tr>
@@ -358,6 +369,84 @@
     </div>
     {% endif %}
   </div>
+
+  <!-- Active Sessions Section -->
+  {% if active_sessions %}
+  <div class="dashboard-section">
+    <div class="section-header">
+      <h2>Active Sessions</h2>
+      <p style="color: #666; font-size: 14px; margin-top: 4px;">Monitor active user sessions with risk scoring</p>
+    </div>
+    
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>IP Address</th>
+          <th>Device</th>
+          <th>Country</th>
+          <th>Risk Score</th>
+          <th>New Device</th>
+          <th>New Country</th>
+          <th>Failed Attempts</th>
+          <th>Last Activity</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for sess in active_sessions %}
+        <tr>
+          <td><strong>{{ sess.username }}</strong><br><small style="color: #666;">{{ sess.email }}</small></td>
+          <td>{{ sess.ip_address or 'N/A' }}</td>
+          <td><small style="color: #666;">{{ sess.device_fingerprint[:12] if sess.device_fingerprint else 'N/A' }}...</small></td>
+          <td>{{ sess.country or 'Unknown' }}</td>
+          <td>
+            {% if sess.risk_score >= 6 %}
+              <span class="badge" style="background: #ffebee; color: #c62828; font-weight: bold;">{{ sess.risk_score }}</span>
+            {% elif sess.risk_score >= 4 %}
+              <span class="badge" style="background: #fff3e0; color: #e65100; font-weight: bold;">{{ sess.risk_score }}</span>
+            {% elif sess.risk_score >= 2 %}
+              <span class="badge" style="background: #fff9c4; color: #f57f17; font-weight: bold;">{{ sess.risk_score }}</span>
+            {% else %}
+              <span class="badge" style="background: #e8f5e9; color: #2e7d32; font-weight: bold;">{{ sess.risk_score }}</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if sess.is_new_device %}
+              <span class="badge" style="background: #fff3e0; color: #e65100;">Yes (+2)</span>
+            {% else %}
+              <span style="color: #999;">No</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if sess.is_new_country %}
+              <span class="badge" style="background: #fff3e0; color: #e65100;">Yes (+2)</span>
+            {% else %}
+              <span style="color: #999;">No</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if sess.previous_failed_attempts > 0 %}
+              <span class="badge" style="background: #ffebee; color: #c62828;">{{ sess.previous_failed_attempts }} (+{{ sess.previous_failed_attempts * 2 }})</span>
+            {% else %}
+              <span style="color: #999;">0</span>
+            {% endif %}
+          </td>
+          <td class="timestamp">{{ sess.last_activity.strftime('%Y-%m-%d %H:%M') if sess.last_activity else 'N/A' }}</td>
+          <td>
+            <button 
+              class="btn-delete" 
+              onclick="logoutSession({{ sess.id }}, '{{ sess.username }}')"
+              style="font-size: 12px; padding: 6px 12px;">
+              Logout
+            </button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
 
   <!-- Security Logs Section -->
   <div class="dashboard-section">
@@ -416,11 +505,13 @@ document.getElementById('subAdminForm').addEventListener('submit', async (e) => 
   const password = document.getElementById('subAdminPassword').value;
   
   const permissions = {
-    view_users: document.getElementById('perm_view_users').checked,
-    delete_users: document.getElementById('perm_delete_users').checked,
-    view_logs: document.getElementById('perm_view_logs').checked,
-    manage_bookings: document.getElementById('perm_manage_bookings').checked,
-    create_sub_admins: document.getElementById('perm_create_sub_admins').checked
+    view_bookings: document.getElementById('perm_view_bookings').checked,
+    modify_bookings: document.getElementById('perm_modify_bookings').checked,
+    view_guest_profiles: document.getElementById('perm_view_guest_profiles').checked,
+    add_guest_notes: document.getElementById('perm_add_guest_notes').checked,
+    update_room_status: document.getElementById('perm_update_room_status').checked,
+    delete_user: document.getElementById('perm_delete_user').checked,
+    view_active_sessions: document.getElementById('perm_view_active_sessions').checked
   };
   
   try {
@@ -474,6 +565,32 @@ async function deleteUser(userId, username) {
     }
   } catch (error) {
     alert('An error occurred while deleting the user.');
+    console.error(error);
+  }
+}
+
+async function logoutSession(sessionId, username) {
+  if (!confirm(`Are you sure you want to logout "${username}"'s session?`)) {
+    return;
+  }
+  
+  try {
+    const response = await fetch(`/admin/logout-session/${sessionId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (response.ok) {
+      alert(`Session for "${username}" has been logged out successfully.`);
+      window.location.reload();
+    } else {
+      const data = await response.json();
+      alert(`Error: ${data.error || 'Failed to logout session'}`);
+    }
+  } catch (error) {
+    alert('An error occurred while logging out the session.');
     console.error(error);
   }
 }

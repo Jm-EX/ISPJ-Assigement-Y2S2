@@ -1,9 +1,32 @@
 from flask import Blueprint, redirect, render_template, session, url_for, request, jsonify, flash
-from app.auth_db import get_login_stats, get_all_users, delete_user, get_security_logs, create_sub_admin, update_user_role, get_user_permissions
+from app.auth_db import get_login_stats, get_all_users, delete_user, get_security_logs, create_sub_admin, update_user_role, get_user_permissions, get_active_sessions, delete_session
 from werkzeug.security import generate_password_hash
+import json
 
 
 admin = Blueprint("admin", __name__)
+
+
+def check_permission(user_id, permission_name):
+    """Check if user has a specific permission. Super admins always have all permissions."""
+    user_perms = get_user_permissions(user_id)
+    if not user_perms:
+        return False
+    
+    role = user_perms.get('role')
+    # Super admin or master admin (no role set) has all permissions
+    if role is None or role == 'super_admin' or role == 'master_admin':
+        return True
+    
+    # Sub-admins need specific permissions
+    permissions = user_perms.get('permissions', {})
+    if isinstance(permissions, str):
+        try:
+            permissions = json.loads(permissions)
+        except:
+            permissions = {}
+    
+    return permissions.get(permission_name, False)
 
 
 @admin.get("/admin")
@@ -17,7 +40,17 @@ def portal():
     users = get_all_users()
     security_logs = get_security_logs(limit=50)
     
-    return render_template("admin_portal.html", stats=stats, users=users, security_logs=security_logs)
+    # Get active sessions - master admin always has access, sub-admins need permission
+    active_sessions = []
+    current_user_id = session.get("user_id")
+    user_perms = get_user_permissions(current_user_id)
+    role = user_perms.get('role') if user_perms else None
+    
+    # Master admin (role=None) or users with view_active_sessions permission can see sessions
+    if role is None or role == 'super_admin' or role == 'master_admin' or check_permission(current_user_id, 'view_active_sessions'):
+        active_sessions = get_active_sessions()
+    
+    return render_template("admin_portal.html", stats=stats, users=users, security_logs=security_logs, active_sessions=active_sessions)
 
 
 @admin.post("/admin/delete-user/<int:user_id>")
@@ -27,8 +60,22 @@ def delete_user_route(user_id):
     if not session.get("is_admin"):
         return jsonify({"error": "Not authorized"}), 403
     
+    # Check if user has permission to delete users
+    current_user_id = session.get("user_id")
+    
+    # Master admin (role=None) and super admins always have permission
+    # Sub-admins need explicit delete_user permission
+    if not check_permission(current_user_id, 'delete_user'):
+        return jsonify({"error": "You do not have permission to delete users"}), 403
+    
     if user_id == session.get("user_id"):
         return jsonify({"error": "Cannot delete your own account"}), 400
+    
+    # Prevent deletion of master admin account (Admin1!)
+    from app.auth_db import get_user_by_id
+    target_user = get_user_by_id(user_id)
+    if target_user and target_user.get('username') == 'Admin1!':
+        return jsonify({"error": "Cannot delete the master admin account"}), 403
     
     delete_user(user_id)
     return jsonify({"success": True})
@@ -40,6 +87,14 @@ def create_sub_admin_route():
         return jsonify({"error": "Not authenticated"}), 401
     if not session.get("is_admin"):
         return jsonify({"error": "Not authorized"}), 403
+    
+    # Only super admin can create users (sub-admins cannot)
+    current_user_id = session.get("user_id")
+    user_perms = get_user_permissions(current_user_id)
+    role = user_perms.get('role') if user_perms else None
+    
+    if role is not None and role != 'super_admin' and role != 'master_admin':
+        return jsonify({"error": "Only super admin can create users"}), 403
     
     data = request.get_json()
     username = data.get("username", "").strip()
@@ -69,6 +124,14 @@ def update_permissions_route(user_id):
     if not session.get("is_admin"):
         return jsonify({"error": "Not authorized"}), 403
     
+    # Only super admin can update permissions (sub-admins cannot)
+    current_user_id = session.get("user_id")
+    user_perms = get_user_permissions(current_user_id)
+    role = user_perms.get('role') if user_perms else None
+    
+    if role is not None and role != 'super_admin' and role != 'master_admin':
+        return jsonify({"error": "Only super admin can update permissions"}), 403
+    
     data = request.get_json()
     role = data.get("role", "sub_admin")
     permissions = data.get("permissions", {})
@@ -78,3 +141,23 @@ def update_permissions_route(user_id):
         return jsonify({"success": True})
     except Exception as e:
         return jsonify({"error": str(e)}), 400
+
+
+@admin.post("/admin/logout-session/<int:session_id>")
+def logout_session_route(session_id):
+    if not session.get("user_id"):
+        return jsonify({"error": "Not authenticated"}), 401
+    if not session.get("is_admin"):
+        return jsonify({"error": "Not authorized"}), 403
+    
+    # Check if user has permission to view active sessions (same permission required to logout)
+    current_user_id = session.get("user_id")
+    user_perms = get_user_permissions(current_user_id)
+    role = user_perms.get('role') if user_perms else None
+    
+    # Master admin or users with view_active_sessions permission can logout sessions
+    if role is None or role == 'super_admin' or role == 'master_admin' or check_permission(current_user_id, 'view_active_sessions'):
+        delete_session(session_id)
+        return jsonify({"success": True})
+    else:
+        return jsonify({"error": "You do not have permission to logout sessions"}), 403

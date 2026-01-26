@@ -30,7 +30,7 @@ from webauthn.helpers.structs import (
 from webauthn.helpers.cose import COSEAlgorithmIdentifier
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from app import mail
+from app import mail, limiter
 from app.auth_db import (
     create_otp_challenge,
     create_passkey_credential,
@@ -191,12 +191,33 @@ def login_get():
 
 
 @auth.post("/login")
+@limiter.limit("5 per minute")
 def login_post():
     username = (request.form.get("username") or "").strip()
     password = request.form.get("password") or ""
 
     user = get_user_by_username(username)
+    
+    # Check for account lockout if user exists
+    if user:
+        from app.auth_db import check_account_lockout
+        ip_address = request.remote_addr
+        user_agent = request.headers.get('User-Agent', '')
+        user_role = user.get('role')  # Get user role for threshold determination
+        is_locked, remaining_time = check_account_lockout(user["id"], ip_address, user_agent, user_role)
+        
+        if is_locked:
+            flash(f"Account temporarily locked due to multiple failed attempts. Please try again in {remaining_time}.", "error")
+            return redirect(url_for("auth.login_get"))
+    
     if user is None or not check_password_hash(user["password_hash"], password):
+        # Increment failed attempts if user exists
+        if user:
+            from app.auth_db import increment_failed_attempts_by_user
+            ip_address = request.remote_addr
+            user_agent = request.headers.get('User-Agent', '')
+            increment_failed_attempts_by_user(user["id"], ip_address, user_agent)
+        
         log_security_event(None, username, 'login_failed', 'Invalid credentials')
         flash("Invalid username or password.", "error")
         return redirect(url_for("auth.login_get"))
@@ -356,9 +377,23 @@ def setup_totp_post():
     user = get_user_by_id(user_id)
     session.pop("pending_totp_user_id", None)
     
+    session.permanent = True
     session["user_id"] = int(user["id"])
     session["username"] = user["username"]
     session["is_admin"] = bool(user["is_admin"])
+    
+    from app.auth_db import update_last_login, create_or_update_session, send_high_risk_alert
+    update_last_login(user["id"])
+    
+    # Track session with risk scoring - use Flask session ID
+    session_token = session.get('_id', str(user["id"]))
+    ip_address = request.remote_addr
+    user_agent = request.headers.get('User-Agent', '')
+    total_risk_score = create_or_update_session(user["id"], session_token, ip_address, user_agent)
+    
+    # Send email alert if total risk score >= 6
+    if total_risk_score >= 6:
+        send_high_risk_alert(user["username"], total_risk_score)
     
     log_security_event(user["id"], user["username"], 'login_success', 'TOTP setup completed')
     
@@ -374,6 +409,7 @@ def verify_totp_get():
 
 
 @auth.post("/verify-totp")
+@limiter.limit("10 per minute")
 def verify_totp_post():
     if not session.get("pending_totp_user_id"):
         return redirect(url_for("auth.login_get"))
@@ -396,9 +432,23 @@ def verify_totp_post():
     user = get_user_by_id(user_id)
     session.pop("pending_totp_user_id", None)
     
+    session.permanent = True
     session["user_id"] = int(user["id"])
     session["username"] = user["username"]
     session["is_admin"] = bool(user["is_admin"])
+    
+    from app.auth_db import update_last_login, create_or_update_session, send_high_risk_alert
+    update_last_login(user["id"])
+    
+    # Track session with risk scoring - use Flask session ID
+    session_token = session.get('_id', str(user["id"]))
+    ip_address = request.remote_addr
+    user_agent = request.headers.get('User-Agent', '')
+    total_risk_score = create_or_update_session(user["id"], session_token, ip_address, user_agent)
+    
+    # Send email alert if total risk score >= 6
+    if total_risk_score >= 6:
+        send_high_risk_alert(user["username"], total_risk_score)
     
     log_security_event(user["id"], user["username"], 'login_success', 'TOTP verification successful')
     
@@ -413,6 +463,7 @@ def verify_otp_get():
 
 
 @auth.post("/verify-otp")
+@limiter.limit("10 per minute")
 def verify_otp_post():
     otp_token = session.get("otp_token")
     if not otp_token:
@@ -476,9 +527,23 @@ def verify_otp_post():
             session["pending_totp_user_id"] = user["id"]
             return redirect(url_for("auth.verify_totp_get"))
 
+    session.permanent = True
     session["user_id"] = int(user["id"])
     session["username"] = user["username"]
     session["is_admin"] = bool(user["is_admin"])
+    
+    from app.auth_db import update_last_login, create_or_update_session, send_high_risk_alert
+    update_last_login(user["id"])
+    
+    # Track session with risk scoring - use Flask session ID
+    session_token = session.get('_id', str(user["id"]))
+    ip_address = request.remote_addr
+    user_agent = request.headers.get('User-Agent', '')
+    total_risk_score = create_or_update_session(user["id"], session_token, ip_address, user_agent)
+    
+    # Send email alert if total risk score >= 6
+    if total_risk_score >= 6:
+        send_high_risk_alert(user["username"], total_risk_score)
     
     log_security_event(user["id"], user["username"], 'login_success', 'OTP verification successful')
 
@@ -489,6 +554,15 @@ def verify_otp_post():
 
 @auth.get("/logout")
 def logout():
+    from app.auth_db import log_security_event
+    
+    # Log logout event before clearing session
+    user_id = session.get("user_id")
+    username = session.get("username")
+    
+    if user_id and username:
+        log_security_event(user_id, username, 'logout', 'User initiated logout')
+    
     session.clear()
     return redirect(url_for("main.index"))
 
@@ -642,9 +716,13 @@ def passkey_register_begin():
         
         from webauthn.helpers.structs import AttestationConveyancePreference
         
-        rp_id = request.host.split(':')[0]
-        if rp_id == "127.0.0.1":
+        # Get the hostname without port for rp_id
+        hostname = request.host.split(':')[0]
+        # WebAuthn requires localhost for local development, not 127.0.0.1
+        if hostname == "127.0.0.1":
             rp_id = "localhost"
+        else:
+            rp_id = hostname
         
         options = generate_registration_options(
             rp_id=rp_id,
@@ -728,11 +806,18 @@ def passkey_register_complete():
         print(f"Raw ID bytes length: {len(raw_id_bytes)}")
         
         print("Step 5: Setting up rp_id...")
-        rp_id = request.host.split(':')[0]
-        if rp_id == "127.0.0.1":
+        # Get the hostname without port for rp_id
+        hostname = request.host.split(':')[0]
+        # WebAuthn requires localhost for local development, not 127.0.0.1
+        if hostname == "127.0.0.1":
             rp_id = "localhost"
+            # Origin must use localhost too when rp_id is localhost
+            expected_origin = f"{request.scheme}://localhost:{request.host.split(':')[1]}" if ':' in request.host else f"{request.scheme}://localhost"
+        else:
+            rp_id = hostname
+            expected_origin = f"{request.scheme}://{request.host}"
         print(f"RP ID: {rp_id}")
-        print(f"Origin: {request.scheme}://{request.host}")
+        print(f"Origin: {expected_origin}")
         
         print("Step 6: Verifying registration response...")
         verification = verify_registration_response(
@@ -746,7 +831,7 @@ def passkey_register_complete():
                 "type": "public-key",
             },
             expected_challenge=challenge_bytes,
-            expected_origin=f"{request.scheme}://{request.host}",
+            expected_origin=expected_origin,
             expected_rp_id=rp_id,
         )
         print("Verification successful!")
@@ -817,9 +902,13 @@ def passkey_authenticate_begin():
     if not passkeys:
         return jsonify({"error": "No passkeys registered"}), 404
     
-    rp_id = request.host.split(':')[0]
-    if rp_id == "127.0.0.1":
+    # Get the hostname without port for rp_id
+    hostname = request.host.split(':')[0]
+    # WebAuthn requires localhost for local development, not 127.0.0.1
+    if hostname == "127.0.0.1":
         rp_id = "localhost"
+    else:
+        rp_id = hostname
     
     allow_credentials = [
         PublicKeyCredentialDescriptor(id=base64.urlsafe_b64decode(p["credential_id"] + '=='))
@@ -868,9 +957,16 @@ def passkey_authenticate_complete():
         authenticator_data_bytes = base64.urlsafe_b64decode(authenticator_data + '==')
         signature_bytes = base64.urlsafe_b64decode(signature + '==')
         
-        rp_id = request.host.split(':')[0]
-        if rp_id == "127.0.0.1":
+        # Get the hostname without port for rp_id
+        hostname = request.host.split(':')[0]
+        # WebAuthn requires localhost for local development, not 127.0.0.1
+        if hostname == "127.0.0.1":
             rp_id = "localhost"
+            # Origin must use localhost too when rp_id is localhost
+            expected_origin = f"{request.scheme}://localhost:{request.host.split(':')[1]}" if ':' in request.host else f"{request.scheme}://localhost"
+        else:
+            rp_id = hostname
+            expected_origin = f"{request.scheme}://{request.host}"
         
         verification = verify_authentication_response(
             credential={
@@ -884,7 +980,7 @@ def passkey_authenticate_complete():
                 "type": "public-key",
             },
             expected_challenge=challenge_bytes,
-            expected_origin=f"{request.scheme}://{request.host}",
+            expected_origin=expected_origin,
             expected_rp_id=rp_id,
             credential_public_key=public_key_bytes,
             credential_current_sign_count=passkey["sign_count"],

@@ -45,7 +45,10 @@ def init_db(app):
                 email VARCHAR(255) NOT NULL UNIQUE,
                 password_hash VARCHAR(255) NOT NULL,
                 is_admin TINYINT NOT NULL DEFAULT 0,
-                created_at DATETIME NOT NULL
+                role VARCHAR(50) DEFAULT NULL,
+                permissions TEXT DEFAULT NULL,
+                created_at DATETIME NOT NULL,
+                last_login DATETIME DEFAULT NULL
             )
             """
         )
@@ -96,6 +99,79 @@ def init_db(app):
                 ip_address VARCHAR(255),
                 user_agent TEXT,
                 details TEXT,
+                created_at DATETIME NOT NULL,
+                FOREIGN KEY (user_id) REFERENCES users (id)
+            )
+            """
+        )
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS rooms (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                room_type VARCHAR(100) NOT NULL,
+                total_count INT NOT NULL DEFAULT 0,
+                available_count INT NOT NULL DEFAULT 0,
+                occupied_count INT NOT NULL DEFAULT 0,
+                cleaning_count INT NOT NULL DEFAULT 0,
+                maintenance_count INT NOT NULL DEFAULT 0,
+                price_per_night DECIMAL(10, 2) NOT NULL,
+                updated_at DATETIME NOT NULL
+            )
+            """
+        )
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS bookings (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                guest_name VARCHAR(255) NOT NULL,
+                guest_email VARCHAR(255) NOT NULL,
+                guest_phone VARCHAR(50),
+                room_type VARCHAR(100) NOT NULL,
+                check_in_date DATE NOT NULL,
+                check_out_date DATE NOT NULL,
+                num_guests INT NOT NULL DEFAULT 1,
+                total_price DECIMAL(10, 2) NOT NULL,
+                status VARCHAR(50) NOT NULL DEFAULT 'pending',
+                special_requests TEXT,
+                notes TEXT,
+                created_at DATETIME NOT NULL,
+                updated_at DATETIME NOT NULL,
+                created_by INT,
+                FOREIGN KEY (created_by) REFERENCES users (id)
+            )
+            """
+        )
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS guest_profiles (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                guest_name VARCHAR(255) NOT NULL,
+                guest_email VARCHAR(255) NOT NULL UNIQUE,
+                guest_phone VARCHAR(50),
+                preferences TEXT,
+                notes TEXT,
+                total_bookings INT NOT NULL DEFAULT 0,
+                created_at DATETIME NOT NULL,
+                updated_at DATETIME NOT NULL
+            )
+            """
+        )
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS active_sessions (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT NOT NULL,
+                session_token VARCHAR(255) NOT NULL UNIQUE,
+                ip_address VARCHAR(255),
+                user_agent TEXT,
+                device_fingerprint VARCHAR(255),
+                country VARCHAR(100),
+                risk_score INT NOT NULL DEFAULT 0,
+                is_new_device TINYINT NOT NULL DEFAULT 0,
+                is_new_country TINYINT NOT NULL DEFAULT 0,
+                failed_attempts INT NOT NULL DEFAULT 0,
+                previous_failed_attempts INT NOT NULL DEFAULT 0,
+                last_activity DATETIME NOT NULL,
                 created_at DATETIME NOT NULL,
                 FOREIGN KEY (user_id) REFERENCES users (id)
             )
@@ -304,11 +380,16 @@ def delete_passkey_credential(credential_id: str):
     )
 
 
-def log_security_event(user_id, username, event_type, details=None):
+def log_security_event(user_id, username, event_type, details=None, risk_score=None):
     db = get_db()
     cursor = db.cursor()
     ip_address = request.remote_addr if request else None
     user_agent = request.headers.get('User-Agent') if request else None
+    
+    # Include risk score in details if provided
+    if risk_score is not None:
+        details = f"{details} | Risk Score: {risk_score}" if details else f"Risk Score: {risk_score}"
+    
     cursor.execute(
         """
         INSERT INTO security_logs (user_id, username, event_type, ip_address, user_agent, details, created_at)
@@ -363,7 +444,7 @@ def get_login_stats():
 def get_all_users():
     db = get_db()
     cursor = db.cursor()
-    cursor.execute("SELECT id, username, email, is_admin, role, permissions, created_at FROM users ORDER BY created_at DESC")
+    cursor.execute("SELECT id, username, email, is_admin, role, permissions, created_at, last_login FROM users ORDER BY created_at DESC")
     users = cursor.fetchall()
     import json
     for user in users:
@@ -380,7 +461,9 @@ def get_all_users():
 def delete_user(user_id: int):
     db = get_db()
     cursor = db.cursor()
+    cursor.execute("DELETE FROM passkey_credentials WHERE user_id = %s", (user_id,))
     cursor.execute("DELETE FROM users WHERE id = %s", (user_id,))
+    db.commit()
 
 
 def create_sub_admin(username: str, email: str, password_hash: str, role: str, permissions: dict):
@@ -410,15 +493,25 @@ def update_user_role(user_id: int, role: str, permissions: dict):
 def get_user_permissions(user_id: int):
     db = get_db()
     cursor = db.cursor()
-    cursor.execute("SELECT role, permissions FROM users WHERE id = %s", (user_id,))
-    result = cursor.fetchone()
-    if result and result.get('permissions'):
-        import json
-        try:
-            result['permissions'] = json.loads(result['permissions'])
-        except:
-            result['permissions'] = {}
-    return result
+    try:
+        cursor.execute("SELECT role, permissions FROM users WHERE id = %s", (user_id,))
+        result = cursor.fetchone()
+        if result:
+            import json
+            if result.get('permissions'):
+                try:
+                    result['permissions'] = json.loads(result['permissions'])
+                except:
+                    result['permissions'] = {}
+            else:
+                result['permissions'] = {}
+        return result
+    except Exception:
+        # Columns don't exist yet - return default for master admin
+        cursor.execute("SELECT id FROM users WHERE id = %s", (user_id,))
+        if cursor.fetchone():
+            return {'role': None, 'permissions': {}}
+        return None
 
 
 def set_totp_secret(user_id: int, totp_secret: str):
@@ -433,3 +526,266 @@ def get_totp_secret(user_id: int):
     cursor.execute("SELECT totp_secret FROM users WHERE id = %s", (user_id,))
     result = cursor.fetchone()
     return result['totp_secret'] if result else None
+
+
+def update_last_login(user_id: int):
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("UPDATE users SET last_login = %s WHERE id = %s", (datetime.utcnow(), user_id))
+
+
+def get_country_from_ip(ip_address: str) -> str:
+    """Get country from IP address using ip-api.com (free, no key required)"""
+    if not ip_address or ip_address == '127.0.0.1' or ip_address.startswith('192.168.') or ip_address.startswith('10.'):
+        return 'Local'
+    
+    try:
+        import requests
+        response = requests.get(f'http://ip-api.com/json/{ip_address}?fields=country', timeout=2)
+        if response.status_code == 200:
+            data = response.json()
+            return data.get('country', 'Unknown')
+    except:
+        pass
+    return 'Unknown'
+
+
+def create_or_update_session(user_id: int, session_token: str, ip_address: str, user_agent: str, country: str = None):
+    """Create or update a session with risk scoring based on device and country"""
+    db = get_db()
+    cursor = db.cursor()
+    
+    # Get country from IP if not provided
+    if not country:
+        country = get_country_from_ip(ip_address)
+    
+    # Generate device fingerprint from user agent
+    import hashlib
+    device_fingerprint = hashlib.md5(user_agent.encode()).hexdigest() if user_agent else None
+    
+    # Check if session already exists first
+    cursor.execute("SELECT id, failed_attempts, device_fingerprint, country FROM active_sessions WHERE session_token = %s", (session_token,))
+    existing = cursor.fetchone()
+    
+    # Get failed attempts from any session with same device/IP (regardless of user)
+    cursor.execute(
+        "SELECT failed_attempts FROM active_sessions WHERE device_fingerprint = %s AND ip_address = %s ORDER BY last_activity DESC LIMIT 1",
+        (device_fingerprint, ip_address)
+    )
+    device_session = cursor.fetchone()
+    previous_failed = device_session['failed_attempts'] if device_session else 0
+    
+    # Check if this is a new device for this user (exclude current session)
+    is_new_device = False
+    if not existing or existing['device_fingerprint'] != device_fingerprint:
+        cursor.execute(
+            "SELECT COUNT(*) as count FROM active_sessions WHERE user_id = %s AND device_fingerprint = %s AND session_token != %s",
+            (user_id, device_fingerprint, session_token)
+        )
+        is_new_device = cursor.fetchone()['count'] == 0
+    
+    # Check if this is a new country for this user (exclude current session)
+    is_new_country = False
+    if country and (not existing or existing['country'] != country):
+        cursor.execute(
+            "SELECT COUNT(*) as count FROM active_sessions WHERE user_id = %s AND country = %s AND session_token != %s",
+            (user_id, country, session_token)
+        )
+        is_new_country = cursor.fetchone()['count'] == 0
+    
+    # Calculate risk score for new device/country only
+    risk_score = 0
+    if is_new_device:
+        risk_score += 2
+    if is_new_country:
+        risk_score += 2
+    
+    # Add failed attempts to risk score (each failed attempt = +2)
+    total_risk_score = risk_score + (previous_failed * 2)
+    
+    if existing:
+        # Update existing session and reset failed_attempts on successful login
+        cursor.execute(
+            """UPDATE active_sessions 
+               SET last_activity = %s, risk_score = %s, ip_address = %s, 
+                   previous_failed_attempts = %s, failed_attempts = 0
+               WHERE session_token = %s""",
+            (datetime.utcnow(), total_risk_score, ip_address, previous_failed, session_token)
+        )
+    else:
+        # Create new session
+        cursor.execute(
+            """INSERT INTO active_sessions 
+               (user_id, session_token, ip_address, user_agent, device_fingerprint, country, 
+                risk_score, is_new_device, is_new_country, previous_failed_attempts, last_activity, created_at)
+               VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+            (user_id, session_token, ip_address, user_agent, device_fingerprint, country,
+             total_risk_score, is_new_device, is_new_country, previous_failed, datetime.utcnow(), datetime.utcnow())
+        )
+    db.commit()
+    return total_risk_score
+
+
+def increment_session_failed_attempts(session_token: str):
+    """Increment failed attempts and update risk score (+2 per failed attempt)"""
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute(
+        """UPDATE active_sessions 
+           SET failed_attempts = failed_attempts + 1, 
+               risk_score = risk_score + 2,
+               last_activity = %s
+           WHERE session_token = %s""",
+        (datetime.utcnow(), session_token)
+    )
+    db.commit()
+
+
+def increment_failed_attempts_by_user(user_id: int, ip_address: str, user_agent: str):
+    """Increment failed attempts by IP and device (regardless of username)"""
+    db = get_db()
+    cursor = db.cursor()
+    
+    import hashlib
+    device_fingerprint = hashlib.md5(user_agent.encode()).hexdigest() if user_agent else None
+    
+    # Find existing session for this device/IP (regardless of user_id)
+    cursor.execute(
+        """SELECT id, risk_score FROM active_sessions 
+           WHERE device_fingerprint = %s AND ip_address = %s
+           ORDER BY last_activity DESC LIMIT 1""",
+        (device_fingerprint, ip_address)
+    )
+    session = cursor.fetchone()
+    
+    if session:
+        # Update existing session
+        new_risk_score = session['risk_score'] + 2
+        cursor.execute(
+            """UPDATE active_sessions 
+               SET failed_attempts = failed_attempts + 1, 
+                   risk_score = %s,
+                   last_activity = %s
+               WHERE id = %s""",
+            (new_risk_score, datetime.utcnow(), session['id'])
+        )
+        db.commit()
+        return new_risk_score
+    return 0
+
+
+def send_high_risk_alert(username: str, risk_score: int):
+    """Send email alert to master admin when risk score >= 8"""
+    from flask_mail import Message
+    from app import mail
+    
+    try:
+        msg = Message(
+            subject=f"High Risk Alert: {username}",
+            sender="noreply@ispjhotel.com",
+            recipients=["ngisaac15@gmail.com"]
+        )
+        msg.body = f"""
+High Risk Security Alert
+
+Username: {username}
+Risk Score: {risk_score}
+Time: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC
+
+This user account has reached a risk score of {risk_score}, indicating multiple failed login attempts or suspicious activity.
+
+Please review the active sessions in the admin portal for more details.
+"""
+        mail.send(msg)
+    except Exception as e:
+        # Log error but don't fail the login process
+        print(f"Failed to send high risk alert email: {e}")
+
+
+def check_account_lockout(user_id: int, ip_address: str, user_agent: str, role: str = None):
+    """Check if account is locked out due to failed attempts (5 attempts for all users)"""
+    db = get_db()
+    cursor = db.cursor()
+    
+    # Lockout threshold is 5 for all users
+    threshold = 5
+    
+    import hashlib
+    device_fingerprint = hashlib.md5(user_agent.encode()).hexdigest() if user_agent else None
+    
+    # Find existing session for this device/IP (regardless of user_id)
+    cursor.execute(
+        """SELECT failed_attempts, last_activity FROM active_sessions 
+           WHERE device_fingerprint = %s AND ip_address = %s
+           ORDER BY last_activity DESC LIMIT 1""",
+        (device_fingerprint, ip_address)
+    )
+    session = cursor.fetchone()
+    
+    if session and session['failed_attempts'] >= threshold:
+        # Check if 5 minutes have passed since last failed attempt
+        last_activity = session['last_activity']
+        if isinstance(last_activity, str):
+            last_activity = datetime.fromisoformat(last_activity)
+        
+        time_diff = datetime.utcnow() - last_activity
+        if time_diff.total_seconds() < 300:  # 5 minutes = 300 seconds
+            remaining_seconds = 300 - int(time_diff.total_seconds())
+            remaining_minutes = remaining_seconds // 60
+            remaining_secs = remaining_seconds % 60
+            return True, f"{remaining_minutes}:{remaining_secs:02d}"
+    
+    return False, None
+
+
+def get_active_sessions():
+    """Get all active sessions with user information"""
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute(
+        """SELECT s.*, u.username, u.email 
+           FROM active_sessions s
+           JOIN users u ON s.user_id = u.id
+           ORDER BY s.risk_score DESC, s.last_activity DESC"""
+    )
+    return cursor.fetchall()
+
+
+def cleanup_old_sessions(hours: int = 24):
+    """Remove sessions older than specified hours"""
+    db = get_db()
+    cursor = db.cursor()
+    cutoff = datetime.utcnow() - timedelta(hours=hours)
+    cursor.execute("DELETE FROM active_sessions WHERE last_activity < %s", (cutoff,))
+    db.commit()
+
+
+def delete_session(session_id: int):
+    """Delete a specific session by ID and log admin-forced logout"""
+    db = get_db()
+    cursor = db.cursor()
+    
+    # Get session info before deleting for logging
+    cursor.execute(
+        "SELECT user_id, risk_score FROM active_sessions WHERE id = %s",
+        (session_id,)
+    )
+    session_info = cursor.fetchone()
+    
+    if session_info:
+        # Get username for logging
+        cursor.execute("SELECT username FROM users WHERE id = %s", (session_info['user_id'],))
+        user_info = cursor.fetchone()
+        
+        if user_info:
+            # Log admin-forced logout with risk score
+            log_security_event(
+                session_info['user_id'],
+                user_info['username'],
+                'logout',
+                'Admin forced logout',
+                risk_score=session_info['risk_score']
+            )
+    
+    cursor.execute("DELETE FROM active_sessions WHERE id = %s", (session_id,))
+    db.commit()
