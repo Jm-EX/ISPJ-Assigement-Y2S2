@@ -1,0 +1,308 @@
+2026-02-01 16:22:44,252 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001
+2026-02-01 16:22:44,252 - INFO - [33mPress CTRL+C to quit[0m
+2026-02-01 16:22:44,253 - INFO -  * Restarting with stat
+2026-02-01 16:22:44,613 - WARNING -  * Debugger is active!
+2026-02-01 16:22:44,616 - INFO -  * Debugger PIN: 114-928-946
+2026-02-01 16:22:45,983 - INFO - 127.0.0.1 - - [01/Feb/2026 16:22:45] "GET / HTTP/1.1" 200 -
+2026-02-01 16:22:46,140 - INFO - 127.0.0.1 - - [01/Feb/2026 16:22:46] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:22:46,144 - INFO - 127.0.0.1 - - [01/Feb/2026 16:22:46] "[36mGET /static/images/resort2.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:22:46,145 - INFO - 127.0.0.1 - - [01/Feb/2026 16:22:46] "[36mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:22:46,147 - INFO - 127.0.0.1 - - [01/Feb/2026 16:22:46] "[36mGET /static/images/dining.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:22:46,153 - INFO - 127.0.0.1 - - [01/Feb/2026 16:22:46] "[36mGET /static/images/pool.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:22:46,153 - INFO - 127.0.0.1 - - [01/Feb/2026 16:22:46] "[36mGET /static/images/resort1.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:22:46,154 - INFO - 127.0.0.1 - - [01/Feb/2026 16:22:46] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2026-02-01 16:22:46,157 - INFO - 127.0.0.1 - - [01/Feb/2026 16:22:46] "[36mGET /static/images/resort3.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:22:46,163 - INFO - 127.0.0.1 - - [01/Feb/2026 16:22:46] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:22:46,187 - INFO - 127.0.0.1 - - [01/Feb/2026 16:22:46] "[36mGET /static/images/home-hero-bg.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:22:46,189 - INFO - 127.0.0.1 - - [01/Feb/2026 16:22:46] "[36mGET /static/images/home-am-bg.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:22:46,254 - INFO - 127.0.0.1 - - [01/Feb/2026 16:22:46] "[36mGET /static/images/hotel-pin.png HTTP/1.1[0m" 304 -
+2026-02-01 16:34:42,877 - INFO - 127.0.0.1 - - [01/Feb/2026 16:34:42] "GET / HTTP/1.1" 200 -
+2026-02-01 16:34:42,890 - INFO - 127.0.0.1 - - [01/Feb/2026 16:34:42] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:34:42,895 - INFO - 127.0.0.1 - - [01/Feb/2026 16:34:42] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2026-02-01 16:34:42,898 - INFO - 127.0.0.1 - - [01/Feb/2026 16:34:42] "[36mGET /static/images/dining.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:34:42,901 - INFO - 127.0.0.1 - - [01/Feb/2026 16:34:42] "[36mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:34:42,901 - INFO - 127.0.0.1 - - [01/Feb/2026 16:34:42] "[36mGET /static/images/pool.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:34:42,908 - INFO - 127.0.0.1 - - [01/Feb/2026 16:34:42] "[36mGET /static/images/resort1.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:34:42,910 - INFO - 127.0.0.1 - - [01/Feb/2026 16:34:42] "[36mGET /static/images/resort2.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:34:42,915 - INFO - 127.0.0.1 - - [01/Feb/2026 16:34:42] "[36mGET /static/images/resort3.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:34:42,917 - INFO - 127.0.0.1 - - [01/Feb/2026 16:34:42] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:34:42,949 - INFO - 127.0.0.1 - - [01/Feb/2026 16:34:42] "[36mGET /static/images/home-hero-bg.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:34:42,954 - INFO - 127.0.0.1 - - [01/Feb/2026 16:34:42] "[36mGET /static/images/home-am-bg.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:34:43,015 - INFO - 127.0.0.1 - - [01/Feb/2026 16:34:43] "[36mGET /static/images/hotel-pin.png HTTP/1.1[0m" 304 -
+2026-02-01 16:34:45,644 - INFO - 127.0.0.1 - - [01/Feb/2026 16:34:45] "GET /book HTTP/1.1" 200 -
+2026-02-01 16:34:45,660 - INFO - 127.0.0.1 - - [01/Feb/2026 16:34:45] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:34:45,665 - INFO - 127.0.0.1 - - [01/Feb/2026 16:34:45] "[36mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:34:45,671 - INFO - 127.0.0.1 - - [01/Feb/2026 16:34:45] "[36mGET /static/images/executive-suite.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:34:45,675 - INFO - 127.0.0.1 - - [01/Feb/2026 16:34:45] "[36mGET /static/images/deluxe-room.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:34:45,676 - INFO - 127.0.0.1 - - [01/Feb/2026 16:34:45] "[36mGET /static/css/book_room.css HTTP/1.1[0m" 304 -
+2026-02-01 16:34:45,678 - INFO - 127.0.0.1 - - [01/Feb/2026 16:34:45] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:34:45,710 - INFO - 127.0.0.1 - - [01/Feb/2026 16:34:45] "[36mGET /static/images/hotel-lobby.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:34:48,131 - INFO - 127.0.0.1 - - [01/Feb/2026 16:34:48] "GET /book/Luxury%20Suite HTTP/1.1" 200 -
+2026-02-01 16:34:48,145 - INFO - 127.0.0.1 - - [01/Feb/2026 16:34:48] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:34:48,147 - INFO - 127.0.0.1 - - [01/Feb/2026 16:34:48] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2026-02-01 16:34:48,151 - INFO - 127.0.0.1 - - [01/Feb/2026 16:34:48] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:40:07,742 - INFO -  * Detected change in 'c:\\School\\Poly Year 2\\Sem 2\\Infosecurity Project\\ISPJ-Assigement-Y2S2\\app\\routes.py', reloading
+2026-02-01 16:40:07,791 - INFO -  * Restarting with stat
+2026-02-01 16:40:08,290 - WARNING -  * Debugger is active!
+2026-02-01 16:40:08,293 - INFO -  * Debugger PIN: 114-928-946
+2026-02-01 16:44:00,999 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001
+2026-02-01 16:44:00,999 - INFO - [33mPress CTRL+C to quit[0m
+2026-02-01 16:44:01,001 - INFO -  * Restarting with stat
+2026-02-01 16:44:01,439 - WARNING -  * Debugger is active!
+2026-02-01 16:44:01,442 - INFO -  * Debugger PIN: 114-928-946
+2026-02-01 16:44:02,429 - INFO - 127.0.0.1 - - [01/Feb/2026 16:44:02] "GET / HTTP/1.1" 200 -
+2026-02-01 16:44:02,576 - INFO - 127.0.0.1 - - [01/Feb/2026 16:44:02] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2026-02-01 16:44:02,577 - INFO - 127.0.0.1 - - [01/Feb/2026 16:44:02] "[36mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:44:02,579 - INFO - 127.0.0.1 - - [01/Feb/2026 16:44:02] "[36mGET /static/images/pool.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:44:02,581 - INFO - 127.0.0.1 - - [01/Feb/2026 16:44:02] "[36mGET /static/images/resort1.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:44:02,583 - INFO - 127.0.0.1 - - [01/Feb/2026 16:44:02] "[36mGET /static/images/resort2.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:44:02,584 - INFO - 127.0.0.1 - - [01/Feb/2026 16:44:02] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:44:02,584 - INFO - 127.0.0.1 - - [01/Feb/2026 16:44:02] "[36mGET /static/images/dining.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:44:02,589 - INFO - 127.0.0.1 - - [01/Feb/2026 16:44:02] "[36mGET /static/images/resort3.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:44:02,589 - INFO - 127.0.0.1 - - [01/Feb/2026 16:44:02] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:44:02,619 - INFO - 127.0.0.1 - - [01/Feb/2026 16:44:02] "[36mGET /static/images/home-hero-bg.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:44:02,621 - INFO - 127.0.0.1 - - [01/Feb/2026 16:44:02] "[36mGET /static/images/home-am-bg.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:44:02,664 - INFO - 127.0.0.1 - - [01/Feb/2026 16:44:02] "[36mGET /static/images/hotel-pin.png HTTP/1.1[0m" 304 -
+2026-02-01 16:44:15,839 - INFO - 127.0.0.1 - - [01/Feb/2026 16:44:15] "GET /book HTTP/1.1" 200 -
+2026-02-01 16:44:15,852 - INFO - 127.0.0.1 - - [01/Feb/2026 16:44:15] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:44:15,861 - INFO - 127.0.0.1 - - [01/Feb/2026 16:44:15] "[36mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:44:15,861 - INFO - 127.0.0.1 - - [01/Feb/2026 16:44:15] "[36mGET /static/images/deluxe-room.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:44:15,863 - INFO - 127.0.0.1 - - [01/Feb/2026 16:44:15] "[36mGET /static/images/executive-suite.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:44:15,864 - INFO - 127.0.0.1 - - [01/Feb/2026 16:44:15] "[36mGET /static/css/book_room.css HTTP/1.1[0m" 304 -
+2026-02-01 16:44:15,869 - INFO - 127.0.0.1 - - [01/Feb/2026 16:44:15] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:44:15,893 - INFO - 127.0.0.1 - - [01/Feb/2026 16:44:15] "[36mGET /static/images/hotel-lobby.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:44:18,746 - INFO - 127.0.0.1 - - [01/Feb/2026 16:44:18] "GET /book/Luxury%20Suite HTTP/1.1" 200 -
+2026-02-01 16:44:18,762 - INFO - 127.0.0.1 - - [01/Feb/2026 16:44:18] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:44:18,764 - INFO - 127.0.0.1 - - [01/Feb/2026 16:44:18] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2026-02-01 16:44:18,765 - INFO - 127.0.0.1 - - [01/Feb/2026 16:44:18] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:45:10,302 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001
+2026-02-01 16:45:10,303 - INFO - [33mPress CTRL+C to quit[0m
+2026-02-01 16:45:10,304 - INFO -  * Restarting with stat
+2026-02-01 16:45:10,706 - WARNING -  * Debugger is active!
+2026-02-01 16:45:10,708 - INFO -  * Debugger PIN: 114-928-946
+2026-02-01 16:45:11,550 - INFO - 127.0.0.1 - - [01/Feb/2026 16:45:11] "GET / HTTP/1.1" 200 -
+2026-02-01 16:45:11,739 - INFO - 127.0.0.1 - - [01/Feb/2026 16:45:11] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2026-02-01 16:45:11,742 - INFO - 127.0.0.1 - - [01/Feb/2026 16:45:11] "[36mGET /static/images/dining.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:45:11,744 - INFO - 127.0.0.1 - - [01/Feb/2026 16:45:11] "[36mGET /static/images/resort2.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:45:11,745 - INFO - 127.0.0.1 - - [01/Feb/2026 16:45:11] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:45:11,749 - INFO - 127.0.0.1 - - [01/Feb/2026 16:45:11] "[36mGET /static/images/resort1.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:45:11,751 - INFO - 127.0.0.1 - - [01/Feb/2026 16:45:11] "[36mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:45:11,752 - INFO - 127.0.0.1 - - [01/Feb/2026 16:45:11] "[36mGET /static/images/pool.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:45:11,752 - INFO - 127.0.0.1 - - [01/Feb/2026 16:45:11] "[36mGET /static/images/resort3.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:45:11,753 - INFO - 127.0.0.1 - - [01/Feb/2026 16:45:11] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:45:11,776 - INFO - 127.0.0.1 - - [01/Feb/2026 16:45:11] "[36mGET /static/images/home-hero-bg.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:45:11,779 - INFO - 127.0.0.1 - - [01/Feb/2026 16:45:11] "[36mGET /static/images/home-am-bg.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:45:11,839 - INFO - 127.0.0.1 - - [01/Feb/2026 16:45:11] "[36mGET /static/images/hotel-pin.png HTTP/1.1[0m" 304 -
+2026-02-01 16:45:13,849 - INFO - 127.0.0.1 - - [01/Feb/2026 16:45:13] "GET /book HTTP/1.1" 200 -
+2026-02-01 16:45:13,865 - INFO - 127.0.0.1 - - [01/Feb/2026 16:45:13] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:45:13,869 - INFO - 127.0.0.1 - - [01/Feb/2026 16:45:13] "[36mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:45:13,869 - INFO - 127.0.0.1 - - [01/Feb/2026 16:45:13] "[36mGET /static/images/deluxe-room.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:45:13,872 - INFO - 127.0.0.1 - - [01/Feb/2026 16:45:13] "[36mGET /static/images/executive-suite.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:45:13,876 - INFO - 127.0.0.1 - - [01/Feb/2026 16:45:13] "[36mGET /static/css/book_room.css HTTP/1.1[0m" 304 -
+2026-02-01 16:45:13,876 - INFO - 127.0.0.1 - - [01/Feb/2026 16:45:13] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:45:13,891 - INFO - 127.0.0.1 - - [01/Feb/2026 16:45:13] "[36mGET /static/images/hotel-lobby.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:45:15,943 - INFO - 127.0.0.1 - - [01/Feb/2026 16:45:15] "GET /book/Luxury%20Suite HTTP/1.1" 200 -
+2026-02-01 16:45:15,957 - INFO - 127.0.0.1 - - [01/Feb/2026 16:45:15] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:45:15,964 - INFO - 127.0.0.1 - - [01/Feb/2026 16:45:15] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2026-02-01 16:45:15,966 - INFO - 127.0.0.1 - - [01/Feb/2026 16:45:15] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:46:40,772 - INFO - 127.0.0.1 - - [01/Feb/2026 16:46:40] "GET /book/Luxury%20Suite HTTP/1.1" 200 -
+2026-02-01 16:46:40,792 - INFO - 127.0.0.1 - - [01/Feb/2026 16:46:40] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:46:40,798 - INFO - 127.0.0.1 - - [01/Feb/2026 16:46:40] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2026-02-01 16:46:40,798 - INFO - 127.0.0.1 - - [01/Feb/2026 16:46:40] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:47:13,453 - INFO -  * Detected change in 'c:\\School\\Poly Year 2\\Sem 2\\Infosecurity Project\\ISPJ-Assigement-Y2S2\\app\\__init__.py', reloading
+2026-02-01 16:47:13,519 - INFO -  * Restarting with stat
+2026-02-01 16:47:13,927 - WARNING -  * Debugger is active!
+2026-02-01 16:47:13,929 - INFO -  * Debugger PIN: 114-928-946
+2026-02-01 16:47:56,478 - INFO - 127.0.0.1 - - [01/Feb/2026 16:47:56] "GET /book/Luxury%20Suite HTTP/1.1" 200 -
+2026-02-01 16:47:56,676 - INFO - 127.0.0.1 - - [01/Feb/2026 16:47:56] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:47:56,678 - INFO - 127.0.0.1 - - [01/Feb/2026 16:47:56] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:47:56,682 - INFO - 127.0.0.1 - - [01/Feb/2026 16:47:56] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2026-02-01 16:47:58,490 - INFO - 127.0.0.1 - - [01/Feb/2026 16:47:58] "GET /book/Luxury%20Suite HTTP/1.1" 200 -
+2026-02-01 16:47:58,508 - INFO - 127.0.0.1 - - [01/Feb/2026 16:47:58] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:47:58,514 - INFO - 127.0.0.1 - - [01/Feb/2026 16:47:58] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:47:58,514 - INFO - 127.0.0.1 - - [01/Feb/2026 16:47:58] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2026-02-01 16:49:20,666 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:20] "GET /book/Luxury%20Suite HTTP/1.1" 200 -
+2026-02-01 16:49:20,681 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:20] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:49:20,686 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:20] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:49:20,687 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:20] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2026-02-01 16:49:21,626 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:21] "GET /book/Luxury%20Suite HTTP/1.1" 200 -
+2026-02-01 16:49:21,648 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:21] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:49:21,654 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:21] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2026-02-01 16:49:21,655 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:21] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:49:22,067 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:22] "GET /book/Luxury%20Suite HTTP/1.1" 200 -
+2026-02-01 16:49:22,089 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:22] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:49:22,096 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:22] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:49:22,097 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:22] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2026-02-01 16:49:22,594 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:22] "GET /book/Luxury%20Suite HTTP/1.1" 200 -
+2026-02-01 16:49:22,613 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:22] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:49:22,616 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:22] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:49:22,621 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:22] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2026-02-01 16:49:46,015 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:46] "GET /book/Luxury%20Suite HTTP/1.1" 200 -
+2026-02-01 16:49:46,034 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:46] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:49:46,040 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:46] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:49:46,041 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:46] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2026-02-01 16:49:46,495 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:46] "GET /book/Luxury%20Suite HTTP/1.1" 200 -
+2026-02-01 16:49:46,511 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:46] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:49:46,519 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:46] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:49:46,520 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:46] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2026-02-01 16:49:46,828 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:46] "GET /book/Luxury%20Suite HTTP/1.1" 200 -
+2026-02-01 16:49:46,845 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:46] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:49:46,854 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:46] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:49:46,854 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:46] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2026-02-01 16:49:47,110 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:47] "GET /book/Luxury%20Suite HTTP/1.1" 200 -
+2026-02-01 16:49:47,128 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:47] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:49:47,131 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:47] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2026-02-01 16:49:47,133 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:47] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:49:47,336 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:47] "GET /book/Luxury%20Suite HTTP/1.1" 200 -
+2026-02-01 16:49:47,357 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:47] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:49:47,362 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:47] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2026-02-01 16:49:47,363 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:47] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:49:47,527 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:47] "GET /book/Luxury%20Suite HTTP/1.1" 200 -
+2026-02-01 16:49:47,543 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:47] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:49:47,550 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:47] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:49:47,551 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:47] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2026-02-01 16:49:48,030 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:48] "GET /book/Luxury%20Suite HTTP/1.1" 200 -
+2026-02-01 16:49:48,049 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:48] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:49:48,054 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:48] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:49:48,055 - INFO - 127.0.0.1 - - [01/Feb/2026 16:49:48] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2026-02-01 16:49:58,956 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001
+2026-02-01 16:49:58,956 - INFO - [33mPress CTRL+C to quit[0m
+2026-02-01 16:49:58,957 - INFO -  * Restarting with stat
+2026-02-01 16:49:59,390 - WARNING -  * Debugger is active!
+2026-02-01 16:49:59,392 - INFO -  * Debugger PIN: 114-928-946
+2026-02-01 16:50:00,265 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:00] "GET / HTTP/1.1" 200 -
+2026-02-01 16:50:00,431 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:00] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:50:00,435 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:00] "[36mGET /static/images/resort2.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:50:00,439 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:00] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2026-02-01 16:50:00,440 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:00] "[36mGET /static/images/resort1.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:50:00,443 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:00] "[36mGET /static/images/pool.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:50:00,445 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:00] "[36mGET /static/images/resort3.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:50:00,446 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:00] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:50:00,447 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:00] "[36mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:50:00,448 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:00] "[36mGET /static/images/dining.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:50:00,472 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:00] "[36mGET /static/images/home-hero-bg.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:50:00,474 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:00] "[36mGET /static/images/home-am-bg.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:50:00,513 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:00] "[36mGET /static/images/hotel-pin.png HTTP/1.1[0m" 304 -
+2026-02-01 16:50:01,974 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:01] "GET /book HTTP/1.1" 200 -
+2026-02-01 16:50:01,989 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:01] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:50:01,997 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:01] "[36mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:50:02,000 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:02] "[36mGET /static/images/deluxe-room.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:50:02,001 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:02] "[36mGET /static/images/executive-suite.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:50:02,003 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:02] "[36mGET /static/css/book_room.css HTTP/1.1[0m" 304 -
+2026-02-01 16:50:02,004 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:02] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:50:02,037 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:02] "[36mGET /static/images/hotel-lobby.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:50:03,946 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:03] "GET /book/Luxury%20Suite HTTP/1.1" 200 -
+2026-02-01 16:50:03,959 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:03] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:50:03,965 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:03] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2026-02-01 16:50:03,966 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:03] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:50:23,747 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:23] "GET /book/Luxury%20Suite HTTP/1.1" 200 -
+2026-02-01 16:50:23,769 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:23] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:50:23,771 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:23] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:50:23,773 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:23] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2026-02-01 16:50:25,278 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:25] "GET /book/Luxury%20Suite HTTP/1.1" 200 -
+2026-02-01 16:50:25,296 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:25] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:50:25,302 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:25] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2026-02-01 16:50:25,305 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:25] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:50:25,655 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:25] "GET /book/Luxury%20Suite HTTP/1.1" 200 -
+2026-02-01 16:50:25,677 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:25] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:50:25,681 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:25] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2026-02-01 16:50:25,684 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:25] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:50:25,894 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:25] "GET /book/Luxury%20Suite HTTP/1.1" 200 -
+2026-02-01 16:50:25,911 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:25] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:50:25,916 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:25] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2026-02-01 16:50:25,917 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:25] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:50:26,051 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:26] "GET /book/Luxury%20Suite HTTP/1.1" 200 -
+2026-02-01 16:50:26,069 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:26] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:50:26,072 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:26] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2026-02-01 16:50:26,074 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:26] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:50:40,781 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:40] "GET /book/Luxury%20Suite HTTP/1.1" 200 -
+2026-02-01 16:50:40,802 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:40] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:50:40,810 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:40] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2026-02-01 16:50:40,811 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:40] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:50:41,270 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:41] "GET /book/Luxury%20Suite HTTP/1.1" 200 -
+2026-02-01 16:50:41,287 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:41] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:50:41,293 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:41] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2026-02-01 16:50:41,298 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:41] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:50:41,466 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:41] "GET /book/Luxury%20Suite HTTP/1.1" 200 -
+2026-02-01 16:50:41,484 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:41] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:50:41,487 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:41] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:50:41,490 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:41] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2026-02-01 16:50:41,633 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:41] "GET /book/Luxury%20Suite HTTP/1.1" 200 -
+2026-02-01 16:50:41,651 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:41] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:50:41,657 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:41] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:50:41,658 - INFO - 127.0.0.1 - - [01/Feb/2026 16:50:41] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2026-02-01 16:51:30,345 - INFO - 127.0.0.1 - - [01/Feb/2026 16:51:30] "GET /book/Luxury%20Suite HTTP/1.1" 200 -
+2026-02-01 16:51:30,363 - INFO - 127.0.0.1 - - [01/Feb/2026 16:51:30] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:51:30,371 - INFO - 127.0.0.1 - - [01/Feb/2026 16:51:30] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:51:30,374 - INFO - 127.0.0.1 - - [01/Feb/2026 16:51:30] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2026-02-01 16:51:30,759 - INFO - 127.0.0.1 - - [01/Feb/2026 16:51:30] "GET /book/Luxury%20Suite HTTP/1.1" 200 -
+2026-02-01 16:51:30,776 - INFO - 127.0.0.1 - - [01/Feb/2026 16:51:30] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:51:30,781 - INFO - 127.0.0.1 - - [01/Feb/2026 16:51:30] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:51:30,783 - INFO - 127.0.0.1 - - [01/Feb/2026 16:51:30] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2026-02-01 16:51:30,946 - INFO - 127.0.0.1 - - [01/Feb/2026 16:51:30] "GET /book/Luxury%20Suite HTTP/1.1" 200 -
+2026-02-01 16:51:30,957 - INFO - 127.0.0.1 - - [01/Feb/2026 16:51:30] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:51:30,961 - INFO - 127.0.0.1 - - [01/Feb/2026 16:51:30] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:51:30,962 - INFO - 127.0.0.1 - - [01/Feb/2026 16:51:30] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2026-02-01 16:51:31,118 - INFO - 127.0.0.1 - - [01/Feb/2026 16:51:31] "GET /book/Luxury%20Suite HTTP/1.1" 200 -
+2026-02-01 16:51:31,132 - INFO - 127.0.0.1 - - [01/Feb/2026 16:51:31] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:51:31,135 - INFO - 127.0.0.1 - - [01/Feb/2026 16:51:31] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2026-02-01 16:51:31,137 - INFO - 127.0.0.1 - - [01/Feb/2026 16:51:31] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:51:31,314 - INFO - 127.0.0.1 - - [01/Feb/2026 16:51:31] "GET /book/Luxury%20Suite HTTP/1.1" 200 -
+2026-02-01 16:51:31,325 - INFO - 127.0.0.1 - - [01/Feb/2026 16:51:31] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:51:31,333 - INFO - 127.0.0.1 - - [01/Feb/2026 16:51:31] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2026-02-01 16:51:31,334 - INFO - 127.0.0.1 - - [01/Feb/2026 16:51:31] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:51:46,932 - INFO - message='Request to Stripe api' method=post url=https://api.stripe.com/v1/checkout/sessions
+2026-02-01 16:51:47,851 - INFO - message='Stripe API response' path=https://api.stripe.com/v1/checkout/sessions response_code=200
+2026-02-01 16:51:47,861 - INFO - 127.0.0.1 - - [01/Feb/2026 16:51:47] "[32mPOST /book/Luxury%20Suite HTTP/1.1[0m" 303 -
+2026-02-01 16:51:51,643 - INFO - 127.0.0.1 - - [01/Feb/2026 16:51:51] "GET /book/Luxury%20Suite HTTP/1.1" 200 -
+2026-02-01 16:51:51,660 - INFO - 127.0.0.1 - - [01/Feb/2026 16:51:51] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:51:51,673 - INFO - 127.0.0.1 - - [01/Feb/2026 16:51:51] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2026-02-01 16:51:51,674 - INFO - 127.0.0.1 - - [01/Feb/2026 16:51:51] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:52:14,330 - INFO - message='Request to Stripe api' method=post url=https://api.stripe.com/v1/checkout/sessions
+2026-02-01 16:52:15,233 - INFO - message='Stripe API response' path=https://api.stripe.com/v1/checkout/sessions response_code=200
+2026-02-01 16:52:15,238 - INFO - 127.0.0.1 - - [01/Feb/2026 16:52:15] "[32mPOST /book/Luxury%20Suite HTTP/1.1[0m" 303 -
+2026-02-01 16:52:17,284 - INFO - 127.0.0.1 - - [01/Feb/2026 16:52:17] "GET /book/Luxury%20Suite HTTP/1.1" 200 -
+2026-02-01 16:52:17,303 - INFO - 127.0.0.1 - - [01/Feb/2026 16:52:17] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:52:17,311 - INFO - 127.0.0.1 - - [01/Feb/2026 16:52:17] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2026-02-01 16:52:17,313 - INFO - 127.0.0.1 - - [01/Feb/2026 16:52:17] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:57:08,302 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001
+2026-02-01 16:57:08,302 - INFO - [33mPress CTRL+C to quit[0m
+2026-02-01 16:57:08,303 - INFO -  * Restarting with stat
+2026-02-01 16:57:08,725 - WARNING -  * Debugger is active!
+2026-02-01 16:57:08,727 - INFO -  * Debugger PIN: 114-928-946
+2026-02-01 16:57:09,874 - INFO - 127.0.0.1 - - [01/Feb/2026 16:57:09] "GET / HTTP/1.1" 200 -
+2026-02-01 16:57:10,022 - INFO - 127.0.0.1 - - [01/Feb/2026 16:57:10] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:57:10,026 - INFO - 127.0.0.1 - - [01/Feb/2026 16:57:10] "[36mGET /static/images/resort2.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:57:10,034 - INFO - 127.0.0.1 - - [01/Feb/2026 16:57:10] "[36mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:57:10,035 - INFO - 127.0.0.1 - - [01/Feb/2026 16:57:10] "[36mGET /static/images/resort3.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:57:10,037 - INFO - 127.0.0.1 - - [01/Feb/2026 16:57:10] "[36mGET /static/images/dining.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:57:10,037 - INFO - 127.0.0.1 - - [01/Feb/2026 16:57:10] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2026-02-01 16:57:10,040 - INFO - 127.0.0.1 - - [01/Feb/2026 16:57:10] "[36mGET /static/images/pool.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:57:10,042 - INFO - 127.0.0.1 - - [01/Feb/2026 16:57:10] "[36mGET /static/images/resort1.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:57:10,043 - INFO - 127.0.0.1 - - [01/Feb/2026 16:57:10] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:57:10,058 - INFO - 127.0.0.1 - - [01/Feb/2026 16:57:10] "[36mGET /static/images/home-hero-bg.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:57:10,059 - INFO - 127.0.0.1 - - [01/Feb/2026 16:57:10] "[36mGET /static/images/home-am-bg.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:57:10,103 - INFO - 127.0.0.1 - - [01/Feb/2026 16:57:10] "[36mGET /static/images/hotel-pin.png HTTP/1.1[0m" 304 -
+2026-02-01 16:57:11,819 - INFO - 127.0.0.1 - - [01/Feb/2026 16:57:11] "GET /book HTTP/1.1" 200 -
+2026-02-01 16:57:11,833 - INFO - 127.0.0.1 - - [01/Feb/2026 16:57:11] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:57:11,842 - INFO - 127.0.0.1 - - [01/Feb/2026 16:57:11] "[36mGET /static/images/deluxe-room.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:57:11,843 - INFO - 127.0.0.1 - - [01/Feb/2026 16:57:11] "[36mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:57:11,845 - INFO - 127.0.0.1 - - [01/Feb/2026 16:57:11] "[36mGET /static/images/executive-suite.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:57:11,849 - INFO - 127.0.0.1 - - [01/Feb/2026 16:57:11] "[36mGET /static/css/book_room.css HTTP/1.1[0m" 304 -
+2026-02-01 16:57:11,850 - INFO - 127.0.0.1 - - [01/Feb/2026 16:57:11] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:57:11,884 - INFO - 127.0.0.1 - - [01/Feb/2026 16:57:11] "[36mGET /static/images/hotel-lobby.jpg HTTP/1.1[0m" 304 -
+2026-02-01 16:57:14,417 - INFO - 127.0.0.1 - - [01/Feb/2026 16:57:14] "GET /book/Luxury%20Suite HTTP/1.1" 200 -
+2026-02-01 16:57:14,432 - INFO - 127.0.0.1 - - [01/Feb/2026 16:57:14] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:57:14,438 - INFO - 127.0.0.1 - - [01/Feb/2026 16:57:14] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2026-02-01 16:57:14,439 - INFO - 127.0.0.1 - - [01/Feb/2026 16:57:14] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 16:57:27,140 - WARNING - Invalid file upload attempt by test123 (admin@marketplace.com)
+2026-02-01 16:57:27,142 - INFO - 127.0.0.1 - - [01/Feb/2026 16:57:27] "[32mPOST /book/Luxury%20Suite HTTP/1.1[0m" 302 -
+2026-02-01 16:57:27,147 - INFO - 127.0.0.1 - - [01/Feb/2026 16:57:27] "GET /book/Luxury%20Suite HTTP/1.1" 200 -
+2026-02-01 16:57:27,172 - INFO - 127.0.0.1 - - [01/Feb/2026 16:57:27] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
+2026-02-01 16:57:27,173 - INFO - 127.0.0.1 - - [01/Feb/2026 16:57:27] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 16:57:27,177 - INFO - 127.0.0.1 - - [01/Feb/2026 16:57:27] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -

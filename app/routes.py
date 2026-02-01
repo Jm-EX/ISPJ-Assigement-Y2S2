@@ -6,6 +6,7 @@ import os
 from datetime import datetime
 import random
 import stripe
+import requests
 
 # =========================
 # Setup
@@ -91,7 +92,56 @@ def book_room_confirm(room_type):
             "total_price": room_prices.get(room_type, 0) * nights,
         }
 
+        # Handle passport upload
+        passport = request.files.get("passport")
+        if passport and allowed_file(passport.filename):
+            # Create uploads directory if it doesn't exist
+            upload_folder = os.path.join('app', 'static', 'uploads', 'passports')
+            os.makedirs(upload_folder, exist_ok=True)
+            
+            # Generate secure filename
+            timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+            filename = f"{timestamp}_{secure_filename(passport.filename)}"
+            filepath = os.path.join(upload_folder, filename)
+            
+            file_ext = passport.filename.rsplit('.', 1)[1].lower()
+            
+            # Validate image files with Pillow
+            if file_ext in ['jpg', 'jpeg', 'png']:
+                try:
+                    img = Image.open(passport)
+                    img.verify()  # Verify image integrity
+                    passport.seek(0)  # Reset pointer for saving
+                except Exception:
+                    flash('Uploaded file is not a valid image', 'error')
+                    logging.warning(f"Invalid file upload attempt by {request.form.get('full_name')} ({request.form.get('email')})")
+                    return redirect(request.url)
+            
+            # Save the file
+            passport.save(filepath)
+            booking_data["passport_file"] = filename
+        elif passport:
+            flash('Invalid file type. Only PDF, JPG, JPEG, PNG allowed.', 'error')
+            logging.warning(f"Invalid file upload attempt by {request.form.get('full_name')} ({request.form.get('email')})")
+            return redirect(request.url)
+
         session["booking_data"] = booking_data
+
+        # reCAPTCHA verification
+        recaptcha_response = request.form.get('g-recaptcha-response')
+        if not recaptcha_response:
+            flash('Please complete the reCAPTCHA', 'error')
+            return redirect(request.url)
+
+        secret_key = os.environ.get('RECAPTCHA_SECRET_KEY')
+        verify_response = requests.post(
+            'https://www.google.com/recaptcha/api/siteverify',
+            data={'secret': secret_key, 'response': recaptcha_response}
+        )
+
+        if not verify_response.json().get('success'):
+            flash('reCAPTCHA verification failed', 'error')
+            return redirect(request.url)
 
         # CREATE STRIPE CHECKOUT SESSION
         checkout_session = stripe.checkout.Session.create(

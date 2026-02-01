@@ -18,6 +18,10 @@ def create_app():
     app.config["MAIL_USE_SSL"] = False
     app.config["MAIL_DEFAULT_SENDER"] = os.environ.get("SMTP_FROM")
     app.config["ADMIN_EMAIL"] = os.environ.get("ADMIN_EMAIL", "admin@example.com")
+    
+    # reCAPTCHA configuration
+    app.config["RECAPTCHA_SITE_KEY"] = os.environ.get("RECAPTCHA_SITE_KEY")
+    app.config["RECAPTCHA_SECRET_KEY"] = os.environ.get("RECAPTCHA_SECRET_KEY")
 
     mail.init_app(app)
 
