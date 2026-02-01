@@ -3,6 +3,7 @@
 <head>
     <title>{% block title %}MGM Resort{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/Header&Footer.css') }}">
+    {% block head %}{% endblock %}
     <style>
         /* Chat Widget Styles */
         #chat-widget {
