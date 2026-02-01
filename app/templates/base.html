@@ -1,15 +1,193 @@
-<!-- This contains the HEADER n FOOTER only -->
-
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{% block title %}My Flask App{% endblock %}</title>
+    <title>{% block title %}MGM Resort{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/Header&Footer.css') }}">
     {% block head %}{% endblock %}
+    <style>
+        /* Chat Widget Styles */
+        #chat-widget {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        #chat-tab {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        #chat-tab:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .chat-popup {
+            position: absolute;
+            bottom: 70px;
+            right: 0;
+            width: 350px;
+            height: 500px; /* Adjusted height */
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+            display: none; /* Controlled by JS as 'flex' */
+            flex-direction: column; 
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        /* 1. FIXED HEADER */
+        .chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0; /* Header stays at the top */
+            min-height: 50px; /* Ensure minimum height */
+        }
+
+        .chat-header h4 { 
+            margin: 0; 
+            font-size: 16px; 
+            flex: 1; /* Take available space */
+            line-height: 1.2; /* Good line height for wrapping */
+            word-wrap: break-word; /* Allow long words to break */
+            white-space: normal; /* Allow text to wrap to next line */
+        }
+
+        .chat-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+
+        .chat-close:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .human-support-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .human-support-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+
+        /* 2. SCROLLABLE MIDDLE HISTORY */
+        .chat-messages {
+            flex: 1;            /* Takes up all remaining middle space */
+            padding: 20px;
+            overflow-y: auto;   /* Scrollable when content overflows */
+            background: #fdfdfd;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* 3. FLUSHED BOTTOM INPUT */
+        .chat-input {
+            padding: 15px;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+            background: white;
+            flex-shrink: 0; /* Input stays at the bottom */
+        }
+
+        .chat-input input {
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            padding: 8px 15px;
+            outline: none;
+        }
+
+        .chat-input button {
+            background: #764ba2;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        /* Message Bubbles */
+        .chat-message {
+            padding: 10px 14px;
+            border-radius: 15px;
+            max-width: 85%;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .chat-message.customer {
+            background: #667eea;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+        }
+
+        .chat-message.support {
+            background: #f0f0f0;
+            color: #333;
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+        }
+
+        .chat-time {
+            display: block;
+            font-size: 10px;
+            margin-top: 4px;
+            opacity: 0.7;
+        }
+    </style>
 </head>
 <body>
 
-    <header class="site-header">
+<header class="site-header">
     <div class="header-container">
         <div class="header-left">
             <a href="/" class="brand">MGM Resort</a>
@@ -45,22 +223,21 @@
     </div>
 </header>
 
-    
-    {% with messages = get_flashed_messages(with_categories=True) %}
-        {% if messages %}
-            <div class="flash-wrap">
-                {% for category, message in messages %}
-                    <div class="flash {{ category }}">{{ message }}</div>
-                {% endfor %}
-            </div>
-        {% endif %}
-    {% endwith %}
+{% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+        <div class="flash-wrap">
+            {% for category, message in messages %}
+                <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
 
-    <main>
-        {% block content %}{% endblock %}
-    </main>
+<main>
+    {% block content %}{% endblock %}
+</main>
 
-    <footer class="site-footer">
+<footer class="site-footer">
     <div class="footer-container">
 
         <div class="footer-col">
@@ -118,6 +295,245 @@
         <p>Brand logos here</p>
     </div>
 </footer>
+
+<div id="chat-widget">
+    <div id="chat-tab" onclick="toggleChat()">
+        <i class="fas fa-comments"></i> Chat Support
+        <span id="chat-badge" class="chat-badge" style="display: none;">1</span>
+    </div>
+    
+    <div id="chat-popup" class="chat-popup">
+        <div class="chat-header">
+            <h4>AI Support</h4>
+            <div class="header-buttons">
+                <button onclick="toggleSupportMode()" class="human-support-btn" title="Switch to Human Support">
+                    <i class="fas fa-user-tie"></i>
+                    <span>Concierge Support</span>
+                </button>
+                <button onclick="toggleChat()" class="chat-close">&times;</button>
+            </div>
+        </div>
+        
+        <div id="chat-messages" class="chat-messages">
+            </div>
+        
+        <div class="chat-input">
+            <input type="text" id="message-input" placeholder="Ask about check-in..." onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script>
+const socket = io();
+let chatOpen = false;
+let chatHistory = []; // Store chat history
+let isHumanMode = false; // Track current support mode
+let aiConnected = true; // Track AI connection status
+
+function toggleChat() {
+    const popup = document.getElementById('chat-popup');
+    const badge = document.getElementById('chat-badge');
+    chatOpen = !chatOpen;
+    
+    if (chatOpen) {
+        // We use flex so the child elements (header, msg, input) 
+        // obey the flex-grow/shrink rules.
+        popup.style.display = 'flex'; 
+        badge.style.display = 'none';
+        socket.emit('join_chat', {room: 'customer_service'});
+        
+        // Restore chat history if exists
+        if (chatHistory.length > 0) {
+            restoreChatHistory();
+        }
+    } else {
+        popup.style.display = 'none';
+        // Don't clear history - keep it for next time
+    }
+}
+
+function toggleSupportMode() {
+    isHumanMode = !isHumanMode;
+    
+    const headerTitle = document.querySelector('.chat-header h4');
+    const supportButton = document.querySelector('.human-support-btn span');
+    const supportButtonIcon = document.querySelector('.human-support-btn i');
+    
+    if (isHumanMode) {
+        // Switch to Human Support mode
+        headerTitle.textContent = 'Concierge Support';
+        supportButton.textContent = 'AI Support';
+        supportButtonIcon.className = 'fas fa-robot';
+        supportButton.parentElement.setAttribute('title', 'Switch to AI Support');
+        
+        // Disconnect AI - notify server we're in human mode
+        socket.emit('switch_to_human_mode');
+        aiConnected = false;
+        
+        // Add system message about switching to human mode
+        const switchMessage = "👋 You're now connected with Concierge Support. A human agent will assist you shortly. AI responses have been disabled.";
+        addMessageToChat('System', switchMessage, 'system');
+    } else {
+        // Switch to AI Support mode
+        headerTitle.textContent = 'AI Support';
+        supportButton.textContent = 'Concierge Support';
+        supportButtonIcon.className = 'fas fa-user-tie';
+        supportButton.parentElement.setAttribute('title', 'Switch to Human Support');
+        
+        // Reconnect AI - notify server we're back in AI mode
+        socket.emit('switch_to_ai_mode');
+        aiConnected = true;
+        
+        // Add system message about switching to AI mode
+        const switchMessage = "🤖 You're now connected with AI Support. I can help you with hotel information and booking questions.";
+        addMessageToChat('System', switchMessage, 'system');
+    }
+    
+    // Add to history
+    const messageObj = {
+        sender: 'System',
+        text: switchMessage,
+        type: 'system',
+        time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+    };
+    chatHistory.push(messageObj);
+}
+
+function formatMessage(text) {
+    // Convert markdown-style formatting to HTML
+    // Handle **bold** and *italic*
+    text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    
+    // Handle line breaks
+    text = text.replace(/\n/g, '<br>');
+    
+    return text;
+}
+
+function restoreChatHistory() {
+    const messagesDiv = document.getElementById('chat-messages');
+    messagesDiv.innerHTML = ''; // Clear current display
+    
+    // Restore all messages from history
+    chatHistory.forEach(message => {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `chat-message ${message.type}`;
+        
+        // Format the message text when restoring
+        const formattedMessage = formatMessage(message.text);
+        
+        messageDiv.innerHTML = `
+            <strong>${message.sender}:</strong> <div>${formattedMessage}</div>
+            <span class="chat-time">${message.time}</span>
+        `;
+        messagesDiv.appendChild(messageDiv);
+    });
+    
+    // Scroll to bottom
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
+
+function sendMessage() {
+    const input = document.getElementById('message-input');
+    const msg = input.value.trim();
+    
+    if (msg) {
+        socket.emit('send_message', {
+            msg: msg,
+            sender: 'customer',
+            room: 'customer_service'
+        });
+        
+        // Add to history immediately
+        const messageObj = {
+            sender: 'You',
+            text: msg,
+            type: 'customer',
+            time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+        };
+        chatHistory.push(messageObj);
+        
+        addMessageToChat('You', msg, 'customer');
+        input.value = '';
+    }
+}
+
+function handleKeyPress(event) {
+    if (event.key === 'Enter') sendMessage();
+}
+
+function requestHumanSupport() {
+    // Add system message about human support request
+    const humanMessage = "👋 A human support agent will be with you shortly. For immediate assistance, please call our front desk at +1-800-MGM-HELP.";
+    addMessageToChat('System', humanMessage, 'system');
+    
+    // Add to history
+    const messageObj = {
+        sender: 'System',
+        text: humanMessage,
+        type: 'system',
+        time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+    };
+    chatHistory.push(messageObj);
+    
+    // You could also:
+    // 1. Send a notification to admin dashboard
+    // 2. Send an email to support staff
+    // 3. Integrate with a live chat service
+    // 4. Show estimated wait time
+    
+    // Log the human support request
+    console.log('Human support requested at:', new Date().toISOString());
+}
+
+function addMessageToChat(sender, message, senderType) {
+    // Only add to display if chat is open
+    if (chatOpen) {
+        const messagesDiv = document.getElementById('chat-messages');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `chat-message ${senderType}`;
+        
+        // Format the message text
+        const formattedMessage = formatMessage(message);
+        
+        messageDiv.innerHTML = `
+            <strong>${sender}:</strong> <div>${formattedMessage}</div>
+            <span class="chat-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+        `;
+        
+        messagesDiv.appendChild(messageDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+    
+    // Always add to history (except for customer messages which are added in sendMessage)
+    if (sender !== 'You') {
+        const messageObj = {
+            sender: sender,
+            text: message, // Store original text
+            type: senderType,
+            time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+        };
+        chatHistory.push(messageObj);
+    }
+}
+
+socket.on('receive_message', function(data) {
+    if (!chatOpen && data.sender !== 'customer') {
+        document.getElementById('chat-badge').style.display = 'block';
+    }
+    // Using 'support' as the class for AI/Admin replies
+    const type = data.sender === 'customer' ? 'customer' : 'support';
+    addMessageToChat(data.sender, data.msg, type);
+});
+
+socket.on('status', function(data) {
+    addMessageToChat('System', data.msg, 'system');
+});
+</script>
 
 </body>
 </html>
