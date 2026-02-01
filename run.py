@@ -3,6 +3,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# Clear bookings.log file on startup
+log_file = 'logs/bookings.log'
+if os.path.exists(log_file):
+    with open(log_file, 'w') as f:
+        f.truncate(0)
+    print(f"Cleared contents of {log_file}")
+
 from app import create_app
 
 app = create_app()
