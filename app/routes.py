@@ -267,17 +267,32 @@ def get_gemini_response(message):
         logging.info(f"Getting Gemini response for: {message}")
         
         # Hotel-specific prompt
-        hotel_context = """
-        You are a helpful concierge assistant for MGM Resort. You provide information about:
-        - Room types (Deluxe Room: $229/night, Luxury Suite: $299/night, Executive Suite: $399/night)
-        - Resort locations (Pulau Tekong, Toa Payoh, Upper Thomson)
-        - Hotel amenities and services
-        - Booking and check-in procedures
-        - Resort facilities (pools, dining, spa, etc.)
-        
-        Be friendly, professional, and concise. If asked about topics outside hotel services, 
-        politely redirect to hotel-related topics.
-        """
+        hotel_context = """Knowledge Base:
+
+Check-in: 3:00 PM | Check-out: 11:00 AM.
+
+Amenities: Free Wi-Fi, Rooftop Pool (6 AM - 10 PM), Gym (24/7), Dining, Spa.
+
+Breakfast time: Served in the lobby from 7 AM to 11 AM.
+
+Luxury Suite: Elegant suite with panoramic city views, separate living area, and premium amenities.
+2 Guests, 1 King Bed, 55 m², From $299 / night
+
+Deluxe Room: Spacious room with modern amenities and stunning city or garden views.
+2 Guests, 1 King or 2 Queens, 42 m², From, $229 / night
+
+Executive Suite: Luxurious suite with separate living area, work desk, and premium amenities.
+2-4 Guests, 1 King Bed + Sofa Bed, 65 m², From $399 / night
+
+Resort locations: Pulau Tekong, Toa Payoh, Upper Thomson)
+
+Strict Rules:
+
+Focus: Only answer questions about the hotel or the local area.
+
+Refusal: If a user asks about politics, coding, or unrelated topics, say: \"I'm here to assist with your stay at MGM Resorts. I'm afraid I can't help with that topic.\"
+
+Tone: Professional, welcoming, and luxury-oriented."""
         
         full_prompt = f"{hotel_context}\n\nCustomer question: {message}"
         response = gemini_model.generate_content(full_prompt)
@@ -287,7 +302,7 @@ def get_gemini_response(message):
         
     except Exception as e:
         logging.error(f"Gemini AI error: {str(e)}")
-        return "I'm sorry, I'm having trouble connecting right now. Please try again or contact our front desk directly."
+        return "I'm sorry, I'm having trouble connecting right now. Please try again later or contact us through concierge support."
 
 
 # =========================
@@ -343,10 +358,10 @@ def on_message(data):
             # Get AI response
             ai_response = get_gemini_response(message)
             
-            # Send AI response as "Concierge"
+            # Send AI response as "AI Support"
             ai_message_data = {
                 'msg': ai_response,
-                'sender': 'Concierge',
+                'sender': 'AI Support',
                 'timestamp': datetime.now().strftime('%H:%M')
             }
             
@@ -363,7 +378,7 @@ def on_message(data):
             logging.error(f"Error generating AI response: {str(e)}")
             error_message = {
                 'msg': "I'm sorry, I'm having trouble processing your request right now. Please try again.",
-                'sender': 'Concierge',
+                'sender': 'AI Support',
                 'timestamp': datetime.now().strftime('%H:%M')
             }
             emit('receive_message', error_message, room=room)
