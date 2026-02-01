@@ -6,6 +6,7 @@ import os
 from datetime import datetime
 import random
 import stripe
+import requests
 
 # =========================
 # Setup
@@ -91,7 +92,6 @@ def book_room_confirm(room_type):
             "total_price": room_prices.get(room_type, 0) * nights,
         }
 
-
         # Handle passport upload
         passport = request.files.get("passport")
         if passport and allowed_file(passport.filename):
@@ -126,6 +126,22 @@ def book_room_confirm(room_type):
             return redirect(request.url)
 
         session["booking_data"] = booking_data
+
+        # reCAPTCHA verification
+        recaptcha_response = request.form.get('g-recaptcha-response')
+        if not recaptcha_response:
+            flash('Please complete the reCAPTCHA', 'error')
+            return redirect(request.url)
+
+        secret_key = os.environ.get('RECAPTCHA_SECRET_KEY')
+        verify_response = requests.post(
+            'https://www.google.com/recaptcha/api/siteverify',
+            data={'secret': secret_key, 'response': recaptcha_response}
+        )
+
+        if not verify_response.json().get('success'):
+            flash('reCAPTCHA verification failed', 'error')
+            return redirect(request.url)
 
         # CREATE STRIPE CHECKOUT SESSION
         checkout_session = stripe.checkout.Session.create(
