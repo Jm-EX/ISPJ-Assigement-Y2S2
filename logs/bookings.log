@@ -1,0 +1,141 @@
+2026-02-01 19:43:08,137 - INFO - Gemini API Key loaded: True
+2026-02-01 19:43:08,198 - INFO - Available models: ['models/gemini-2.5-flash', 'models/gemini-2.5-pro', 'models/gemini-2.0-flash', 'models/gemini-2.0-flash-001', 'models/gemini-2.0-flash-exp-image-generation', 'models/gemini-2.0-flash-lite-001', 'models/gemini-2.0-flash-lite', 'models/gemini-exp-1206', 'models/gemini-2.5-flash-preview-tts', 'models/gemini-2.5-pro-preview-tts', 'models/gemma-3-1b-it', 'models/gemma-3-4b-it', 'models/gemma-3-12b-it', 'models/gemma-3-27b-it', 'models/gemma-3n-e4b-it', 'models/gemma-3n-e2b-it', 'models/gemini-flash-latest', 'models/gemini-flash-lite-latest', 'models/gemini-pro-latest', 'models/gemini-2.5-flash-lite', 'models/gemini-2.5-flash-image', 'models/gemini-2.5-flash-preview-09-2025', 'models/gemini-2.5-flash-lite-preview-09-2025', 'models/gemini-3-pro-preview', 'models/gemini-3-flash-preview', 'models/gemini-3-pro-image-preview', 'models/nano-banana-pro-preview', 'models/gemini-robotics-er-1.5-preview', 'models/gemini-2.5-computer-use-preview-10-2025', 'models/deep-research-pro-preview-12-2025']
+2026-02-01 19:43:08,198 - INFO - Using first available model: gemini-2.5-flash
+2026-02-01 19:43:08,198 - INFO - Gemini AI configured successfully
+2026-02-01 19:43:08,281 - WARNING -  * Debugger is active!
+2026-02-01 19:43:08,283 - INFO -  * Debugger PIN: 114-928-946
+2026-02-01 19:43:08,290 - INFO - 127.0.0.1 - - [01/Feb/2026 19:43:08] "GET /socket.io/?EIO=4&transport=polling&t=PmP0u6M HTTP/1.1" 200 -
+2026-02-01 19:43:08,293 - INFO - 127.0.0.1 - - [01/Feb/2026 19:43:08] "POST /socket.io/?EIO=4&transport=polling&t=PmP0ue3&sid=J_S9AstvMduQyt3qAAAA HTTP/1.1" 200 -
+2026-02-01 19:43:08,295 - INFO - 127.0.0.1 - - [01/Feb/2026 19:43:08] "GET /socket.io/?EIO=4&transport=polling&t=PmP0ue5&sid=J_S9AstvMduQyt3qAAAA HTTP/1.1" 200 -
+2026-02-01 19:43:10,321 - INFO - 127.0.0.1 - - [01/Feb/2026 19:43:10] "GET / HTTP/1.1" 200 -
+2026-02-01 19:43:10,350 - INFO - 127.0.0.1 - - [01/Feb/2026 19:43:10] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 19:43:10,352 - INFO - 127.0.0.1 - - [01/Feb/2026 19:43:10] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2026-02-01 19:43:10,369 - INFO - 127.0.0.1 - - [01/Feb/2026 19:43:10] "[36mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 304 -
+2026-02-01 19:43:10,370 - INFO - 127.0.0.1 - - [01/Feb/2026 19:43:10] "[36mGET /static/images/pool.jpg HTTP/1.1[0m" 304 -
+2026-02-01 19:43:10,386 - INFO - 127.0.0.1 - - [01/Feb/2026 19:43:10] "[36mGET /static/images/dining.jpg HTTP/1.1[0m" 304 -
+2026-02-01 19:43:10,399 - INFO - 127.0.0.1 - - [01/Feb/2026 19:43:10] "[36mGET /static/images/resort1.jpg HTTP/1.1[0m" 304 -
+2026-02-01 19:43:10,401 - INFO - 127.0.0.1 - - [01/Feb/2026 19:43:10] "[36mGET /static/images/resort2.jpg HTTP/1.1[0m" 304 -
+2026-02-01 19:43:10,425 - INFO - 127.0.0.1 - - [01/Feb/2026 19:43:10] "[36mGET /static/images/resort3.jpg HTTP/1.1[0m" 304 -
+2026-02-01 19:43:10,449 - INFO - 127.0.0.1 - - [01/Feb/2026 19:43:10] "[36mGET /static/images/home-hero-bg.jpg HTTP/1.1[0m" 304 -
+2026-02-01 19:43:10,556 - INFO - 127.0.0.1 - - [01/Feb/2026 19:43:10] "GET /socket.io/?EIO=4&transport=polling&t=PmP0vBP HTTP/1.1" 200 -
+2026-02-01 19:43:10,559 - INFO - 127.0.0.1 - - [01/Feb/2026 19:43:10] "[36mGET /static/images/home-am-bg.jpg HTTP/1.1[0m" 304 -
+2026-02-01 19:43:10,573 - INFO - 127.0.0.1 - - [01/Feb/2026 19:43:10] "POST /socket.io/?EIO=4&transport=polling&t=PmP0vBh&sid=UD_F1gonh52MwqwGAAAC HTTP/1.1" 200 -
+2026-02-01 19:43:10,576 - INFO - 127.0.0.1 - - [01/Feb/2026 19:43:10] "GET /socket.io/?EIO=4&transport=polling&t=PmP0vBj&sid=UD_F1gonh52MwqwGAAAC HTTP/1.1" 200 -
+2026-02-01 19:43:10,584 - INFO - 127.0.0.1 - - [01/Feb/2026 19:43:10] "GET /socket.io/?EIO=4&transport=polling&t=PmP0vBs&sid=UD_F1gonh52MwqwGAAAC HTTP/1.1" 200 -
+2026-02-01 19:43:10,597 - INFO - 127.0.0.1 - - [01/Feb/2026 19:43:10] "[36mGET /static/images/hotel-pin.png HTTP/1.1[0m" 304 -
+2026-02-01 19:43:11,737 - INFO - 127.0.0.1 - - [01/Feb/2026 19:43:11] "GET / HTTP/1.1" 200 -
+2026-02-01 19:43:11,769 - INFO - 127.0.0.1 - - [01/Feb/2026 19:43:11] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 19:43:11,774 - INFO - 127.0.0.1 - - [01/Feb/2026 19:43:11] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2026-02-01 19:43:11,786 - INFO - 127.0.0.1 - - [01/Feb/2026 19:43:11] "[36mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 304 -
+2026-02-01 19:43:11,789 - INFO - 127.0.0.1 - - [01/Feb/2026 19:43:11] "[36mGET /static/images/pool.jpg HTTP/1.1[0m" 304 -
+2026-02-01 19:43:11,799 - INFO - 127.0.0.1 - - [01/Feb/2026 19:43:11] "[36mGET /static/images/resort1.jpg HTTP/1.1[0m" 304 -
+2026-02-01 19:43:11,801 - INFO - 127.0.0.1 - - [01/Feb/2026 19:43:11] "[36mGET /static/images/dining.jpg HTTP/1.1[0m" 304 -
+2026-02-01 19:43:11,804 - INFO - 127.0.0.1 - - [01/Feb/2026 19:43:11] "[36mGET /static/images/resort2.jpg HTTP/1.1[0m" 304 -
+2026-02-01 19:43:11,810 - INFO - 127.0.0.1 - - [01/Feb/2026 19:43:11] "[36mGET /static/images/resort3.jpg HTTP/1.1[0m" 304 -
+2026-02-01 19:43:11,845 - INFO - 127.0.0.1 - - [01/Feb/2026 19:43:11] "[36mGET /static/images/home-hero-bg.jpg HTTP/1.1[0m" 304 -
+2026-02-01 19:43:11,846 - INFO - 127.0.0.1 - - [01/Feb/2026 19:43:11] "[36mGET /static/images/home-am-bg.jpg HTTP/1.1[0m" 304 -
+2026-02-01 19:43:11,899 - INFO - 127.0.0.1 - - [01/Feb/2026 19:43:11] "[36mGET /static/images/hotel-pin.png HTTP/1.1[0m" 304 -
+2026-02-01 19:43:11,903 - INFO - 127.0.0.1 - - [01/Feb/2026 19:43:11] "GET /socket.io/?EIO=4&transport=polling&t=PmP0vWS HTTP/1.1" 200 -
+2026-02-01 19:43:11,908 - INFO - 127.0.0.1 - - [01/Feb/2026 19:43:11] "POST /socket.io/?EIO=4&transport=polling&t=PmP0vWY&sid=fKEmpujX2sa4mKNTAAAE HTTP/1.1" 200 -
+2026-02-01 19:43:11,911 - INFO - 127.0.0.1 - - [01/Feb/2026 19:43:11] "GET /socket.io/?EIO=4&transport=polling&t=PmP0vWZ&sid=fKEmpujX2sa4mKNTAAAE HTTP/1.1" 200 -
+2026-02-01 19:43:12,016 - INFO - 127.0.0.1 - - [01/Feb/2026 19:43:12] "GET /socket.io/?EIO=4&transport=polling&t=PmP0vYC&sid=fKEmpujX2sa4mKNTAAAE HTTP/1.1" 200 -
+2026-02-01 19:43:31,366 - INFO - Chat message from customer: hello! what time is the breakfast until?
+2026-02-01 19:43:31,367 - INFO - Getting Gemini response for: hello! what time is the breakfast until?
+2026-02-01 19:43:34,141 - INFO - Gemini response received: Hello there! Welcome to MGM Resorts!
+
+Our dining hours, including breakfast times, can vary by resta...
+2026-02-01 19:43:35,142 - INFO - AI response: Hello there! Welcome to MGM Resorts!
+
+Our dining hours, including breakfast times, can vary by restaurant and season. For the most accurate and up-to-date information, I recommend checking directly with our front desk upon arrival, or you can find details in your in-room guest services guide.
+
+Is there anything else I can assist you with regarding our room types, resort locations, amenities, or booking procedures?
+2026-02-01 19:44:00,915 - INFO - 127.0.0.1 - - [01/Feb/2026 19:44:00] "GET /socket.io/?EIO=4&transport=websocket&sid=J_S9AstvMduQyt3qAAAA HTTP/1.1" 200 -
+2026-02-01 19:44:01,530 - INFO - 127.0.0.1 - - [01/Feb/2026 19:44:01] "GET /socket.io/?EIO=4&transport=websocket&sid=UD_F1gonh52MwqwGAAAC HTTP/1.1" 200 -
+2026-02-01 19:44:07,024 - INFO - Chat message from customer: what is 3+1?
+2026-02-01 19:44:07,024 - INFO - Getting Gemini response for: what is 3+1?
+2026-02-01 19:44:08,633 - INFO - Gemini response received: Welcome to MGM Resorts! I'm here to help you with any questions you have about our hotels and servic...
+2026-02-01 19:44:09,634 - INFO - AI response: Welcome to MGM Resorts! I'm here to help you with any questions you have about our hotels and services.
+
+Regarding your question "what is 3+1?", that's a bit outside the services I provide as your concierge. I'd be happy to assist you with information about our room types, resort locations, amenities, booking procedures, or facilities like our pools, dining, or spa.
+
+What can I tell you about MGM Resorts today?
+2026-02-01 19:44:29,894 - INFO - Chat message from customer: what time is breakfast?
+2026-02-01 19:44:29,894 - INFO - Getting Gemini response for: what time is breakfast?
+2026-02-01 19:44:32,776 - INFO - Gemini response received: Hello! I can certainly help you with dining information. For the most accurate breakfast times, I re...
+2026-02-01 19:44:33,778 - INFO - AI response: Hello! I can certainly help you with dining information. For the most accurate breakfast times, I recommend checking directly with our front desk upon arrival or consulting the in-room dining guide, as timings can sometimes vary.
+
+Is there anything else I can assist you with regarding our room types, resort locations, amenities, or facilities?
+2026-02-01 19:45:03,556 - INFO - Chat message from customer: what are some available amenities?
+2026-02-01 19:45:03,557 - INFO - Getting Gemini response for: what are some available amenities?
+2026-02-01 19:45:07,163 - INFO - Gemini response received: Certainly! We offer a wonderful range of amenities and facilities to make your stay truly enjoyable ...
+2026-02-01 19:45:08,164 - INFO - AI response: Certainly! We offer a wonderful range of amenities and facilities to make your stay truly enjoyable at MGM Resort. You can look forward to:
+
+*   **Refreshing Pools:** Perfect for a relaxing swim or sunbathing.
+*   **Diverse Dining Options:** A variety of restaurants and bars to suit every taste.
+*   **Luxurious Spa & Wellness Center:** For ultimate relaxation and rejuvenation.
+*   **State-of-the-art Fitness Center:** To help you keep up with your routine.
+*   **Concierge Services:** Our team is ready to assist you with any needs or recommendations.
+*   **Complimentary Wi-Fi:** Available throughout the resort.
+*   **Room Service:** For your convenience.
+
+Is there a particular amenity you'd like to know more about?
+2026-02-01 19:46:36,879 - INFO - 127.0.0.1 - - [01/Feb/2026 19:46:36] "GET /socket.io/?EIO=4&transport=websocket&sid=fKEmpujX2sa4mKNTAAAE HTTP/1.1" 200 -
+2026-02-01 19:46:36,894 - INFO - 127.0.0.1 - - [01/Feb/2026 19:46:36] "GET / HTTP/1.1" 200 -
+2026-02-01 19:46:36,916 - INFO - 127.0.0.1 - - [01/Feb/2026 19:46:36] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 19:46:36,919 - INFO - 127.0.0.1 - - [01/Feb/2026 19:46:36] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2026-02-01 19:46:36,922 - INFO - 127.0.0.1 - - [01/Feb/2026 19:46:36] "[36mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 304 -
+2026-02-01 19:46:36,929 - INFO - 127.0.0.1 - - [01/Feb/2026 19:46:36] "[36mGET /static/images/pool.jpg HTTP/1.1[0m" 304 -
+2026-02-01 19:46:36,932 - INFO - 127.0.0.1 - - [01/Feb/2026 19:46:36] "[36mGET /static/images/dining.jpg HTTP/1.1[0m" 304 -
+2026-02-01 19:46:36,937 - INFO - 127.0.0.1 - - [01/Feb/2026 19:46:36] "[36mGET /static/images/resort1.jpg HTTP/1.1[0m" 304 -
+2026-02-01 19:46:36,941 - INFO - 127.0.0.1 - - [01/Feb/2026 19:46:36] "[36mGET /static/images/resort2.jpg HTTP/1.1[0m" 304 -
+2026-02-01 19:46:36,947 - INFO - 127.0.0.1 - - [01/Feb/2026 19:46:36] "[36mGET /static/images/resort3.jpg HTTP/1.1[0m" 304 -
+2026-02-01 19:46:36,949 - INFO - 127.0.0.1 - - [01/Feb/2026 19:46:36] "[36mGET /static/images/home-hero-bg.jpg HTTP/1.1[0m" 304 -
+2026-02-01 19:46:36,956 - INFO - 127.0.0.1 - - [01/Feb/2026 19:46:36] "[36mGET /static/images/home-am-bg.jpg HTTP/1.1[0m" 304 -
+2026-02-01 19:46:36,957 - INFO - 127.0.0.1 - - [01/Feb/2026 19:46:36] "GET /socket.io/?EIO=4&transport=polling&t=PmP1haJ HTTP/1.1" 200 -
+2026-02-01 19:46:36,958 - INFO - 127.0.0.1 - - [01/Feb/2026 19:46:36] "[36mGET /static/images/hotel-pin.png HTTP/1.1[0m" 304 -
+2026-02-01 19:46:36,965 - INFO - 127.0.0.1 - - [01/Feb/2026 19:46:36] "POST /socket.io/?EIO=4&transport=polling&t=PmP1haX&sid=sHrI2-1isE-9kSr1AAAG HTTP/1.1" 200 -
+2026-02-01 19:46:36,968 - INFO - 127.0.0.1 - - [01/Feb/2026 19:46:36] "GET /socket.io/?EIO=4&transport=polling&t=PmP1haY&sid=sHrI2-1isE-9kSr1AAAG HTTP/1.1" 200 -
+2026-02-01 19:46:36,971 - INFO - 127.0.0.1 - - [01/Feb/2026 19:46:36] "GET /socket.io/?EIO=4&transport=polling&t=PmP1haf&sid=sHrI2-1isE-9kSr1AAAG HTTP/1.1" 200 -
+2026-02-01 19:46:45,450 - INFO - Chat message from customer: hello, what are some available amenities?
+2026-02-01 19:46:45,451 - INFO - Getting Gemini response for: hello, what are some available amenities?
+2026-02-01 19:46:47,523 - INFO - Gemini response received: Hello there! I'd be happy to tell you about our available amenities at MGM Resort.
+
+We offer a wide ...
+2026-02-01 19:46:48,524 - INFO - AI response: Hello there! I'd be happy to tell you about our available amenities at MGM Resort.
+
+We offer a wide range of services and facilities to enhance your stay, including:
+
+*   **Hotel Amenities:** Complimentary Wi-Fi, 24-hour room service, a dedicated concierge desk, and daily housekeeping.
+*   **Resort Facilities:** Beautiful swimming pools, a variety of dining options from casual to fine dining, and a luxurious spa and fitness center for your relaxation and well-being.
+
+Is there anything specific you were looking for, or would you like more details on any of these?
+2026-02-01 19:47:02,531 - INFO - Chat message from customer: what is 6+7?
+2026-02-01 19:47:02,531 - INFO - Getting Gemini response for: what is 6+7?
+2026-02-01 19:47:04,743 - INFO - Gemini response received: Hello there! As your MGM Resorts concierge, I'm here to help you with any information about our room...
+2026-02-01 19:47:05,744 - INFO - AI response: Hello there! As your MGM Resorts concierge, I'm here to help you with any information about our room types, resort locations, amenities, or services.
+
+How can I assist you with your stay today?
+2026-02-01 19:47:19,092 - INFO - Chat message from customer: when was python created?
+2026-02-01 19:47:19,092 - INFO - Getting Gemini response for: when was python created?
+2026-02-01 19:47:20,539 - INFO - Gemini response received: Welcome to MGM Resorts! I'm here to help you with any information you need about our hotels and serv...
+2026-02-01 19:47:21,540 - INFO - AI response: Welcome to MGM Resorts! I'm here to help you with any information you need about our hotels and services.
+
+Regarding your question, I can only assist with information related to MGM Resorts. If you have any questions about our room types, locations, amenities, or anything else about your stay, please let me know!
+2026-02-01 19:47:28,511 - INFO - Chat message from customer: what is 6+7?
+2026-02-01 19:47:28,512 - INFO - Getting Gemini response for: what is 6+7?
+2026-02-01 19:47:30,319 - INFO - Gemini response received: Welcome to MGM Resort! I can help you with information about our room types, amenities, booking, and...
+2026-02-01 19:47:31,321 - INFO - AI response: Welcome to MGM Resort! I can help you with information about our room types, amenities, booking, and more.
+
+Regarding your question, I can best assist you with information about our resort. What can I tell you about MGM Resort today?
+2026-02-01 19:49:34,352 - INFO - Chat message from customer: can i request a human customer service?
+2026-02-01 19:49:34,353 - INFO - Getting Gemini response for: can i request a human customer service?
+2026-02-01 19:49:37,139 - INFO - Gemini response received: Certainly! I understand you'd like to speak with a human customer service representative.
+
+While I'm...
+2026-02-01 19:49:38,140 - INFO - AI response: Certainly! I understand you'd like to speak with a human customer service representative.
+
+While I'm here to assist you with all information regarding MGM Resort's room types, amenities, booking procedures, and more, I can certainly guide you.
+
+Is there anything specific I can help you with right now? I might be able to answer your question immediately.
+
+If you still prefer to speak with a team member, you can typically reach the Front Desk by calling the main resort line, or by visiting the Front Desk directly if you are on-site.

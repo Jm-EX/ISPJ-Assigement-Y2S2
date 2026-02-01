@@ -8,6 +8,7 @@ import random
 import stripe
 import requests
 from flask_socketio import SocketIO, emit, join_room, leave_room
+import google.generativeai as genai
 
 # =========================
 # Setup
@@ -25,6 +26,42 @@ main = Blueprint('main', __name__)
 
 # Stripe test secret key
 stripe.api_key = 'sk_test_51SeUJR2OsU80dT1Yw27XKOVnYeA8JgICdgfkNgRo5wZ2n5TuEXi3IFLffC1bsSm8UAgchYJFvkrAw8BF72rWxtyE00MY1LodZ7'
+
+# Configure Gemini AI
+gemini_api_key = os.environ.get('GEMINI_API_KEY')
+logging.info(f"Gemini API Key loaded: {bool(gemini_api_key)}")
+
+if gemini_api_key:
+    genai.configure(api_key=gemini_api_key)
+    
+    # List available models to debug
+    try:
+        models = genai.list_models()
+        available_models = [model.name for model in models if 'generateContent' in model.supported_generation_methods]
+        logging.info(f"Available models: {available_models}")
+        
+        # Try to find the best model
+        if 'models/gemini-1.5-flash' in available_models:
+            gemini_model = genai.GenerativeModel('gemini-1.5-flash')
+        elif 'models/gemini-pro' in available_models:
+            gemini_model = genai.GenerativeModel('gemini-pro')
+        elif 'models/gemini-1.0-pro' in available_models:
+            gemini_model = genai.GenerativeModel('gemini-1.0-pro')
+        else:
+            # Use the first available model
+            first_model = available_models[0].replace('models/', '')
+            gemini_model = genai.GenerativeModel(first_model)
+            logging.info(f"Using first available model: {first_model}")
+        
+        logging.info("Gemini AI configured successfully")
+    except Exception as e:
+        logging.error(f"Error listing models: {str(e)}")
+        # Fallback to gemini-pro
+        gemini_model = genai.GenerativeModel('gemini-pro')
+        logging.info("Using fallback model: gemini-pro")
+else:
+    logging.error("Gemini API Key not found in environment variables")
+    gemini_model = None
 
 # =========================
 # Resort locaiton
@@ -220,6 +257,39 @@ def booking_confirmation():
     return render_template("booking_confirmation.html", booking=booking_data)
 
 
+def get_gemini_response(message):
+    """Get AI response for hotel-related questions"""
+    try:
+        if not gemini_model:
+            logging.error("Gemini model not initialized")
+            return "AI service is not available right now. Please try again later."
+        
+        logging.info(f"Getting Gemini response for: {message}")
+        
+        # Hotel-specific prompt
+        hotel_context = """
+        You are a helpful concierge assistant for MGM Resort. You provide information about:
+        - Room types (Deluxe Room: $229/night, Luxury Suite: $299/night, Executive Suite: $399/night)
+        - Resort locations (Pulau Tekong, Toa Payoh, Upper Thomson)
+        - Hotel amenities and services
+        - Booking and check-in procedures
+        - Resort facilities (pools, dining, spa, etc.)
+        
+        Be friendly, professional, and concise. If asked about topics outside hotel services, 
+        politely redirect to hotel-related topics.
+        """
+        
+        full_prompt = f"{hotel_context}\n\nCustomer question: {message}"
+        response = gemini_model.generate_content(full_prompt)
+        
+        logging.info(f"Gemini response received: {response.text[:100]}...")
+        return response.text
+        
+    except Exception as e:
+        logging.error(f"Gemini AI error: {str(e)}")
+        return "I'm sorry, I'm having trouble connecting right now. Please try again or contact our front desk directly."
+
+
 # =========================
 # Chat Events
 # =========================
@@ -236,14 +306,47 @@ def on_join(data):
 @socketio.on('send_message')
 def on_message(data):
     room = data['room']
-    message_data = {
-        'msg': data['msg'],
-        'sender': data['sender'],
-        'timestamp': datetime.now().strftime('%H:%M')
-    }
+    sender = data['sender']
+    message = data['msg']
     
     # Log message
-    logging.info(f"Chat message from {data['sender']}: {data['msg']}")
+    logging.info(f"Chat message from {sender}: {message}")
     
-    # Send to everyone except the sender
+    # Broadcast customer message to everyone (including admin/staff)
+    message_data = {
+        'msg': message,
+        'sender': sender,
+        'timestamp': datetime.now().strftime('%H:%M')
+    }
     emit('receive_message', message_data, room=room, include_self=False)
+    
+    # If it's a customer message, generate AI response
+    if sender == 'customer':
+        try:
+            # Get AI response
+            ai_response = get_gemini_response(message)
+            
+            # Send AI response as "Concierge"
+            ai_message_data = {
+                'msg': ai_response,
+                'sender': 'Concierge',
+                'timestamp': datetime.now().strftime('%H:%M')
+            }
+            
+            # Small delay to make it feel natural
+            import time
+            time.sleep(1)
+            
+            emit('receive_message', ai_message_data, room=room)
+            
+            # Log AI response
+            logging.info(f"AI response: {ai_response}")
+            
+        except Exception as e:
+            logging.error(f"Error generating AI response: {str(e)}")
+            error_message = {
+                'msg': "I'm sorry, I'm having trouble processing your request right now. Please try again.",
+                'sender': 'Concierge',
+                'timestamp': datetime.now().strftime('%H:%M')
+            }
+            emit('receive_message', error_message, room=room)

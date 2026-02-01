@@ -75,6 +75,43 @@
             font-size: 24px;
             cursor: pointer;
             line-height: 1;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+
+        .chat-close:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .human-support-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .human-support-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
         }
 
         /* 2. SCROLLABLE MIDDLE HISTORY */
@@ -177,7 +214,12 @@
     <div id="chat-popup" class="chat-popup">
         <div class="chat-header">
             <h4>Concierge Support</h4>
-            <button onclick="toggleChat()" class="chat-close">&times;</button>
+            <div class="header-buttons">
+                <button onclick="requestHumanSupport()" class="human-support-btn" title="Talk to Human Support">
+                    <i class="fas fa-user-headset"></i>
+                </button>
+                <button onclick="toggleChat()" class="chat-close">&times;</button>
+            </div>
         </div>
         
         <div id="chat-messages" class="chat-messages">
@@ -191,9 +233,11 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 <script>
 const socket = io();
 let chatOpen = false;
+let chatHistory = []; // Store chat history
 
 function toggleChat() {
     const popup = document.getElementById('chat-popup');
@@ -206,9 +250,50 @@ function toggleChat() {
         popup.style.display = 'flex'; 
         badge.style.display = 'none';
         socket.emit('join_chat', {room: 'customer_service'});
+        
+        // Restore chat history if exists
+        if (chatHistory.length > 0) {
+            restoreChatHistory();
+        }
     } else {
         popup.style.display = 'none';
+        // Don't clear history - keep it for next time
     }
+}
+
+function formatMessage(text) {
+    // Convert markdown-style formatting to HTML
+    // Handle **bold** and *italic*
+    text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    
+    // Handle line breaks
+    text = text.replace(/\n/g, '<br>');
+    
+    return text;
+}
+
+function restoreChatHistory() {
+    const messagesDiv = document.getElementById('chat-messages');
+    messagesDiv.innerHTML = ''; // Clear current display
+    
+    // Restore all messages from history
+    chatHistory.forEach(message => {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `chat-message ${message.type}`;
+        
+        // Format the message text when restoring
+        const formattedMessage = formatMessage(message.text);
+        
+        messageDiv.innerHTML = `
+            <strong>${message.sender}:</strong> <div>${formattedMessage}</div>
+            <span class="chat-time">${message.time}</span>
+        `;
+        messagesDiv.appendChild(messageDiv);
+    });
+    
+    // Scroll to bottom
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
 
 function sendMessage() {
@@ -221,6 +306,16 @@ function sendMessage() {
             sender: 'customer',
             room: 'customer_service'
         });
+        
+        // Add to history immediately
+        const messageObj = {
+            sender: 'You',
+            text: msg,
+            type: 'customer',
+            time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+        };
+        chatHistory.push(messageObj);
+        
         addMessageToChat('You', msg, 'customer');
         input.value = '';
     }
@@ -230,20 +325,59 @@ function handleKeyPress(event) {
     if (event.key === 'Enter') sendMessage();
 }
 
+function requestHumanSupport() {
+    // Add system message about human support request
+    const humanMessage = "👋 A human support agent will be with you shortly. For immediate assistance, please call our front desk at +1-800-MGM-HELP.";
+    addMessageToChat('System', humanMessage, 'system');
+    
+    // Add to history
+    const messageObj = {
+        sender: 'System',
+        text: humanMessage,
+        type: 'system',
+        time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+    };
+    chatHistory.push(messageObj);
+    
+    // You could also:
+    // 1. Send a notification to admin dashboard
+    // 2. Send an email to support staff
+    // 3. Integrate with a live chat service
+    // 4. Show estimated wait time
+    
+    // Log the human support request
+    console.log('Human support requested at:', new Date().toISOString());
+}
+
 function addMessageToChat(sender, message, senderType) {
-    const messagesDiv = document.getElementById('chat-messages');
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `chat-message ${senderType}`;
+    // Only add to display if chat is open
+    if (chatOpen) {
+        const messagesDiv = document.getElementById('chat-messages');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `chat-message ${senderType}`;
+        
+        // Format the message text
+        const formattedMessage = formatMessage(message);
+        
+        messageDiv.innerHTML = `
+            <strong>${sender}:</strong> <div>${formattedMessage}</div>
+            <span class="chat-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+        `;
+        
+        messagesDiv.appendChild(messageDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
     
-    messageDiv.innerHTML = `
-        <strong>${sender}:</strong> <div>${message}</div>
-        <span class="chat-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
-    `;
-    
-    messagesDiv.appendChild(messageDiv);
-    
-    // Auto-scroll to the bottom when a new message arrives
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    // Always add to history (except for customer messages which are added in sendMessage)
+    if (sender !== 'You') {
+        const messageObj = {
+            sender: sender,
+            text: message, // Store original text
+            type: senderType,
+            time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+        };
+        chatHistory.push(messageObj);
+    }
 }
 
 socket.on('receive_message', function(data) {
@@ -253,6 +387,10 @@ socket.on('receive_message', function(data) {
     // Using 'support' as the class for AI/Admin replies
     const type = data.sender === 'customer' ? 'customer' : 'support';
     addMessageToChat(data.sender, data.msg, type);
+});
+
+socket.on('status', function(data) {
+    addMessageToChat('System', data.msg, 'system');
 });
 </script>
 
