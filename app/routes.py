@@ -7,6 +7,7 @@ from datetime import datetime
 import random
 import stripe
 import requests
+from flask_socketio import SocketIO, emit, join_room, leave_room
 
 # =========================
 # Setup
@@ -217,3 +218,32 @@ def booking_confirmation():
         flash("No booking found", "error")
         return redirect(url_for("main.book_room"))
     return render_template("booking_confirmation.html", booking=booking_data)
+
+
+# =========================
+# Chat Events
+# =========================
+
+# Initialize SocketIO (this will be imported in run.py)
+socketio = SocketIO()
+
+@socketio.on('join_chat')
+def on_join(data):
+    room = data['room']
+    join_room(room)
+    emit('status', {'msg': 'Connected to customer support'}, room=room)
+
+@socketio.on('send_message')
+def on_message(data):
+    room = data['room']
+    message_data = {
+        'msg': data['msg'],
+        'sender': data['sender'],
+        'timestamp': datetime.now().strftime('%H:%M')
+    }
+    
+    # Log message
+    logging.info(f"Chat message from {data['sender']}: {data['msg']}")
+    
+    # Send to everyone except the sender
+    emit('receive_message', message_data, room=room, include_self=False)
