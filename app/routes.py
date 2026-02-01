@@ -297,17 +297,34 @@ def get_gemini_response(message):
 # Initialize SocketIO (this will be imported in run.py)
 socketio = SocketIO()
 
+# Track user modes
+user_modes = {}  # {session_id: 'ai' or 'human'}
+
 @socketio.on('join_chat')
 def on_join(data):
     room = data['room']
+    session_id = request.sid
+    user_modes[session_id] = 'ai'  # Default to AI mode
     join_room(room)
     emit('status', {'msg': 'Connected to customer support'}, room=room)
+    logging.info(f"User {session_id} joined chat in AI mode")
+
+@socketio.on('switch_to_human_mode')
+def on_switch_to_human():
+    session_id = request.sid
+    user_modes[session_id] = 'human'
+
+@socketio.on('switch_to_ai_mode')
+def on_switch_to_ai():
+    session_id = request.sid
+    user_modes[session_id] = 'ai'
 
 @socketio.on('send_message')
 def on_message(data):
     room = data['room']
     sender = data['sender']
     message = data['msg']
+    session_id = request.sid
     
     # Log message
     logging.info(f"Chat message from {sender}: {message}")
@@ -320,8 +337,8 @@ def on_message(data):
     }
     emit('receive_message', message_data, room=room, include_self=False)
     
-    # If it's a customer message, generate AI response
-    if sender == 'customer':
+    # If it's a customer message and user is in AI mode, generate AI response
+    if sender == 'customer' and user_modes.get(session_id) == 'ai':
         try:
             # Get AI response
             ai_response = get_gemini_response(message)
@@ -350,3 +367,9 @@ def on_message(data):
                 'timestamp': datetime.now().strftime('%H:%M')
             }
             emit('receive_message', error_message, room=room)
+    elif sender == 'customer' and user_modes.get(session_id) == 'human':
+        # In human mode, don't generate AI responses
+        logging.info(f"User {session_id} is in Human mode - no AI response generated")
+    else:
+        # Handle admin/staff messages (forward to room)
+        pass

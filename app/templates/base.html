@@ -213,10 +213,11 @@
     
     <div id="chat-popup" class="chat-popup">
         <div class="chat-header">
-            <h4>Concierge Support</h4>
+            <h4>AI Support</h4>
             <div class="header-buttons">
-                <button onclick="requestHumanSupport()" class="human-support-btn" title="Talk to Human Support">
-                    <i class="fas fa-user-headset"></i>
+                <button onclick="toggleSupportMode()" class="human-support-btn" title="Switch to Human Support">
+                    <i class="fas fa-user-tie"></i>
+                    <span>Concierge Support</span>
                 </button>
                 <button onclick="toggleChat()" class="chat-close">&times;</button>
             </div>
@@ -238,6 +239,8 @@
 const socket = io();
 let chatOpen = false;
 let chatHistory = []; // Store chat history
+let isHumanMode = false; // Track current support mode
+let aiConnected = true; // Track AI connection status
 
 function toggleChat() {
     const popup = document.getElementById('chat-popup');
@@ -259,6 +262,53 @@ function toggleChat() {
         popup.style.display = 'none';
         // Don't clear history - keep it for next time
     }
+}
+
+function toggleSupportMode() {
+    isHumanMode = !isHumanMode;
+    
+    const headerTitle = document.querySelector('.chat-header h4');
+    const supportButton = document.querySelector('.human-support-btn span');
+    const supportButtonIcon = document.querySelector('.human-support-btn i');
+    
+    if (isHumanMode) {
+        // Switch to Human Support mode
+        headerTitle.textContent = 'Concierge Support';
+        supportButton.textContent = 'AI Support';
+        supportButtonIcon.className = 'fas fa-robot';
+        supportButton.parentElement.setAttribute('title', 'Switch to AI Support');
+        
+        // Disconnect AI - notify server we're in human mode
+        socket.emit('switch_to_human_mode');
+        aiConnected = false;
+        
+        // Add system message about switching to human mode
+        const switchMessage = "👋 You're now connected with Concierge Support. A human agent will assist you shortly. AI responses have been disabled.";
+        addMessageToChat('System', switchMessage, 'system');
+    } else {
+        // Switch to AI Support mode
+        headerTitle.textContent = 'AI Support';
+        supportButton.textContent = 'Concierge Support';
+        supportButtonIcon.className = 'fas fa-user-tie';
+        supportButton.parentElement.setAttribute('title', 'Switch to Human Support');
+        
+        // Reconnect AI - notify server we're back in AI mode
+        socket.emit('switch_to_ai_mode');
+        aiConnected = true;
+        
+        // Add system message about switching to AI mode
+        const switchMessage = "🤖 You're now connected with AI Support. I can help you with hotel information and booking questions.";
+        addMessageToChat('System', switchMessage, 'system');
+    }
+    
+    // Add to history
+    const messageObj = {
+        sender: 'System',
+        text: switchMessage,
+        type: 'system',
+        time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+    };
+    chatHistory.push(messageObj);
 }
 
 function formatMessage(text) {
