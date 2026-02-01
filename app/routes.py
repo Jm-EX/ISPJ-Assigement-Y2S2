@@ -259,15 +259,27 @@ def booking_confirmation():
 
 def get_gemini_response(message):
     """Get AI response for hotel-related questions"""
-    try:
-        if not gemini_model:
-            logging.error("Gemini model not initialized")
-            return "AI service is not available right now. Please try again later."
-        
-        logging.info(f"Getting Gemini response for: {message}")
-        
-        # Hotel-specific prompt
-        hotel_context = """Knowledge Base:
+    # Try different models if primary one hits quota limit
+    models_to_try = [
+        'gemini-2.5-flash',
+        'gemini-2.5-flash-lite',
+        'gemini-2.5-flash-preview-tts',
+        'gemini-3-flash-preview',
+        'gemini-robotics-er-1.5-preview',
+        'gemini-2.0-flash', 
+        'gemini-1.5-flash',
+        'gemini-pro-latest'
+    ]
+    
+    for model_name in models_to_try:
+        try:
+            logging.info(f"Trying model: {model_name}")
+            temp_model = genai.GenerativeModel(model_name)
+            
+            logging.info(f"Getting Gemini response for: {message}")
+            
+            # Hotel-specific prompt
+            hotel_context = """Knowledge Base:
 
 Check-in: 3:00 PM | Check-out: 11:00 AM.
 
@@ -279,12 +291,12 @@ Luxury Suite: Elegant suite with panoramic city views, separate living area, and
 2 Guests, 1 King Bed, 55 m², From $299 / night
 
 Deluxe Room: Spacious room with modern amenities and stunning city or garden views.
-2 Guests, 1 King or 2 Queens, 42 m², From, $229 / night
+2 Guests, 1 King or 2 Queens, 42 m², From $229 / night
 
 Executive Suite: Luxurious suite with separate living area, work desk, and premium amenities.
 2-4 Guests, 1 King Bed + Sofa Bed, 65 m², From $399 / night
 
-Resort locations: Pulau Tekong, Toa Payoh, Upper Thomson)
+Resort locations: Pulau Tekong, Toa Payoh, Upper Thomson
 
 Strict Rules:
 
@@ -293,16 +305,20 @@ Focus: Only answer questions about the hotel or the local area.
 Refusal: If a user asks about politics, coding, or unrelated topics, say: \"I'm here to assist with your stay at MGM Resorts. I'm afraid I can't help with that topic.\"
 
 Tone: Professional, welcoming, and luxury-oriented."""
-        
-        full_prompt = f"{hotel_context}\n\nCustomer question: {message}"
-        response = gemini_model.generate_content(full_prompt)
-        
-        logging.info(f"Gemini response received: {response.text[:100]}...")
-        return response.text
-        
-    except Exception as e:
-        logging.error(f"Gemini AI error: {str(e)}")
-        return "I'm sorry, I'm having trouble connecting right now. Please try again later or contact us through concierge support."
+            
+            full_prompt = f"{hotel_context}\n\nCustomer question: {message}"
+            response = temp_model.generate_content(full_prompt)
+            
+            logging.info(f"Gemini response received from {model_name}: {response.text[:100]}...")
+            return response.text
+            
+        except Exception as e:
+            logging.warning(f"Model {model_name} failed: {str(e)}")
+            continue  # Try next model
+    
+    # All models failed
+    logging.error("All Gemini models failed")
+    return "I'm sorry, I'm having trouble connecting right now. Please try again later or contact us through concierge support."
 
 
 # =========================

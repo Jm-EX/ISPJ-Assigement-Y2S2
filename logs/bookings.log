@@ -1,31 +1,35 @@
-2026-02-01 21:08:09,698 - INFO - Gemini API Key loaded: True
-2026-02-01 21:08:09,760 - INFO - Available models: ['models/gemini-2.5-flash', 'models/gemini-2.5-pro', 'models/gemini-2.0-flash', 'models/gemini-2.0-flash-001', 'models/gemini-2.0-flash-exp-image-generation', 'models/gemini-2.0-flash-lite-001', 'models/gemini-2.0-flash-lite', 'models/gemini-exp-1206', 'models/gemini-2.5-flash-preview-tts', 'models/gemini-2.5-pro-preview-tts', 'models/gemma-3-1b-it', 'models/gemma-3-4b-it', 'models/gemma-3-12b-it', 'models/gemma-3-27b-it', 'models/gemma-3n-e4b-it', 'models/gemma-3n-e2b-it', 'models/gemini-flash-latest', 'models/gemini-flash-lite-latest', 'models/gemini-pro-latest', 'models/gemini-2.5-flash-lite', 'models/gemini-2.5-flash-image', 'models/gemini-2.5-flash-preview-09-2025', 'models/gemini-2.5-flash-lite-preview-09-2025', 'models/gemini-3-pro-preview', 'models/gemini-3-flash-preview', 'models/gemini-3-pro-image-preview', 'models/nano-banana-pro-preview', 'models/gemini-robotics-er-1.5-preview', 'models/gemini-2.5-computer-use-preview-10-2025', 'models/deep-research-pro-preview-12-2025']
-2026-02-01 21:08:09,760 - INFO - Using first available model: gemini-2.5-flash
-2026-02-01 21:08:09,760 - INFO - Gemini AI configured successfully
-2026-02-01 21:08:09,821 - WARNING -  * Debugger is active!
-2026-02-01 21:08:09,824 - INFO -  * Debugger PIN: 114-928-946
-2026-02-01 21:08:11,019 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:11] "GET / HTTP/1.1" 200 -
-2026-02-01 21:08:11,046 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:11] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
-2026-02-01 21:08:11,047 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:11] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
-2026-02-01 21:08:11,062 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:11] "[36mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 304 -
-2026-02-01 21:08:11,062 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:11] "[36mGET /static/images/pool.jpg HTTP/1.1[0m" 304 -
-2026-02-01 21:08:11,070 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:11] "[36mGET /static/images/dining.jpg HTTP/1.1[0m" 304 -
-2026-02-01 21:08:11,076 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:11] "[36mGET /static/images/resort1.jpg HTTP/1.1[0m" 304 -
-2026-02-01 21:08:11,077 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:11] "[36mGET /static/images/resort2.jpg HTTP/1.1[0m" 304 -
-2026-02-01 21:08:11,080 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:11] "[36mGET /static/images/resort3.jpg HTTP/1.1[0m" 304 -
-2026-02-01 21:08:11,087 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:11] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
-2026-02-01 21:08:11,128 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:11] "[36mGET /static/images/home-hero-bg.jpg HTTP/1.1[0m" 304 -
-2026-02-01 21:08:11,130 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:11] "[36mGET /static/images/home-am-bg.jpg HTTP/1.1[0m" 304 -
-2026-02-01 21:08:11,170 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:11] "[36mGET /static/images/hotel-pin.png HTTP/1.1[0m" 304 -
-2026-02-01 21:08:11,181 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:11] "GET /socket.io/?EIO=4&transport=polling&t=PmPKMSh HTTP/1.1" 200 -
-2026-02-01 21:08:11,292 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:11] "POST /socket.io/?EIO=4&transport=polling&t=PmPKMUP&sid=X0HbyiT4JSee5v4ZAAAA HTTP/1.1" 200 -
-2026-02-01 21:08:11,297 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:11] "GET /socket.io/?EIO=4&transport=polling&t=PmPKMUQ&sid=X0HbyiT4JSee5v4ZAAAA HTTP/1.1" 200 -
-2026-02-01 21:08:13,060 - INFO - User UK4BL4KG4JSNgF51AAAB joined chat in AI mode
-2026-02-01 21:08:15,271 - INFO - Chat message from customer: hello!
-2026-02-01 21:08:15,271 - INFO - Getting Gemini response for: hello!
-2026-02-01 21:08:15,597 - ERROR - Gemini AI error: 429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+2026-02-01 21:20:57,344 - INFO - Gemini API Key loaded: True
+2026-02-01 21:20:57,435 - INFO - Available models: ['models/gemini-2.5-flash', 'models/gemini-2.5-pro', 'models/gemini-2.0-flash', 'models/gemini-2.0-flash-001', 'models/gemini-2.0-flash-exp-image-generation', 'models/gemini-2.0-flash-lite-001', 'models/gemini-2.0-flash-lite', 'models/gemini-exp-1206', 'models/gemini-2.5-flash-preview-tts', 'models/gemini-2.5-pro-preview-tts', 'models/gemma-3-1b-it', 'models/gemma-3-4b-it', 'models/gemma-3-12b-it', 'models/gemma-3-27b-it', 'models/gemma-3n-e4b-it', 'models/gemma-3n-e2b-it', 'models/gemini-flash-latest', 'models/gemini-flash-lite-latest', 'models/gemini-pro-latest', 'models/gemini-2.5-flash-lite', 'models/gemini-2.5-flash-image', 'models/gemini-2.5-flash-preview-09-2025', 'models/gemini-2.5-flash-lite-preview-09-2025', 'models/gemini-3-pro-preview', 'models/gemini-3-flash-preview', 'models/gemini-3-pro-image-preview', 'models/nano-banana-pro-preview', 'models/gemini-robotics-er-1.5-preview', 'models/gemini-2.5-computer-use-preview-10-2025', 'models/deep-research-pro-preview-12-2025']
+2026-02-01 21:20:57,435 - INFO - Using first available model: gemini-2.5-flash
+2026-02-01 21:20:57,435 - INFO - Gemini AI configured successfully
+2026-02-01 21:20:57,505 - WARNING -  * Debugger is active!
+2026-02-01 21:20:57,507 - INFO -  * Debugger PIN: 114-928-946
+2026-02-01 21:20:58,531 - INFO - 127.0.0.1 - - [01/Feb/2026 21:20:58] "GET / HTTP/1.1" 200 -
+2026-02-01 21:20:58,542 - INFO - 127.0.0.1 - - [01/Feb/2026 21:20:58] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
+2026-02-01 21:20:58,543 - INFO - 127.0.0.1 - - [01/Feb/2026 21:20:58] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2026-02-01 21:20:58,543 - INFO - 127.0.0.1 - - [01/Feb/2026 21:20:58] "[36mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 304 -
+2026-02-01 21:20:58,546 - INFO - 127.0.0.1 - - [01/Feb/2026 21:20:58] "[36mGET /static/images/pool.jpg HTTP/1.1[0m" 304 -
+2026-02-01 21:20:58,549 - INFO - 127.0.0.1 - - [01/Feb/2026 21:20:58] "[36mGET /static/images/dining.jpg HTTP/1.1[0m" 304 -
+2026-02-01 21:20:58,551 - INFO - 127.0.0.1 - - [01/Feb/2026 21:20:58] "[36mGET /static/images/resort1.jpg HTTP/1.1[0m" 304 -
+2026-02-01 21:20:58,553 - INFO - 127.0.0.1 - - [01/Feb/2026 21:20:58] "[36mGET /static/images/resort2.jpg HTTP/1.1[0m" 304 -
+2026-02-01 21:20:58,554 - INFO - 127.0.0.1 - - [01/Feb/2026 21:20:58] "[36mGET /static/images/resort3.jpg HTTP/1.1[0m" 304 -
+2026-02-01 21:20:58,558 - INFO - 127.0.0.1 - - [01/Feb/2026 21:20:58] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
+2026-02-01 21:20:58,589 - INFO - 127.0.0.1 - - [01/Feb/2026 21:20:58] "[36mGET /static/images/home-hero-bg.jpg HTTP/1.1[0m" 304 -
+2026-02-01 21:20:58,591 - INFO - 127.0.0.1 - - [01/Feb/2026 21:20:58] "[36mGET /static/images/home-am-bg.jpg HTTP/1.1[0m" 304 -
+2026-02-01 21:20:58,633 - INFO - 127.0.0.1 - - [01/Feb/2026 21:20:58] "[36mGET /static/images/hotel-pin.png HTTP/1.1[0m" 304 -
+2026-02-01 21:20:58,646 - INFO - 127.0.0.1 - - [01/Feb/2026 21:20:58] "GET /socket.io/?EIO=4&transport=polling&t=PmPNHqJ HTTP/1.1" 200 -
+2026-02-01 21:20:58,757 - INFO - 127.0.0.1 - - [01/Feb/2026 21:20:58] "POST /socket.io/?EIO=4&transport=polling&t=PmPNHs3&sid=HT7AfPR9eeRP0GHoAAAA HTTP/1.1" 200 -
+2026-02-01 21:20:58,761 - INFO - 127.0.0.1 - - [01/Feb/2026 21:20:58] "GET /socket.io/?EIO=4&transport=polling&t=PmPNHs4&sid=HT7AfPR9eeRP0GHoAAAA HTTP/1.1" 200 -
+2026-02-01 21:21:00,284 - INFO - User bQGcz3kd_46jZyeeAAAB joined chat in AI mode
+2026-02-01 21:21:02,151 - INFO - 127.0.0.1 - - [01/Feb/2026 21:21:02] "GET /socket.io/?EIO=4&transport=polling&t=PmPNIh1 HTTP/1.1" 200 -
+2026-02-01 21:21:02,158 - INFO - 127.0.0.1 - - [01/Feb/2026 21:21:02] "POST /socket.io/?EIO=4&transport=polling&t=PmPNIh9&sid=BOIDWsWdBYvuOUBuAAAC HTTP/1.1" 200 -
+2026-02-01 21:21:02,161 - INFO - 127.0.0.1 - - [01/Feb/2026 21:21:02] "GET /socket.io/?EIO=4&transport=polling&t=PmPNIhB&sid=BOIDWsWdBYvuOUBuAAAC HTTP/1.1" 200 -
+2026-02-01 21:21:02,552 - INFO - Chat message from customer: hello!
+2026-02-01 21:21:02,553 - INFO - Trying model: gemini-2.5-flash
+2026-02-01 21:21:02,553 - INFO - Getting Gemini response for: hello!
+2026-02-01 21:21:03,027 - WARNING - Model gemini-2.5-flash failed: 429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
 * Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash
-Please retry in 37.197071525s. [links {
+Please retry in 49.759062331s. [links {
   description: "Learn more about Gemini API quotas"
   url: "https://ai.google.dev/gemini-api/docs/rate-limits"
 }
@@ -43,38 +47,85 @@ Please retry in 37.197071525s. [links {
   quota_value: 20
 }
 , retry_delay {
-  seconds: 37
+  seconds: 49
 }
 ]
-2026-02-01 21:08:16,598 - INFO - AI response: I'm sorry, I'm having trouble connecting right now. Please try again later or contact us through concierge support.
-2026-02-01 21:08:40,883 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:40] "GET /socket.io/?EIO=4&transport=websocket&sid=X0HbyiT4JSee5v4ZAAAA HTTP/1.1" 200 -
-2026-02-01 21:08:40,900 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:40] "GET /book HTTP/1.1" 200 -
-2026-02-01 21:08:40,920 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:40] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
-2026-02-01 21:08:40,923 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:40] "[36mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 304 -
-2026-02-01 21:08:40,925 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:40] "[36mGET /static/images/deluxe-room.jpg HTTP/1.1[0m" 304 -
-2026-02-01 21:08:40,928 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:40] "[36mGET /static/images/executive-suite.jpg HTTP/1.1[0m" 304 -
-2026-02-01 21:08:40,931 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:40] "[36mGET /static/css/book_room.css HTTP/1.1[0m" 304 -
-2026-02-01 21:08:40,933 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:40] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
-2026-02-01 21:08:40,937 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:40] "GET /socket.io/?EIO=4&transport=polling&t=PmPKTjd HTTP/1.1" 200 -
-2026-02-01 21:08:40,943 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:40] "[36mGET /static/images/hotel-lobby.jpg HTTP/1.1[0m" 304 -
-2026-02-01 21:08:40,988 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:40] "POST /socket.io/?EIO=4&transport=polling&t=PmPKTkQ&sid=gN6RKTBNWfQI5zHfAAAC HTTP/1.1" 200 -
-2026-02-01 21:08:40,993 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:40] "GET /socket.io/?EIO=4&transport=polling&t=PmPKTkQ.0&sid=gN6RKTBNWfQI5zHfAAAC HTTP/1.1" 200 -
-2026-02-01 21:08:41,014 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:41] "GET /socket.io/?EIO=4&transport=polling&t=PmPKTkq&sid=gN6RKTBNWfQI5zHfAAAC HTTP/1.1" 200 -
-2026-02-01 21:08:44,803 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:44] "GET /socket.io/?EIO=4&transport=websocket&sid=gN6RKTBNWfQI5zHfAAAC HTTP/1.1" 200 -
-2026-02-01 21:08:44,819 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:44] "GET /book/Luxury%20Suite HTTP/1.1" 200 -
-2026-02-01 21:08:44,833 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:44] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
-2026-02-01 21:08:44,836 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:44] "[36mGET /static/css/booking.css HTTP/1.1[0m" 304 -
-2026-02-01 21:08:44,837 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:44] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
-2026-02-01 21:08:44,847 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:44] "GET /socket.io/?EIO=4&transport=polling&t=PmPKUgg HTTP/1.1" 200 -
-2026-02-01 21:08:44,877 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:44] "POST /socket.io/?EIO=4&transport=polling&t=PmPKUh8&sid=Le8Nd5vc_okhmM_iAAAE HTTP/1.1" 200 -
-2026-02-01 21:08:44,882 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:44] "GET /socket.io/?EIO=4&transport=polling&t=PmPKUh9&sid=Le8Nd5vc_okhmM_iAAAE HTTP/1.1" 200 -
-2026-02-01 21:08:44,892 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:44] "GET /socket.io/?EIO=4&transport=polling&t=PmPKUhM&sid=Le8Nd5vc_okhmM_iAAAE HTTP/1.1" 200 -
-2026-02-01 21:08:46,977 - INFO - User qb2aY3YxRnYSbWN6AAAF joined chat in AI mode
-2026-02-01 21:08:50,297 - INFO - Chat message from customer: hello
-2026-02-01 21:08:50,298 - INFO - Getting Gemini response for: hello
-2026-02-01 21:08:50,574 - ERROR - Gemini AI error: 429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+2026-02-01 21:21:03,027 - INFO - Trying model: gemini-2.5-flash-lite
+2026-02-01 21:21:03,027 - INFO - Getting Gemini response for: hello!
+2026-02-01 21:21:03,737 - INFO - Gemini response received from gemini-2.5-flash-lite: Welcome! How may I assist you with your stay at MGM Resorts today?...
+2026-02-01 21:21:04,738 - INFO - AI response: Welcome! How may I assist you with your stay at MGM Resorts today?
+2026-02-01 21:21:14,306 - INFO - Chat message from customer: What time is checkin?
+2026-02-01 21:21:14,307 - INFO - Trying model: gemini-2.5-flash
+2026-02-01 21:21:14,307 - INFO - Getting Gemini response for: What time is checkin?
+2026-02-01 21:21:14,609 - WARNING - Model gemini-2.5-flash failed: 429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
 * Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash
-Please retry in 2.202911083s. [links {
+Please retry in 38.169870107s. [links {
+  description: "Learn more about Gemini API quotas"
+  url: "https://ai.google.dev/gemini-api/docs/rate-limits"
+}
+, violations {
+  quota_metric: "generativelanguage.googleapis.com/generate_content_free_tier_requests"
+  quota_id: "GenerateRequestsPerDayPerProjectPerModel-FreeTier"
+  quota_dimensions {
+    key: "model"
+    value: "gemini-2.5-flash"
+  }
+  quota_dimensions {
+    key: "location"
+    value: "global"
+  }
+  quota_value: 20
+}
+, retry_delay {
+  seconds: 38
+}
+]
+2026-02-01 21:21:14,610 - INFO - Trying model: gemini-2.5-flash-lite
+2026-02-01 21:21:14,610 - INFO - Getting Gemini response for: What time is checkin?
+2026-02-01 21:21:15,337 - INFO - Gemini response received from gemini-2.5-flash-lite: Welcome to MGM Resorts! Our check-in time is 3:00 PM. We look forward to welcoming you....
+2026-02-01 21:21:16,338 - INFO - AI response: Welcome to MGM Resorts! Our check-in time is 3:00 PM. We look forward to welcoming you.
+2026-02-01 21:21:26,942 - INFO - Chat message from customer: what are some available rooms?
+2026-02-01 21:21:26,942 - INFO - Trying model: gemini-2.5-flash
+2026-02-01 21:21:26,942 - INFO - Getting Gemini response for: what are some available rooms?
+2026-02-01 21:21:27,212 - WARNING - Model gemini-2.5-flash failed: 429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash
+Please retry in 25.556381959s. [links {
+  description: "Learn more about Gemini API quotas"
+  url: "https://ai.google.dev/gemini-api/docs/rate-limits"
+}
+, violations {
+  quota_metric: "generativelanguage.googleapis.com/generate_content_free_tier_requests"
+  quota_id: "GenerateRequestsPerDayPerProjectPerModel-FreeTier"
+  quota_dimensions {
+    key: "model"
+    value: "gemini-2.5-flash"
+  }
+  quota_dimensions {
+    key: "location"
+    value: "global"
+  }
+  quota_value: 20
+}
+, retry_delay {
+  seconds: 25
+}
+]
+2026-02-01 21:21:27,212 - INFO - Trying model: gemini-2.5-flash-lite
+2026-02-01 21:21:27,212 - INFO - Getting Gemini response for: what are some available rooms?
+2026-02-01 21:21:28,457 - INFO - Gemini response received from gemini-2.5-flash-lite: We are delighted to offer a selection of luxurious accommodations to suit your needs. You can choose...
+2026-02-01 21:21:29,458 - INFO - AI response: We are delighted to offer a selection of luxurious accommodations to suit your needs. You can choose from:
+
+*   **Luxury Suite:** An elegant suite with panoramic city views, a separate living area, and premium amenities. It accommodates 2 guests with 1 King Bed and is 55 m², starting from $299 per night.
+*   **Deluxe Room:** A spacious room featuring modern amenities and stunning city or garden views. It can accommodate 2 guests with either 1 King or 2 Queen beds and is 42 m², starting from $229 per night.
+*   **Executive Suite:** A luxurious suite offering a separate living area, a work desk, and premium amenities. It is designed for 2-4 guests with 1 King Bed plus a Sofa Bed and is 65 m², starting from $399 per night.
+
+We look forward to welcoming you.
+2026-02-01 21:21:49,715 - INFO - Chat message from customer: what are some amenities that deluxe room may include?
+2026-02-01 21:21:49,715 - INFO - Trying model: gemini-2.5-flash
+2026-02-01 21:21:49,715 - INFO - Getting Gemini response for: what are some amenities that deluxe room may include?
+2026-02-01 21:21:49,968 - WARNING - Model gemini-2.5-flash failed: 429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash
+Please retry in 2.793905479s. [links {
   description: "Learn more about Gemini API quotas"
   url: "https://ai.google.dev/gemini-api/docs/rate-limits"
 }
@@ -95,44 +146,16 @@ Please retry in 2.202911083s. [links {
   seconds: 2
 }
 ]
-2026-02-01 21:08:51,575 - INFO - AI response: I'm sorry, I'm having trouble connecting right now. Please try again later or contact us through concierge support.
-2026-02-01 21:08:57,035 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:57] "GET /socket.io/?EIO=4&transport=websocket&sid=Le8Nd5vc_okhmM_iAAAE HTTP/1.1" 200 -
-2026-02-01 21:08:57,044 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:57] "GET /book HTTP/1.1" 200 -
-2026-02-01 21:08:57,058 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:57] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
-2026-02-01 21:08:57,065 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:57] "[36mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 304 -
-2026-02-01 21:08:57,067 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:57] "[36mGET /static/images/deluxe-room.jpg HTTP/1.1[0m" 304 -
-2026-02-01 21:08:57,069 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:57] "[36mGET /static/images/executive-suite.jpg HTTP/1.1[0m" 304 -
-2026-02-01 21:08:57,071 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:57] "[36mGET /static/css/book_room.css HTTP/1.1[0m" 304 -
-2026-02-01 21:08:57,073 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:57] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
-2026-02-01 21:08:57,080 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:57] "[36mGET /static/images/hotel-lobby.jpg HTTP/1.1[0m" 304 -
-2026-02-01 21:08:57,095 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:57] "GET /socket.io/?EIO=4&transport=polling&t=PmPKXg4 HTTP/1.1" 200 -
-2026-02-01 21:08:57,257 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:57] "POST /socket.io/?EIO=4&transport=polling&t=PmPKXib&sid=Dde8nfVars9crGwjAAAG HTTP/1.1" 200 -
-2026-02-01 21:08:57,259 - INFO - 127.0.0.1 - - [01/Feb/2026 21:08:57] "GET /socket.io/?EIO=4&transport=polling&t=PmPKXib.0&sid=Dde8nfVars9crGwjAAAG HTTP/1.1" 200 -
-2026-02-01 21:08:58,336 - INFO - User q690uYcY20E66zHhAAAH joined chat in AI mode
-2026-02-01 21:08:59,893 - INFO - User q690uYcY20E66zHhAAAH joined chat in AI mode
-2026-02-01 21:09:02,632 - INFO - 127.0.0.1 - - [01/Feb/2026 21:09:02] "GET /socket.io/?EIO=4&transport=websocket&sid=Dde8nfVars9crGwjAAAG HTTP/1.1" 200 -
-2026-02-01 21:09:02,642 - INFO - 127.0.0.1 - - [01/Feb/2026 21:09:02] "GET / HTTP/1.1" 200 -
-2026-02-01 21:09:02,655 - INFO - 127.0.0.1 - - [01/Feb/2026 21:09:02] "[36mGET /static/css/Header&Footer.css HTTP/1.1[0m" 304 -
-2026-02-01 21:09:02,662 - INFO - 127.0.0.1 - - [01/Feb/2026 21:09:02] "[36mGET /static/images/luxury-suite.jpg HTTP/1.1[0m" 304 -
-2026-02-01 21:09:02,663 - INFO - 127.0.0.1 - - [01/Feb/2026 21:09:02] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
-2026-02-01 21:09:02,667 - INFO - 127.0.0.1 - - [01/Feb/2026 21:09:02] "[36mGET /static/images/pool.jpg HTTP/1.1[0m" 304 -
-2026-02-01 21:09:02,669 - INFO - 127.0.0.1 - - [01/Feb/2026 21:09:02] "[36mGET /static/images/dining.jpg HTTP/1.1[0m" 304 -
-2026-02-01 21:09:02,671 - INFO - 127.0.0.1 - - [01/Feb/2026 21:09:02] "[36mGET /static/images/resort1.jpg HTTP/1.1[0m" 304 -
-2026-02-01 21:09:02,674 - INFO - 127.0.0.1 - - [01/Feb/2026 21:09:02] "[36mGET /static/images/resort2.jpg HTTP/1.1[0m" 304 -
-2026-02-01 21:09:02,677 - INFO - 127.0.0.1 - - [01/Feb/2026 21:09:02] "[36mGET /static/images/resort3.jpg HTTP/1.1[0m" 304 -
-2026-02-01 21:09:02,679 - INFO - 127.0.0.1 - - [01/Feb/2026 21:09:02] "[36mGET /static/images/qrcode.png HTTP/1.1[0m" 304 -
-2026-02-01 21:09:02,682 - INFO - 127.0.0.1 - - [01/Feb/2026 21:09:02] "[36mGET /static/images/home-hero-bg.jpg HTTP/1.1[0m" 304 -
-2026-02-01 21:09:02,687 - INFO - 127.0.0.1 - - [01/Feb/2026 21:09:02] "[36mGET /static/images/home-am-bg.jpg HTTP/1.1[0m" 304 -
-2026-02-01 21:09:02,690 - INFO - 127.0.0.1 - - [01/Feb/2026 21:09:02] "[36mGET /static/images/hotel-pin.png HTTP/1.1[0m" 304 -
-2026-02-01 21:09:02,691 - INFO - 127.0.0.1 - - [01/Feb/2026 21:09:02] "GET /socket.io/?EIO=4&transport=polling&t=PmPKZ1Q HTTP/1.1" 200 -
-2026-02-01 21:09:02,695 - INFO - 127.0.0.1 - - [01/Feb/2026 21:09:02] "POST /socket.io/?EIO=4&transport=polling&t=PmPKZ1a&sid=K2sLpATyqjnYZpSbAAAI HTTP/1.1" 200 -
-2026-02-01 21:09:02,700 - INFO - 127.0.0.1 - - [01/Feb/2026 21:09:02] "GET /socket.io/?EIO=4&transport=polling&t=PmPKZ1b&sid=K2sLpATyqjnYZpSbAAAI HTTP/1.1" 200 -
-2026-02-01 21:09:04,243 - INFO - User UwSBIgiQIicMu9wLAAAJ joined chat in AI mode
-2026-02-01 21:09:14,556 - INFO - Chat message from customer: what time is check in?
-2026-02-01 21:09:14,556 - INFO - Getting Gemini response for: what time is check in?
-2026-02-01 21:09:14,845 - ERROR - Gemini AI error: 429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+2026-02-01 21:21:49,968 - INFO - Trying model: gemini-2.5-flash-lite
+2026-02-01 21:21:49,968 - INFO - Getting Gemini response for: what are some amenities that deluxe room may include?
+2026-02-01 21:21:50,661 - INFO - Gemini response received from gemini-2.5-flash-lite: The Deluxe Room at MGM Resorts offers modern amenities to ensure a comfortable stay. While the speci...
+2026-02-01 21:21:51,662 - INFO - AI response: The Deluxe Room at MGM Resorts offers modern amenities to ensure a comfortable stay. While the specific amenities can vary, you can expect features designed for your convenience and enjoyment.
+2026-02-01 21:22:04,246 - INFO - Chat message from customer: what is 6+7?
+2026-02-01 21:22:04,246 - INFO - Trying model: gemini-2.5-flash
+2026-02-01 21:22:04,246 - INFO - Getting Gemini response for: what is 6+7?
+2026-02-01 21:22:04,523 - WARNING - Model gemini-2.5-flash failed: 429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
 * Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash
-Please retry in 37.932557286s. [links {
+Please retry in 48.247661782s. [links {
   description: "Learn more about Gemini API quotas"
   url: "https://ai.google.dev/gemini-api/docs/rate-limits"
 }
@@ -150,7 +173,12 @@ Please retry in 37.932557286s. [links {
   quota_value: 20
 }
 , retry_delay {
-  seconds: 37
+  seconds: 48
 }
 ]
-2026-02-01 21:09:15,846 - INFO - AI response: I'm sorry, I'm having trouble connecting right now. Please try again later or contact us through concierge support.
+2026-02-01 21:22:04,524 - INFO - Trying model: gemini-2.5-flash-lite
+2026-02-01 21:22:04,524 - INFO - Getting Gemini response for: what is 6+7?
+2026-02-01 21:22:05,448 - INFO - Gemini response received from gemini-2.5-flash-lite: I'm here to assist with your stay at MGM Resorts. I'm afraid I can't help with that topic....
+2026-02-01 21:22:06,449 - INFO - AI response: I'm here to assist with your stay at MGM Resorts. I'm afraid I can't help with that topic.
+2026-02-01 21:22:12,688 - INFO - 127.0.0.1 - - [01/Feb/2026 21:22:12] "GET /socket.io/?EIO=4&transport=websocket&sid=HT7AfPR9eeRP0GHoAAAA HTTP/1.1" 200 -
+2026-02-01 21:22:13,939 - INFO - 127.0.0.1 - - [01/Feb/2026 21:22:13] "GET /socket.io/?EIO=4&transport=websocket&sid=BOIDWsWdBYvuOUBuAAAC HTTP/1.1" 200 -
