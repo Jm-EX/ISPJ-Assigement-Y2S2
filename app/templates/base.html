@@ -214,6 +214,7 @@
                 {% if session.get('is_admin') %}
                     <a href="{{ url_for('admin.portal') }}" class="btn">Admin portal</a>
                 {% endif %}
+                <a href="{{ url_for('auth.profile_get') }}" class="btn">Profile</a>
                 <a href="{{ url_for('auth.logout') }}" class="btn">Logout</a>
             {% else %}
                 <a href="{{ url_for('auth.login_get') }}" class="btn">Sign in</a>
