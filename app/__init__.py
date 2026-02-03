@@ -42,12 +42,36 @@ def create_app():
     app.config["MAIL_DEFAULT_SENDER"] = os.environ.get("SMTP_FROM")
     app.config["ADMIN_EMAIL"] = os.environ.get("ADMIN_EMAIL", "admin@example.com")
     
+    # DEBUG: Print SMTP configuration on startup
+    print("\n" + "="*80)
+    print("DEBUG: SMTP CONFIGURATION ON STARTUP")
+    print("="*80)
+    print(f"SMTP_SERVER env var: {os.environ.get('SMTP_SERVER')}")
+    print(f"SMTP_PORT env var: {os.environ.get('SMTP_PORT')}")
+    print(f"SMTP_USERNAME env var: {os.environ.get('SMTP_USERNAME')}")
+    print(f"SMTP_PASSWORD env var: {'***' + os.environ.get('SMTP_PASSWORD', '')[-4:] if os.environ.get('SMTP_PASSWORD') else None}")
+    print(f"SMTP_USE_TLS env var: {os.environ.get('SMTP_USE_TLS')}")
+    print(f"SMTP_FROM env var: {os.environ.get('SMTP_FROM')}")
+    print(f"\nApp config MAIL_SERVER: {app.config['MAIL_SERVER']}")
+    print(f"App config MAIL_PORT: {app.config['MAIL_PORT']}")
+    print(f"App config MAIL_USERNAME: {app.config['MAIL_USERNAME']}")
+    print(f"App config MAIL_PASSWORD: {'***' + app.config['MAIL_PASSWORD'][-4:] if app.config.get('MAIL_PASSWORD') else None}")
+    print(f"App config MAIL_USE_TLS: {app.config['MAIL_USE_TLS']}")
+    print(f"App config MAIL_USE_SSL: {app.config['MAIL_USE_SSL']}")
+    print(f"App config MAIL_DEFAULT_SENDER: {app.config['MAIL_DEFAULT_SENDER']}")
+    print("="*80 + "\n")
+    
     # reCAPTCHA configuration
     app.config["RECAPTCHA_SITE_KEY"] = os.environ.get("RECAPTCHA_SITE_KEY")
     app.config["RECAPTCHA_SECRET_KEY"] = os.environ.get("RECAPTCHA_SECRET_KEY")
 
+    print("DEBUG: Initializing Flask-Mail...")
     mail.init_app(app)
+    print("DEBUG: Flask-Mail initialized successfully")
+    
+    print("DEBUG: Initializing Flask-Limiter...")
     limiter.init_app(app)
+    print("DEBUG: Flask-Limiter initialized successfully\n")
 
     from app.routes import main
     app.register_blueprint(main)

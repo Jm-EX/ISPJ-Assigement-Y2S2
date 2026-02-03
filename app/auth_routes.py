@@ -80,33 +80,69 @@ def _password_errors(password: str, username: str):
 
 
 def _send_otp_email(to_email: str, otp_code: str):
+    print("\n" + "="*80)
+    print("DEBUG: _send_otp_email function called")
+    print(f"DEBUG: Recipient: {to_email}")
+    print(f"DEBUG: OTP Code: {otp_code}")
+    print("="*80)
+    
     mail_server = current_app.config.get("MAIL_SERVER")
+    mail_port = current_app.config.get("MAIL_PORT")
     mail_username = current_app.config.get("MAIL_USERNAME")
     mail_password = current_app.config.get("MAIL_PASSWORD")
+    mail_use_tls = current_app.config.get("MAIL_USE_TLS")
+    mail_use_ssl = current_app.config.get("MAIL_USE_SSL")
+    mail_default_sender = current_app.config.get("MAIL_DEFAULT_SENDER")
+
+    print(f"DEBUG: MAIL_SERVER = {mail_server}")
+    print(f"DEBUG: MAIL_PORT = {mail_port}")
+    print(f"DEBUG: MAIL_USERNAME = {mail_username}")
+    print(f"DEBUG: MAIL_PASSWORD = {'***' + mail_password[-4:] if mail_password else None}")
+    print(f"DEBUG: MAIL_USE_TLS = {mail_use_tls}")
+    print(f"DEBUG: MAIL_USE_SSL = {mail_use_ssl}")
+    print(f"DEBUG: MAIL_DEFAULT_SENDER = {mail_default_sender}")
 
     current_app.logger.info(f"Attempting to send OTP to {to_email}")
-    current_app.logger.info(f"Mail config - Server: {mail_server}, Username: {mail_username}, Password: {'***' if mail_password else None}")
+    current_app.logger.info(f"Mail config - Server: {mail_server}, Port: {mail_port}, Username: {mail_username}, Password: {'***' if mail_password else None}")
 
     if not (mail_server and mail_username and mail_password):
+        print("DEBUG: SMTP NOT CONFIGURED - Missing required values")
+        print(f"DEBUG: mail_server exists: {bool(mail_server)}")
+        print(f"DEBUG: mail_username exists: {bool(mail_username)}")
+        print(f"DEBUG: mail_password exists: {bool(mail_password)}")
         current_app.logger.warning(
             "SMTP not configured. OTP for %s is %s (dev fallback)", to_email, otp_code
         )
+        print("="*80 + "\n")
         return False
 
     try:
+        print("DEBUG: Creating email message...")
         current_app.logger.info("Creating email message...")
         msg = Message(
             subject="Your One-Time Password (OTP)",
             recipients=[to_email],
             body=f"Your OTP is: {otp_code}\n\nThis code will expire in 5 minutes."
         )
+        print(f"DEBUG: Message created - Subject: {msg.subject}, Recipients: {msg.recipients}")
+        print("DEBUG: Attempting to send email via Flask-Mail...")
         current_app.logger.info("Sending email via Flask-Mail...")
+        
         mail.send(msg)
+        
+        print("DEBUG: Email sent successfully!")
         current_app.logger.info("Email sent successfully!")
+        print("="*80 + "\n")
         return True
     except Exception as e:
+        print(f"DEBUG: EXCEPTION OCCURRED: {type(e).__name__}")
+        print(f"DEBUG: Exception message: {str(e)}")
         current_app.logger.error("Failed to send OTP email: %s", str(e))
         current_app.logger.exception("Full traceback:")
+        import traceback
+        print("DEBUG: Full traceback:")
+        traceback.print_exc()
+        print("="*80 + "\n")
         return False
 
 
