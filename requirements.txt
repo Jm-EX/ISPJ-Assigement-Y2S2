@@ -38,4 +38,5 @@ webauthn==2.3.0
 Flask-Limiter==3.8.0
 Flask-CORS==5.0.0
 gunicorn==21.2.0
-eventlet==0.35.2
+gevent==24.2.1
+gevent-websocket==0.10.1
