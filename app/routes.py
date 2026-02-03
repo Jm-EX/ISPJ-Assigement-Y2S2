@@ -322,8 +322,13 @@ def booking_confirmation():
 
 
 def get_gemini_response(message):
-
-    ]
+    """Get response from Gemini AI with fallback to multiple models"""
+    
+    # Use working models if available, otherwise fallback
+    if working_models:
+        models_to_try = working_models
+    else:
+        models_to_try = ['gemini-1.5-flash', 'gemini-pro']
     
     for model_name in models_to_try:
         try:
