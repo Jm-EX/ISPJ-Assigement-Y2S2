@@ -1,20 +1,29 @@
-import pymysql
+import psycopg2
+import psycopg2.extras
 from datetime import datetime
 from flask import current_app, g, request
 from werkzeug.security import generate_password_hash
+import os
 
 
 def get_db():
     if "db" not in g:
-        g.db = pymysql.connect(
-            host=current_app.config["MYSQL_HOST"],
-            port=current_app.config["MYSQL_PORT"],
-            user=current_app.config["MYSQL_USER"],
-            password=current_app.config["MYSQL_PASSWORD"],
-            database=current_app.config["MYSQL_DATABASE"],
-            autocommit=True,
-            cursorclass=pymysql.cursors.DictCursor
-        )
+        # Check if DATABASE_URL is provided (Render PostgreSQL)
+        database_url = os.environ.get("DATABASE_URL")
+        if database_url:
+            g.db = psycopg2.connect(database_url, cursor_factory=psycopg2.extras.RealDictCursor)
+            g.db.autocommit = True
+        else:
+            # Fallback to individual config values for local development
+            g.db = psycopg2.connect(
+                host=current_app.config["MYSQL_HOST"],
+                port=current_app.config["MYSQL_PORT"],
+                user=current_app.config["MYSQL_USER"],
+                password=current_app.config["MYSQL_PASSWORD"],
+                database=current_app.config["MYSQL_DATABASE"],
+                cursor_factory=psycopg2.extras.RealDictCursor
+            )
+            g.db.autocommit = True
     return g.db
 
 
@@ -25,30 +34,49 @@ def close_db(_exc=None):
 
 
 def init_db(app):
-    conn = pymysql.connect(
-        host=app.config["MYSQL_HOST"],
-        port=app.config["MYSQL_PORT"],
-        user=app.config["MYSQL_USER"],
-        password=app.config["MYSQL_PASSWORD"],
-        autocommit=True
-    )
+    # Check if DATABASE_URL is provided (Render PostgreSQL)
+    database_url = os.environ.get("DATABASE_URL")
+    if database_url:
+        conn = psycopg2.connect(database_url)
+        conn.autocommit = True
+    else:
+        # For local development, connect to default postgres database first
+        conn = psycopg2.connect(
+            host=app.config["MYSQL_HOST"],
+            port=app.config["MYSQL_PORT"],
+            user=app.config["MYSQL_USER"],
+            password=app.config["MYSQL_PASSWORD"],
+            database="postgres"
+        )
+        conn.autocommit = True
     try:
         cursor = conn.cursor()
-        cursor.execute(f"CREATE DATABASE IF NOT EXISTS {app.config['MYSQL_DATABASE']}")
-        cursor.execute(f"USE {app.config['MYSQL_DATABASE']}")
+        # PostgreSQL doesn't need CREATE DATABASE or USE statements when using DATABASE_URL
+        if not database_url:
+            cursor.execute(f"CREATE DATABASE IF NOT EXISTS {app.config['MYSQL_DATABASE']}")
+            conn.close()
+            conn = psycopg2.connect(
+                host=app.config["MYSQL_HOST"],
+                port=app.config["MYSQL_PORT"],
+                user=app.config["MYSQL_USER"],
+                password=app.config["MYSQL_PASSWORD"],
+                database=app.config["MYSQL_DATABASE"]
+            )
+            conn.autocommit = True
+            cursor = conn.cursor()
         
         cursor.execute(
             """
             CREATE TABLE IF NOT EXISTS users (
-                id INT AUTO_INCREMENT PRIMARY KEY,
+                id SERIAL PRIMARY KEY,
                 username VARCHAR(255) NOT NULL UNIQUE,
                 email VARCHAR(255) NOT NULL UNIQUE,
                 password_hash VARCHAR(255) NOT NULL,
-                is_admin TINYINT NOT NULL DEFAULT 0,
+                is_admin SMALLINT NOT NULL DEFAULT 0,
                 role VARCHAR(50) DEFAULT NULL,
                 permissions TEXT DEFAULT NULL,
-                created_at DATETIME NOT NULL,
-                last_login DATETIME DEFAULT NULL
+                created_at TIMESTAMP NOT NULL,
+                last_login TIMESTAMP DEFAULT NULL
             )
             """
         )
@@ -58,9 +86,9 @@ def init_db(app):
                 token VARCHAR(255) PRIMARY KEY,
                 user_id INT NOT NULL,
                 otp_hash VARCHAR(255) NOT NULL,
-                expires_at DATETIME NOT NULL,
+                expires_at TIMESTAMP NOT NULL,
                 attempts INT NOT NULL DEFAULT 0,
-                created_at DATETIME NOT NULL,
+                created_at TIMESTAMP NOT NULL,
                 FOREIGN KEY (user_id) REFERENCES users (id)
             )
             """
@@ -70,8 +98,8 @@ def init_db(app):
             CREATE TABLE IF NOT EXISTS password_reset_tokens (
                 token VARCHAR(255) PRIMARY KEY,
                 user_id INT NOT NULL,
-                expires_at DATETIME NOT NULL,
-                created_at DATETIME NOT NULL,
+                expires_at TIMESTAMP NOT NULL,
+                created_at TIMESTAMP NOT NULL,
                 FOREIGN KEY (user_id) REFERENCES users (id)
             )
             """
@@ -79,12 +107,12 @@ def init_db(app):
         cursor.execute(
             """
             CREATE TABLE IF NOT EXISTS passkey_credentials (
-                id INT AUTO_INCREMENT PRIMARY KEY,
+                id SERIAL PRIMARY KEY,
                 user_id INT NOT NULL,
                 credential_id TEXT NOT NULL,
                 public_key TEXT NOT NULL,
                 sign_count INT NOT NULL DEFAULT 0,
-                created_at DATETIME NOT NULL,
+                created_at TIMESTAMP NOT NULL,
                 FOREIGN KEY (user_id) REFERENCES users (id)
             )
             """
@@ -92,14 +120,14 @@ def init_db(app):
         cursor.execute(
             """
             CREATE TABLE IF NOT EXISTS security_logs (
-                id INT AUTO_INCREMENT PRIMARY KEY,
+                id SERIAL PRIMARY KEY,
                 user_id INT,
                 username VARCHAR(255),
                 event_type VARCHAR(255) NOT NULL,
                 ip_address VARCHAR(255),
                 user_agent TEXT,
                 details TEXT,
-                created_at DATETIME NOT NULL,
+                created_at TIMESTAMP NOT NULL,
                 FOREIGN KEY (user_id) REFERENCES users (id)
             )
             """
@@ -107,7 +135,7 @@ def init_db(app):
         cursor.execute(
             """
             CREATE TABLE IF NOT EXISTS rooms (
-                id INT AUTO_INCREMENT PRIMARY KEY,
+                id SERIAL PRIMARY KEY,
                 room_type VARCHAR(100) NOT NULL,
                 total_count INT NOT NULL DEFAULT 0,
                 available_count INT NOT NULL DEFAULT 0,
@@ -115,14 +143,14 @@ def init_db(app):
                 cleaning_count INT NOT NULL DEFAULT 0,
                 maintenance_count INT NOT NULL DEFAULT 0,
                 price_per_night DECIMAL(10, 2) NOT NULL,
-                updated_at DATETIME NOT NULL
+                updated_at TIMESTAMP NOT NULL
             )
             """
         )
         cursor.execute(
             """
             CREATE TABLE IF NOT EXISTS bookings (
-                id INT AUTO_INCREMENT PRIMARY KEY,
+                id SERIAL PRIMARY KEY,
                 guest_name VARCHAR(255) NOT NULL,
                 guest_email VARCHAR(255) NOT NULL,
                 guest_phone VARCHAR(50),
@@ -134,8 +162,8 @@ def init_db(app):
                 status VARCHAR(50) NOT NULL DEFAULT 'pending',
                 special_requests TEXT,
                 notes TEXT,
-                created_at DATETIME NOT NULL,
-                updated_at DATETIME NOT NULL,
+                created_at TIMESTAMP NOT NULL,
+                updated_at TIMESTAMP NOT NULL,
                 created_by INT,
                 FOREIGN KEY (created_by) REFERENCES users (id)
             )
@@ -144,22 +172,22 @@ def init_db(app):
         cursor.execute(
             """
             CREATE TABLE IF NOT EXISTS guest_profiles (
-                id INT AUTO_INCREMENT PRIMARY KEY,
+                id SERIAL PRIMARY KEY,
                 guest_name VARCHAR(255) NOT NULL,
                 guest_email VARCHAR(255) NOT NULL UNIQUE,
                 guest_phone VARCHAR(50),
                 preferences TEXT,
                 notes TEXT,
                 total_bookings INT NOT NULL DEFAULT 0,
-                created_at DATETIME NOT NULL,
-                updated_at DATETIME NOT NULL
+                created_at TIMESTAMP NOT NULL,
+                updated_at TIMESTAMP NOT NULL
             )
             """
         )
         cursor.execute(
             """
             CREATE TABLE IF NOT EXISTS active_sessions (
-                id INT AUTO_INCREMENT PRIMARY KEY,
+                id SERIAL PRIMARY KEY,
                 user_id INT NOT NULL,
                 session_token VARCHAR(255) NOT NULL UNIQUE,
                 ip_address VARCHAR(255),
@@ -167,12 +195,12 @@ def init_db(app):
                 device_fingerprint VARCHAR(255),
                 country VARCHAR(100),
                 risk_score INT NOT NULL DEFAULT 0,
-                is_new_device TINYINT NOT NULL DEFAULT 0,
-                is_new_country TINYINT NOT NULL DEFAULT 0,
+                is_new_device SMALLINT NOT NULL DEFAULT 0,
+                is_new_country SMALLINT NOT NULL DEFAULT 0,
                 failed_attempts INT NOT NULL DEFAULT 0,
                 previous_failed_attempts INT NOT NULL DEFAULT 0,
-                last_activity DATETIME NOT NULL,
-                created_at DATETIME NOT NULL,
+                last_activity TIMESTAMP NOT NULL,
+                created_at TIMESTAMP NOT NULL,
                 FOREIGN KEY (user_id) REFERENCES users (id)
             )
             """
