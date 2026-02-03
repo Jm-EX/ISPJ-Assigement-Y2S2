@@ -16,7 +16,7 @@ app = create_app()
 
 # Import socketio from routes and initialize it with the app
 from app.routes import socketio
-socketio.init_app(app, cors_allowed_origins="*", async_mode='threading', engineio_logger=False, logger=False)
+socketio.init_app(app, cors_allowed_origins="*", async_mode='threading', engineio_logger=False, logger=False, manage_session=False)
 
 if __name__ == "__main__":
     import os
