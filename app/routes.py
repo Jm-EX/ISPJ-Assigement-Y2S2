@@ -38,6 +38,9 @@ if gemini_api_key:
 print("="*80 + "\n")
 logging.info(f"Gemini API Key loaded: {bool(gemini_api_key)}")
 
+# Global list to store working models
+working_models = []
+
 if gemini_api_key:
     try:
         genai.configure(api_key=gemini_api_key)
@@ -51,22 +54,48 @@ if gemini_api_key:
             print(f"DEBUG: Available models: {available_models}")
             logging.info(f"Available models: {available_models}")
             
-            # Try to find the best model
-            if 'models/gemini-1.5-flash' in available_models:
-                gemini_model = genai.GenerativeModel('gemini-1.5-flash')
-                print("DEBUG: Using gemini-1.5-flash")
-            elif 'models/gemini-pro' in available_models:
-                gemini_model = genai.GenerativeModel('gemini-pro')
-                print("DEBUG: Using gemini-pro")
-            elif 'models/gemini-1.0-pro' in available_models:
-                gemini_model = genai.GenerativeModel('gemini-1.0-pro')
-                print("DEBUG: Using gemini-1.0-pro")
+            # Test all desired models
+            models_to_test = [
+                'gemini-2.5-flash',
+                'gemini-2.5-flash-lite',
+                'gemini-2.5-flash-preview-tts',
+                'gemini-3-flash-preview',
+                'gemini-robotics-er-1.5-preview',
+                'gemini-2.0-flash', 
+                'gemini-1.5-flash',
+                'gemini-pro-latest'
+            ]
+            
+            print("DEBUG: Testing all desired models...")
+            for model_name in models_to_test:
+                try:
+                    test_model = genai.GenerativeModel(model_name)
+                    # Try a simple test request
+                    test_response = test_model.generate_content("Hello")
+                    if test_response.text:
+                        working_models.append(model_name)
+                        print(f"DEBUG: ✓ {model_name} - WORKING")
+                    else:
+                        print(f"DEBUG: ✗ {model_name} - No response")
+                except Exception as e:
+                    print(f"DEBUG: ✗ {model_name} - FAILED: {str(e)}")
+            
+            if working_models:
+                print(f"DEBUG: Found {len(working_models)} working models: {working_models}")
+                logging.info(f"Working models: {working_models}")
+                # Set primary model to first working one
+                gemini_model = genai.GenerativeModel(working_models[0])
+                print(f"DEBUG: Primary model set to: {working_models[0]}")
             else:
-                # Use the first available model
-                first_model = available_models[0].replace('models/', '')
-                gemini_model = genai.GenerativeModel(first_model)
-                print(f"DEBUG: Using first available model: {first_model}")
-                logging.info(f"Using first available model: {first_model}")
+                print("DEBUG: No working models found, using fallback")
+                # Fallback to first available model
+                if available_models:
+                    first_model = available_models[0].replace('models/', '')
+                    gemini_model = genai.GenerativeModel(first_model)
+                    print(f"DEBUG: Using fallback model: {first_model}")
+                    logging.info(f"Using fallback model: {first_model}")
+                else:
+                    gemini_model = None
             
             print("DEBUG: Gemini AI configured successfully")
             logging.info("Gemini AI configured successfully")
@@ -293,37 +322,28 @@ def booking_confirmation():
 
 
 def get_gemini_response(message):
-    """Get response from Gemini AI with fallback to multiple models and retry logic"""
-    
-    print("\n" + "="*80)
-    print("DEBUG: get_gemini_response called")
-    print(f"DEBUG: Message: {message[:100]}...")
-    print(f"DEBUG: gemini_model exists: {gemini_model is not None}")
-    print(f"DEBUG: GEMINI_API_KEY present: {bool(os.environ.get('GEMINI_API_KEY'))}")
-    print("="*80)
-    
-    # Try multiple models in order of preference (only use models available in v1beta)
-    models_to_try = [
-        'gemini-1.5-flash',  # Best for free tier - higher limits
-        'gemini-pro'
+    """Get AI response for hotel-related questions"""
+    # Use pre-tested working models from initialization
+    models_to_try = working_models if working_models else [
+        'gemini-2.5-flash',
+        'gemini-2.5-flash-lite',
+        'gemini-2.5-flash-preview-tts',
+        'gemini-3-flash-preview',
+        'gemini-robotics-er-1.5-preview',
+        'gemini-2.0-flash', 
+        'gemini-1.5-flash',
+        'gemini-pro-latest'
     ]
     
     for model_name in models_to_try:
-        # Retry logic for rate limits
-        max_retries = 2
-        retry_delay = 2  # Start with 2 seconds
-        
-        for attempt in range(max_retries):
-            try:
-                print(f"DEBUG: Trying model: {model_name} (attempt {attempt + 1}/{max_retries})")
-                logging.info(f"Trying model: {model_name} (attempt {attempt + 1}/{max_retries})")
-                temp_model = genai.GenerativeModel(model_name)
-                
-                print(f"DEBUG: Getting Gemini response for: {message[:50]}...")
-                logging.info(f"Getting Gemini response for: {message}")
-                
-                # Hotel-specific prompt
-                hotel_context = """Knowledge Base:
+        try:
+            logging.info(f"Trying model: {model_name}")
+            temp_model = genai.GenerativeModel(model_name)
+            
+            logging.info(f"Getting Gemini response for: {message}")
+            
+            # Hotel-specific prompt
+            hotel_context = """Knowledge Base:
 
 Check-in: 3:00 PM | Check-out: 11:00 AM.
 
@@ -349,41 +369,18 @@ Focus: Only answer questions about the hotel or the local area.
 Refusal: If a user asks about politics, coding, or unrelated topics, say: \"I'm here to assist with your stay at MGM Resorts. I'm afraid I can't help with that topic.\"
 
 Tone: Professional, welcoming, and luxury-oriented."""
-                
-                full_prompt = f"{hotel_context}\n\nCustomer question: {message}"
-                print(f"DEBUG: Generating content with {model_name}...")
-                response = temp_model.generate_content(full_prompt)
-                
-                print(f"DEBUG: Gemini response received from {model_name}: {response.text[:100]}...")
-                logging.info(f"Gemini response received from {model_name}: {response.text[:100]}...")
-                print("="*80 + "\n")
-                return response.text
-                
-            except Exception as e:
-                error_type = type(e).__name__
-                error_msg = str(e)
-                print(f"DEBUG: Model {model_name} attempt {attempt + 1} failed: {error_type}: {error_msg}")
-                logging.warning(f"Model {model_name} attempt {attempt + 1} failed: {error_msg}")
-                
-                # Check if it's a rate limit error
-                if "429" in error_msg or "quota" in error_msg.lower() or "rate" in error_msg.lower():
-                    if attempt < max_retries - 1:
-                        print(f"DEBUG: Rate limit hit, waiting {retry_delay} seconds before retry...")
-                        import time
-                        time.sleep(retry_delay)
-                        retry_delay *= 2  # Exponential backoff
-                        continue
-                    else:
-                        print(f"DEBUG: Max retries reached for {model_name}, trying next model")
-                        break
-                else:
-                    # Non-rate-limit error, try next model immediately
-                    print(f"DEBUG: Non-rate-limit error, trying next model")
-                    break
+            
+            full_prompt = f"{hotel_context}\n\nCustomer question: {message}"
+            response = temp_model.generate_content(full_prompt)
+            
+            logging.info(f"Gemini response received from {model_name}: {response.text[:100]}...")
+            return response.text
+            
+        except Exception as e:
+            logging.warning(f"Model {model_name} failed: {str(e)}")
+            continue  # Try next model
     
     # All models failed
-    print("DEBUG: All Gemini models failed")
-    print("="*80 + "\n")
     logging.error("All Gemini models failed")
     return "I'm sorry, I'm having trouble connecting right now. Please try again later or contact us through concierge support."
 
