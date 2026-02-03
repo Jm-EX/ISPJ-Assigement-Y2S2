@@ -684,14 +684,14 @@ def create_or_update_session(user_id: int, session_token: str, ip_address: str, 
             )
         else:
             print("DEBUG: Creating new session...")
-            # Create new session
+            # Create new session - convert booleans to int for SMALLINT columns
             cursor.execute(
                 """INSERT INTO active_sessions 
                    (user_id, session_token, ip_address, user_agent, device_fingerprint, country, 
                     risk_score, is_new_device, is_new_country, previous_failed_attempts, last_activity, created_at)
                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
                 (user_id, session_token, ip_address, user_agent, device_fingerprint, country,
-                 total_risk_score, is_new_device, is_new_country, previous_failed, datetime.utcnow(), datetime.utcnow())
+                 total_risk_score, int(is_new_device), int(is_new_country), previous_failed, datetime.utcnow(), datetime.utcnow())
             )
         
         print("DEBUG: Committing transaction...")
