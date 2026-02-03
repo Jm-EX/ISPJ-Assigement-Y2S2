@@ -64,6 +64,14 @@ def create_app():
     # reCAPTCHA configuration
     app.config["RECAPTCHA_SITE_KEY"] = os.environ.get("RECAPTCHA_SITE_KEY")
     app.config["RECAPTCHA_SECRET_KEY"] = os.environ.get("RECAPTCHA_SECRET_KEY")
+    
+    print("\n" + "="*80)
+    print("DEBUG: reCAPTCHA Configuration")
+    print(f"DEBUG: RECAPTCHA_SITE_KEY present: {bool(app.config['RECAPTCHA_SITE_KEY'])}")
+    print(f"DEBUG: RECAPTCHA_SECRET_KEY present: {bool(app.config['RECAPTCHA_SECRET_KEY'])}")
+    if app.config['RECAPTCHA_SITE_KEY']:
+        print(f"DEBUG: RECAPTCHA_SITE_KEY: {app.config['RECAPTCHA_SITE_KEY'][:20]}...")
+    print("="*80 + "\n")
 
     print("DEBUG: Initializing Flask-Mail...")
     mail.init_app(app)
