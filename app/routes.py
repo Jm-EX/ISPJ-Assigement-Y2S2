@@ -29,37 +29,60 @@ stripe.api_key = 'sk_test_51SeUJR2OsU80dT1Yw27XKOVnYeA8JgICdgfkNgRo5wZ2n5TuEXi3I
 
 # Configure Gemini AI
 gemini_api_key = os.environ.get('GEMINI_API_KEY')
+print("\n" + "="*80)
+print("DEBUG: Gemini AI Initialization")
+print(f"DEBUG: API Key present: {bool(gemini_api_key)}")
+if gemini_api_key:
+    print(f"DEBUG: API Key length: {len(gemini_api_key)}")
+    print(f"DEBUG: API Key starts with: {gemini_api_key[:10]}...")
+print("="*80 + "\n")
 logging.info(f"Gemini API Key loaded: {bool(gemini_api_key)}")
 
 if gemini_api_key:
-    genai.configure(api_key=gemini_api_key)
-    
-    # List available models to debug
     try:
-        models = genai.list_models()
-        available_models = [model.name for model in models if 'generateContent' in model.supported_generation_methods]
-        logging.info(f"Available models: {available_models}")
+        genai.configure(api_key=gemini_api_key)
+        print("DEBUG: Gemini API configured successfully")
         
-        # Try to find the best model
-        if 'models/gemini-1.5-flash' in available_models:
-            gemini_model = genai.GenerativeModel('gemini-1.5-flash')
-        elif 'models/gemini-pro' in available_models:
+        # List available models to debug
+        try:
+            print("DEBUG: Listing available models...")
+            models = genai.list_models()
+            available_models = [model.name for model in models if 'generateContent' in model.supported_generation_methods]
+            print(f"DEBUG: Available models: {available_models}")
+            logging.info(f"Available models: {available_models}")
+            
+            # Try to find the best model
+            if 'models/gemini-1.5-flash' in available_models:
+                gemini_model = genai.GenerativeModel('gemini-1.5-flash')
+                print("DEBUG: Using gemini-1.5-flash")
+            elif 'models/gemini-pro' in available_models:
+                gemini_model = genai.GenerativeModel('gemini-pro')
+                print("DEBUG: Using gemini-pro")
+            elif 'models/gemini-1.0-pro' in available_models:
+                gemini_model = genai.GenerativeModel('gemini-1.0-pro')
+                print("DEBUG: Using gemini-1.0-pro")
+            else:
+                # Use the first available model
+                first_model = available_models[0].replace('models/', '')
+                gemini_model = genai.GenerativeModel(first_model)
+                print(f"DEBUG: Using first available model: {first_model}")
+                logging.info(f"Using first available model: {first_model}")
+            
+            print("DEBUG: Gemini AI configured successfully")
+            logging.info("Gemini AI configured successfully")
+        except Exception as e:
+            print(f"DEBUG: Error listing models: {type(e).__name__}: {str(e)}")
+            logging.error(f"Error listing models: {str(e)}")
+            # Fallback to gemini-pro
             gemini_model = genai.GenerativeModel('gemini-pro')
-        elif 'models/gemini-1.0-pro' in available_models:
-            gemini_model = genai.GenerativeModel('gemini-1.0-pro')
-        else:
-            # Use the first available model
-            first_model = available_models[0].replace('models/', '')
-            gemini_model = genai.GenerativeModel(first_model)
-            logging.info(f"Using first available model: {first_model}")
-        
-        logging.info("Gemini AI configured successfully")
+            print("DEBUG: Using fallback model: gemini-pro")
+            logging.info("Using fallback model: gemini-pro")
     except Exception as e:
-        logging.error(f"Error listing models: {str(e)}")
-        # Fallback to gemini-pro
-        gemini_model = genai.GenerativeModel('gemini-pro')
-        logging.info("Using fallback model: gemini-pro")
+        print(f"DEBUG: Error configuring Gemini API: {type(e).__name__}: {str(e)}")
+        logging.error(f"Error configuring Gemini API: {str(e)}")
+        gemini_model = None
 else:
+    print("DEBUG: Gemini API Key not found in environment variables")
     logging.error("Gemini API Key not found in environment variables")
     gemini_model = None
 
@@ -258,24 +281,31 @@ def booking_confirmation():
 
 
 def get_gemini_response(message):
-    """Get AI response for hotel-related questions"""
-    # Try different models if primary one hits quota limit
+    """Get response from Gemini AI with fallback to multiple models"""
+    
+    print("\n" + "="*80)
+    print("DEBUG: get_gemini_response called")
+    print(f"DEBUG: Message: {message[:100]}...")
+    print(f"DEBUG: gemini_model exists: {gemini_model is not None}")
+    print(f"DEBUG: GEMINI_API_KEY present: {bool(os.environ.get('GEMINI_API_KEY'))}")
+    print("="*80)
+    
+    # Try multiple models in order of preference
     models_to_try = [
-        'gemini-2.5-flash',
-        'gemini-2.5-flash-lite',
-        'gemini-2.5-flash-preview-tts',
-        'gemini-3-flash-preview',
-        'gemini-robotics-er-1.5-preview',
-        'gemini-2.0-flash', 
+        'gemini-1.5-flash',
+        'gemini-pro',
+        'gemini-1.0-pro',
         'gemini-1.5-flash',
         'gemini-pro-latest'
     ]
     
     for model_name in models_to_try:
         try:
+            print(f"DEBUG: Trying model: {model_name}")
             logging.info(f"Trying model: {model_name}")
             temp_model = genai.GenerativeModel(model_name)
             
+            print(f"DEBUG: Getting Gemini response for: {message[:50]}...")
             logging.info(f"Getting Gemini response for: {message}")
             
             # Hotel-specific prompt
@@ -307,16 +337,25 @@ Refusal: If a user asks about politics, coding, or unrelated topics, say: \"I'm 
 Tone: Professional, welcoming, and luxury-oriented."""
             
             full_prompt = f"{hotel_context}\n\nCustomer question: {message}"
+            print(f"DEBUG: Generating content with {model_name}...")
             response = temp_model.generate_content(full_prompt)
             
+            print(f"DEBUG: Gemini response received from {model_name}: {response.text[:100]}...")
             logging.info(f"Gemini response received from {model_name}: {response.text[:100]}...")
+            print("="*80 + "\n")
             return response.text
             
         except Exception as e:
+            print(f"DEBUG: Model {model_name} failed: {type(e).__name__}: {str(e)}")
             logging.warning(f"Model {model_name} failed: {str(e)}")
+            import traceback
+            print("DEBUG: Traceback:")
+            traceback.print_exc()
             continue  # Try next model
     
     # All models failed
+    print("DEBUG: All Gemini models failed")
+    print("="*80 + "\n")
     logging.error("All Gemini models failed")
     return "I'm sorry, I'm having trouble connecting right now. Please try again later or contact us through concierge support."
 
