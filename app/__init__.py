@@ -109,23 +109,46 @@ def create_app():
         # Check if user is logged in
         user_id = session.get('user_id')
         if user_id:
+            print("\n" + "="*80)
+            print(f"DEBUG: validate_session - endpoint: {request.endpoint}")
+            print(f"DEBUG: validate_session - user_id: {user_id}")
+            print(f"DEBUG: validate_session - session keys: {list(session.keys())}")
+            print(f"DEBUG: validate_session - session._id: {session.get('_id')}")
+            print(f"DEBUG: validate_session - request.sid: {getattr(request, 'sid', 'NOT AVAILABLE')}")
+            
             # Check if session exists in active_sessions table
             db = get_db()
             cursor = db.cursor()
             
-            # Use Flask session ID as session token
-            session_token = session.get('_id', str(user_id))
+            # Use request.sid as session token (this is the actual Flask session ID)
+            session_token = request.sid if hasattr(request, 'sid') else session.get('_id', str(user_id))
+            print(f"DEBUG: validate_session - session_token to check: {session_token}")
             
             cursor.execute(
-                "SELECT id FROM active_sessions WHERE user_id = %s AND session_token = %s",
+                "SELECT id, session_token FROM active_sessions WHERE user_id = %s AND session_token = %s",
                 (user_id, session_token)
             )
             
-            if not cursor.fetchone():
+            result = cursor.fetchone()
+            print(f"DEBUG: validate_session - found session: {result}")
+            
+            if not result:
+                # Debug: Check what sessions exist for this user
+                cursor.execute(
+                    "SELECT session_token FROM active_sessions WHERE user_id = %s",
+                    (user_id,)
+                )
+                all_sessions = cursor.fetchall()
+                print(f"DEBUG: validate_session - all sessions for user {user_id}: {all_sessions}")
+                print("="*80 + "\n")
+                
                 # Session was deleted by admin or expired - force logout with message
                 session.clear()
                 flash("Your session has expired. Please log in again.", "warning")
                 return redirect(url_for('auth.login_get'))
+            
+            print("DEBUG: validate_session - session valid!")
+            print("="*80 + "\n")
 
     @app.after_request
     def set_security_headers(response):
