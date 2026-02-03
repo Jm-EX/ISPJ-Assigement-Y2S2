@@ -398,29 +398,58 @@ user_modes = {}  # {session_id: 'ai' or 'human'}
 
 @socketio.on('join_chat')
 def on_join(data):
+    print("\n" + "="*80)
+    print("CHATBOT DEBUG: join_chat event received")
+    print(f"DEBUG: Data received: {data}")
     room = data['room']
     session_id = request.sid
+    print(f"DEBUG: Room: {room}")
+    print(f"DEBUG: Session ID: {session_id}")
     user_modes[session_id] = 'ai'  # Default to AI mode
+    print(f"DEBUG: User mode set to: {user_modes[session_id]}")
     join_room(room)
+    print(f"DEBUG: User joined room: {room}")
     emit('status', {'msg': 'Connected to customer support'}, room=room)
+    print(f"DEBUG: Status emitted to room")
+    print("="*80 + "\n")
     logging.info(f"User {session_id} joined chat in AI mode")
 
 @socketio.on('switch_to_human_mode')
 def on_switch_to_human():
+    print("\n" + "="*80)
+    print("CHATBOT DEBUG: switch_to_human_mode event received")
     session_id = request.sid
+    print(f"DEBUG: Session ID: {session_id}")
     user_modes[session_id] = 'human'
+    print(f"DEBUG: User mode switched to: human")
+    print("="*80 + "\n")
+    logging.info(f"User {session_id} switched to human mode")
 
 @socketio.on('switch_to_ai_mode')
 def on_switch_to_ai():
+    print("\n" + "="*80)
+    print("CHATBOT DEBUG: switch_to_ai_mode event received")
     session_id = request.sid
+    print(f"DEBUG: Session ID: {session_id}")
     user_modes[session_id] = 'ai'
+    print(f"DEBUG: User mode switched to: ai")
+    print("="*80 + "\n")
+    logging.info(f"User {session_id} switched to AI mode")
 
 @socketio.on('send_message')
 def on_message(data):
+    print("\n" + "="*80)
+    print("CHATBOT DEBUG: send_message event received")
+    print(f"DEBUG: Raw data: {data}")
     room = data['room']
     sender = data['sender']
     message = data['msg']
     session_id = request.sid
+    print(f"DEBUG: Room: {room}")
+    print(f"DEBUG: Sender: {sender}")
+    print(f"DEBUG: Message: {message}")
+    print(f"DEBUG: Session ID: {session_id}")
+    print(f"DEBUG: Current user mode: {user_modes.get(session_id, 'NOT SET')}")
     
     # Log message
     logging.info(f"Chat message from {sender}: {message}")
@@ -431,13 +460,21 @@ def on_message(data):
         'sender': sender,
         'timestamp': datetime.now().strftime('%H:%M')
     }
+    print(f"DEBUG: Broadcasting message to room: {message_data}")
     emit('receive_message', message_data, room=room, include_self=False)
+    print(f"DEBUG: Message broadcasted")
     
     # If it's a customer message and user is in AI mode, generate AI response
+    print(f"DEBUG: Checking if AI response needed...")
+    print(f"DEBUG: sender == 'customer': {sender == 'customer'}")
+    print(f"DEBUG: user_modes.get(session_id): {user_modes.get(session_id)}")
     if sender == 'customer' and user_modes.get(session_id) == 'ai':
+        print(f"DEBUG: AI response will be generated")
         try:
             # Get AI response
+            print(f"DEBUG: Calling get_gemini_response with message: {message[:50]}...")
             ai_response = get_gemini_response(message)
+            print(f"DEBUG: AI response received: {ai_response[:100]}...")
             
             # Send AI response as "AI Support"
             ai_message_data = {
@@ -448,14 +485,22 @@ def on_message(data):
             
             # Small delay to make it feel natural
             import time
+            print(f"DEBUG: Waiting 1 second before sending AI response...")
             time.sleep(1)
             
+            print(f"DEBUG: Emitting AI response to room: {room}")
             emit('receive_message', ai_message_data, room=room)
+            print(f"DEBUG: AI response emitted successfully")
+            print("="*80 + "\n")
             
             # Log AI response
             logging.info(f"AI response: {ai_response}")
             
         except Exception as e:
+            print(f"ERROR: Exception in AI response generation: {type(e).__name__}: {str(e)}")
+            import traceback
+            print(f"ERROR: Traceback: {traceback.format_exc()}")
+            print("="*80 + "\n")
             logging.error(f"Error generating AI response: {str(e)}")
             error_message = {
                 'msg': "I'm sorry, I'm having trouble processing your request right now. Please try again.",
@@ -465,7 +510,11 @@ def on_message(data):
             emit('receive_message', error_message, room=room)
     elif sender == 'customer' and user_modes.get(session_id) == 'human':
         # In human mode, don't generate AI responses
+        print(f"DEBUG: User is in Human mode - no AI response generated")
+        print("="*80 + "\n")
         logging.info(f"User {session_id} is in Human mode - no AI response generated")
     else:
         # Handle admin/staff messages (forward to room)
+        print(f"DEBUG: Message from non-customer sender or no mode set - no AI response")
+        print("="*80 + "\n")
         pass
