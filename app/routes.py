@@ -300,6 +300,14 @@ def get_gemini_response(message):
     print(f"DEBUG: Message: {message[:100]}...")
     print(f"DEBUG: gemini_model exists: {gemini_model is not None}")
     print(f"DEBUG: GEMINI_API_KEY present: {bool(os.environ.get('GEMINI_API_KEY'))}")
+    
+    # Check if API key is missing
+    if not os.environ.get('GEMINI_API_KEY'):
+        print("ERROR: GEMINI_API_KEY not found in environment variables")
+        logging.error("GEMINI_API_KEY not found in environment variables")
+        print("="*80 + "\n")
+        return "I'm sorry, I'm having trouble connecting right now. Please try again later or contact us through concierge support."
+    
     print("="*80)
     
     # Try multiple models in order of preference (only use models available in v1beta)
