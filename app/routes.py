@@ -322,44 +322,28 @@ def booking_confirmation():
 
 
 def get_gemini_response(message):
-    
-    print("\n" + "="*80)
-    print("DEBUG: get_gemini_response called")
-    print(f"DEBUG: Message: {message[:100]}...")
-    print(f"DEBUG: gemini_model exists: {gemini_model is not None}")
-    print(f"DEBUG: GEMINI_API_KEY present: {bool(os.environ.get('GEMINI_API_KEY'))}")
-    
-    # Check if API key is missing
-    if not os.environ.get('GEMINI_API_KEY'):
-        print("ERROR: GEMINI_API_KEY not found in environment variables")
-        logging.error("GEMINI_API_KEY not found in environment variables")
-        print("="*80 + "\n")
-        return "I'm sorry, I'm having trouble connecting right now. Please try again later or contact us through concierge support."
-    
-    print("="*80)
-    
-    # Try multiple models in order of preference (only use models available in v1beta)
-    models_to_try = [
-        'gemini-1.5-flash',  # Best for free tier - higher limits
-        'gemini-pro'
+    """Get AI response for hotel-related questions"""
+    # Use pre-tested working models from initialization
+    models_to_try = working_models if working_models else [
+        'gemini-2.5-flash',
+        'gemini-2.5-flash-lite',
+        'gemini-2.5-flash-preview-tts',
+        'gemini-3-flash-preview',
+        'gemini-robotics-er-1.5-preview',
+        'gemini-2.0-flash', 
+        'gemini-1.5-flash',
+        'gemini-pro-latest'
     ]
     
     for model_name in models_to_try:
-        # Retry logic for rate limits
-        max_retries = 2
-        retry_delay = 2  # Start with 2 seconds
-        
-        for attempt in range(max_retries):
-            try:
-                print(f"DEBUG: Trying model: {model_name} (attempt {attempt + 1}/{max_retries})")
-                logging.info(f"Trying model: {model_name} (attempt {attempt + 1}/{max_retries})")
-                temp_model = genai.GenerativeModel(model_name)
-                
-                print(f"DEBUG: Getting Gemini response for: {message[:50]}...")
-                logging.info(f"Getting Gemini response for: {message}")
-                
-                # Hotel-specific prompt
-                hotel_context = """Knowledge Base:
+        try:
+            logging.info(f"Trying model: {model_name}")
+            temp_model = genai.GenerativeModel(model_name)
+            
+            logging.info(f"Getting Gemini response for: {message}")
+            
+            # Hotel-specific prompt
+            hotel_context = """Knowledge Base:
 
 Check-in: 3:00 PM | Check-out: 11:00 AM.
 
