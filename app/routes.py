@@ -31,6 +31,9 @@ stripe.api_key = 'sk_test_51SeUJR2OsU80dT1Yw27XKOVnYeA8JgICdgfkNgRo5wZ2n5TuEXi3I
 gemini_api_key = os.environ.get('GEMINI_API_KEY')
 logging.info(f"Gemini API Key loaded: {bool(gemini_api_key)}")
 
+# Global list to store working models
+working_models = []
+
 if gemini_api_key:
     genai.configure(api_key=gemini_api_key)
     
@@ -40,18 +43,42 @@ if gemini_api_key:
         available_models = [model.name for model in models if 'generateContent' in model.supported_generation_methods]
         logging.info(f"Available models: {available_models}")
         
-        # Try to find the best model
-        if 'models/gemini-1.5-flash' in available_models:
-            gemini_model = genai.GenerativeModel('gemini-1.5-flash')
-        elif 'models/gemini-pro' in available_models:
-            gemini_model = genai.GenerativeModel('gemini-pro')
-        elif 'models/gemini-1.0-pro' in available_models:
-            gemini_model = genai.GenerativeModel('gemini-1.0-pro')
+        # Test all desired models (user's available models)
+        models_to_test = [
+            'gemini-2.5-flash',
+            'gemini-2.5-flash-lite',
+            'gemini-2.5-flash-preview-tts',
+            'gemini-3-flash',
+            'gemini-robotics-er-1.5-preview'
+        ]
+        
+        for model_name in models_to_test:
+            try:
+                test_model = genai.GenerativeModel(model_name)
+                # Try a simple test request
+                test_response = test_model.generate_content("Hello")
+                if test_response.text:
+                    working_models.append(model_name)
+                    logging.info(f"✓ {model_name} - WORKING")
+                else:
+                    logging.warning(f"✗ {model_name} - No response")
+            except Exception as e:
+                logging.warning(f"✗ {model_name} - FAILED: {str(e)}")
+        
+        if working_models:
+            logging.info(f"Found {len(working_models)} working models: {working_models}")
+            # Set primary model to first working one
+            gemini_model = genai.GenerativeModel(working_models[0])
+            logging.info(f"Primary model set to: {working_models[0]}")
         else:
-            # Use the first available model
-            first_model = available_models[0].replace('models/', '')
-            gemini_model = genai.GenerativeModel(first_model)
-            logging.info(f"Using first available model: {first_model}")
+            logging.warning("No working models found, using fallback")
+            # Fallback to first available model
+            if available_models:
+                first_model = available_models[0].replace('models/', '')
+                gemini_model = genai.GenerativeModel(first_model)
+                logging.info(f"Using fallback model: {first_model}")
+            else:
+                gemini_model = None
         
         logging.info("Gemini AI configured successfully")
     except Exception as e:
@@ -259,16 +286,13 @@ def booking_confirmation():
 
 def get_gemini_response(message):
     """Get AI response for hotel-related questions"""
-    # Try different models if primary one hits quota limit
-    models_to_try = [
+    # Use pre-tested working models from initialization, fallback to all models if needed
+    models_to_try = working_models if working_models else [
         'gemini-2.5-flash',
         'gemini-2.5-flash-lite',
         'gemini-2.5-flash-preview-tts',
-        'gemini-3-flash-preview',
-        'gemini-robotics-er-1.5-preview',
-        'gemini-2.0-flash', 
-        'gemini-1.5-flash',
-        'gemini-pro-latest'
+        'gemini-3-flash',
+        'gemini-robotics-er-1.5-preview'
     ]
     
     for model_name in models_to_try:
