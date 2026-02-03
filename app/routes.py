@@ -190,17 +190,29 @@ def book_room_confirm(room_type):
 
         # reCAPTCHA verification
         recaptcha_response = request.form.get('g-recaptcha-response')
+        print("\n" + "="*80)
+        print("DEBUG: reCAPTCHA Verification")
+        print(f"DEBUG: recaptcha_response present: {bool(recaptcha_response)}")
+        
         if not recaptcha_response:
+            print("DEBUG: reCAPTCHA response missing from form")
+            print("="*80 + "\n")
             flash('Please complete the reCAPTCHA', 'error')
             return redirect(request.url)
 
         secret_key = os.environ.get('RECAPTCHA_SECRET_KEY')
+        print(f"DEBUG: RECAPTCHA_SECRET_KEY present: {bool(secret_key)}")
+        
         verify_response = requests.post(
             'https://www.google.com/recaptcha/api/siteverify',
             data={'secret': secret_key, 'response': recaptcha_response}
         )
+        
+        verification_result = verify_response.json()
+        print(f"DEBUG: Google verification result: {verification_result}")
+        print("="*80 + "\n")
 
-        if not verify_response.json().get('success'):
+        if not verification_result.get('success'):
             flash('reCAPTCHA verification failed', 'error')
             return redirect(request.url)
 
@@ -290,12 +302,10 @@ def get_gemini_response(message):
     print(f"DEBUG: GEMINI_API_KEY present: {bool(os.environ.get('GEMINI_API_KEY'))}")
     print("="*80)
     
-    # Try multiple models in order of preference (avoid gemini-2.5-pro which has stricter limits)
+    # Try multiple models in order of preference (only use models available in v1beta)
     models_to_try = [
         'gemini-1.5-flash',  # Best for free tier - higher limits
-        'gemini-1.5-flash-latest',
-        'gemini-pro',
-        'gemini-1.0-pro'
+        'gemini-pro'
     ]
     
     for model_name in models_to_try:
