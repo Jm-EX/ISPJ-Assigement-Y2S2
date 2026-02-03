@@ -76,7 +76,8 @@ def init_db(app):
                 role VARCHAR(50) DEFAULT NULL,
                 permissions TEXT DEFAULT NULL,
                 created_at TIMESTAMP NOT NULL,
-                last_login TIMESTAMP DEFAULT NULL
+                last_login TIMESTAMP DEFAULT NULL,
+                totp_secret VARCHAR(255) DEFAULT NULL
             )
             """
         )
@@ -205,6 +206,23 @@ def init_db(app):
             )
             """
         )
+        
+        # Migration: Add totp_secret column if it doesn't exist
+        try:
+            cursor.execute("""
+                DO $$ 
+                BEGIN
+                    IF NOT EXISTS (
+                        SELECT 1 FROM information_schema.columns 
+                        WHERE table_name='users' AND column_name='totp_secret'
+                    ) THEN
+                        ALTER TABLE users ADD COLUMN totp_secret VARCHAR(255) DEFAULT NULL;
+                    END IF;
+                END $$;
+            """)
+            print("DEBUG: Checked/added totp_secret column to users table")
+        except Exception as e:
+            print(f"DEBUG: Error adding totp_secret column: {e}")
     finally:
         conn.close()
 
