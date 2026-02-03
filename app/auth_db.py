@@ -214,20 +214,25 @@ def seed_admin(app):
     password = "Admin1!"
     email = app.config.get("ADMIN_EMAIL", "admin@example.com")
 
-    conn = pymysql.connect(
-        host=app.config["MYSQL_HOST"],
-        port=app.config["MYSQL_PORT"],
-        user=app.config["MYSQL_USER"],
-        password=app.config["MYSQL_PASSWORD"],
-        database=app.config["MYSQL_DATABASE"],
-        autocommit=True,
-        cursorclass=pymysql.cursors.DictCursor
-    )
+    # Check if DATABASE_URL is provided (Render PostgreSQL)
+    database_url = os.environ.get("DATABASE_URL")
+    if database_url:
+        conn = psycopg.connect(database_url, row_factory=dict_row)
+        conn.autocommit = True
+    else:
+        conn = psycopg.connect(
+            host=app.config["MYSQL_HOST"],
+            port=app.config["MYSQL_PORT"],
+            user=app.config["MYSQL_USER"],
+            password=app.config["MYSQL_PASSWORD"],
+            dbname=app.config["MYSQL_DATABASE"],
+            row_factory=dict_row
+        )
+        conn.autocommit = True
     try:
         cursor = conn.cursor()
         cursor.execute(
-            "SELECT COUNT(*) as count FROM information_schema.tables WHERE table_schema = %s AND table_name = 'users'",
-            (app.config["MYSQL_DATABASE"],)
+            "SELECT COUNT(*) as count FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'users'"
         )
         if cursor.fetchone()["count"] == 0:
             return
