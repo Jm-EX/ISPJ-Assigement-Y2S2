@@ -869,7 +869,9 @@ def passkey_register_complete():
             expected_origin = f"{request.scheme}://localhost:{request.host.split(':')[1]}" if ':' in request.host else f"{request.scheme}://localhost"
         else:
             rp_id = hostname
-            expected_origin = f"{request.scheme}://{request.host}"
+            # Render uses https, so force https for production
+            scheme = "https" if "onrender.com" in hostname else request.scheme
+            expected_origin = f"{scheme}://{request.host}"
         print(f"RP ID: {rp_id}")
         print(f"Origin: {expected_origin}")
         
@@ -1020,7 +1022,9 @@ def passkey_authenticate_complete():
             expected_origin = f"{request.scheme}://localhost:{request.host.split(':')[1]}" if ':' in request.host else f"{request.scheme}://localhost"
         else:
             rp_id = hostname
-            expected_origin = f"{request.scheme}://{request.host}"
+            # Render uses https, so force https for production
+            scheme = "https" if "onrender.com" in hostname else request.scheme
+            expected_origin = f"{scheme}://{request.host}"
         
         verification = verify_authentication_response(
             credential={
