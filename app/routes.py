@@ -388,6 +388,7 @@ Tone: Professional, welcoming, and luxury-oriented."""
 # =========================
 # Chat Events
 # =========================
+# Trigger fresh deployment
 
 # Initialize SocketIO (this will be imported in run.py)
 socketio = SocketIO()
