@@ -322,17 +322,7 @@ def booking_confirmation():
 
 
 def get_gemini_response(message):
-    """Get AI response for hotel-related questions"""
-    # Use pre-tested working models from initialization
-    models_to_try = working_models if working_models else [
-        'gemini-2.5-flash',
-        'gemini-2.5-flash-lite',
-        'gemini-2.5-flash-preview-tts',
-        'gemini-3-flash-preview',
-        'gemini-robotics-er-1.5-preview',
-        'gemini-2.0-flash', 
-        'gemini-1.5-flash',
-        'gemini-pro-latest'
+
     ]
     
     for model_name in models_to_try:
