@@ -411,18 +411,25 @@ def setup_totp_post():
         return render_template("setup_totp.html", qr_code="", secret=totp_secret)
     
     user = get_user_by_id(user_id)
-    session.pop("pending_totp_user_id", None)
     
+    # Set session data FIRST before popping pending_totp_user_id
     session.permanent = True
     session["user_id"] = int(user["id"])
     session["username"] = user["username"]
     session["is_admin"] = bool(user["is_admin"])
     
+    # Now pop the pending flag
+    session.pop("pending_totp_user_id", None)
+    
     from app.auth_db import update_last_login, create_or_update_session, send_high_risk_alert
     update_last_login(user["id"])
     
-    # Track session with risk scoring - use Flask session ID
-    session_token = session.get('_id', str(user["id"]))
+    # Track session with risk scoring - use request.sid (actual Flask session ID)
+    session_token = request.sid if hasattr(request, 'sid') else session.get('_id', str(user["id"]))
+    print(f"DEBUG: TOTP setup - session_token = {session_token}")
+    print(f"DEBUG: TOTP setup - request.sid = {getattr(request, 'sid', 'NOT AVAILABLE')}")
+    print(f"DEBUG: TOTP setup - session._id = {session.get('_id')}")
+    
     ip_address = request.remote_addr
     user_agent = request.headers.get('User-Agent', '')
     total_risk_score = create_or_update_session(user["id"], session_token, ip_address, user_agent)
@@ -466,18 +473,25 @@ def verify_totp_post():
         return redirect(url_for("auth.verify_totp_get"))
     
     user = get_user_by_id(user_id)
-    session.pop("pending_totp_user_id", None)
     
+    # Set session data FIRST before popping pending_totp_user_id
     session.permanent = True
     session["user_id"] = int(user["id"])
     session["username"] = user["username"]
     session["is_admin"] = bool(user["is_admin"])
     
+    # Now pop the pending flag
+    session.pop("pending_totp_user_id", None)
+    
     from app.auth_db import update_last_login, create_or_update_session, send_high_risk_alert
     update_last_login(user["id"])
     
-    # Track session with risk scoring - use Flask session ID
-    session_token = session.get('_id', str(user["id"]))
+    # Track session with risk scoring - use request.sid (actual Flask session ID)
+    session_token = request.sid if hasattr(request, 'sid') else session.get('_id', str(user["id"]))
+    print(f"DEBUG: TOTP verify - session_token = {session_token}")
+    print(f"DEBUG: TOTP verify - request.sid = {getattr(request, 'sid', 'NOT AVAILABLE')}")
+    print(f"DEBUG: TOTP verify - session._id = {session.get('_id')}")
+    
     ip_address = request.remote_addr
     user_agent = request.headers.get('User-Agent', '')
     total_risk_score = create_or_update_session(user["id"], session_token, ip_address, user_agent)
@@ -571,8 +585,12 @@ def verify_otp_post():
     from app.auth_db import update_last_login, create_or_update_session, send_high_risk_alert
     update_last_login(user["id"])
     
-    # Track session with risk scoring - use Flask session ID
-    session_token = session.get('_id', str(user["id"]))
+    # Track session with risk scoring - use request.sid (actual Flask session ID)
+    session_token = request.sid if hasattr(request, 'sid') else session.get('_id', str(user["id"]))
+    print(f"DEBUG: Regular login - session_token = {session_token}")
+    print(f"DEBUG: Regular login - request.sid = {getattr(request, 'sid', 'NOT AVAILABLE')}")
+    print(f"DEBUG: Regular login - session._id = {session.get('_id')}")
+    
     ip_address = request.remote_addr
     user_agent = request.headers.get('User-Agent', '')
     total_risk_score = create_or_update_session(user["id"], session_token, ip_address, user_agent)
