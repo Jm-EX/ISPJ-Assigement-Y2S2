@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, current_app
 from werkzeug.utils import secure_filename
 from PIL import Image
 import logging
@@ -238,7 +238,7 @@ def book_room_confirm(room_type):
 
         return redirect(checkout_session.url, code=303)
 
-    return render_template("booking_confirm.html", room_type=room_type)
+    return render_template("booking_confirm.html", room_type=room_type, config=current_app.config)
 
 
 # =========================
