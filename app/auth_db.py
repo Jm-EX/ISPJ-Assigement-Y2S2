@@ -603,78 +603,111 @@ def get_country_from_ip(ip_address: str) -> str:
 
 def create_or_update_session(user_id: int, session_token: str, ip_address: str, user_agent: str, country: str = None):
     """Create or update a session with risk scoring based on device and country"""
-    db = get_db()
-    cursor = db.cursor()
+    print("\n" + "="*80)
+    print("DEBUG: create_or_update_session called")
+    print(f"DEBUG: user_id={user_id}, session_token={session_token}, ip_address={ip_address}")
+    print(f"DEBUG: user_agent={user_agent[:50] if user_agent else None}...")
+    print("="*80)
     
-    # Get country from IP if not provided
-    if not country:
-        country = get_country_from_ip(ip_address)
-    
-    # Generate device fingerprint from user agent
-    import hashlib
-    device_fingerprint = hashlib.md5(user_agent.encode()).hexdigest() if user_agent else None
-    
-    # Check if session already exists first
-    cursor.execute("SELECT id, failed_attempts, device_fingerprint, country FROM active_sessions WHERE session_token = %s", (session_token,))
-    existing = cursor.fetchone()
-    
-    # Get failed attempts from any session with same device/IP (regardless of user)
-    cursor.execute(
-        "SELECT failed_attempts FROM active_sessions WHERE device_fingerprint = %s AND ip_address = %s ORDER BY last_activity DESC LIMIT 1",
-        (device_fingerprint, ip_address)
-    )
-    device_session = cursor.fetchone()
-    previous_failed = device_session['failed_attempts'] if device_session else 0
-    
-    # Check if this is a new device for this user (exclude current session)
-    is_new_device = False
-    if not existing or existing['device_fingerprint'] != device_fingerprint:
+    try:
+        db = get_db()
+        cursor = db.cursor()
+        print("DEBUG: Database connection established")
+        
+        # Get country from IP if not provided
+        if not country:
+            print("DEBUG: Getting country from IP...")
+            country = get_country_from_ip(ip_address)
+            print(f"DEBUG: Country resolved: {country}")
+        
+        # Generate device fingerprint from user agent
+        import hashlib
+        device_fingerprint = hashlib.md5(user_agent.encode()).hexdigest() if user_agent else None
+        print(f"DEBUG: Device fingerprint: {device_fingerprint}")
+        
+        # Check if session already exists first
+        print("DEBUG: Checking for existing session...")
+        cursor.execute("SELECT id, failed_attempts, device_fingerprint, country FROM active_sessions WHERE session_token = %s", (session_token,))
+        existing = cursor.fetchone()
+        print(f"DEBUG: Existing session: {existing}")
+        
+        # Get failed attempts from any session with same device/IP (regardless of user)
+        print("DEBUG: Checking for previous failed attempts...")
         cursor.execute(
-            "SELECT COUNT(*) as count FROM active_sessions WHERE user_id = %s AND device_fingerprint = %s AND session_token != %s",
-            (user_id, device_fingerprint, session_token)
+            "SELECT failed_attempts FROM active_sessions WHERE device_fingerprint = %s AND ip_address = %s ORDER BY last_activity DESC LIMIT 1",
+            (device_fingerprint, ip_address)
         )
-        is_new_device = cursor.fetchone()['count'] == 0
-    
-    # Check if this is a new country for this user (exclude current session)
-    is_new_country = False
-    if country and (not existing or existing['country'] != country):
-        cursor.execute(
-            "SELECT COUNT(*) as count FROM active_sessions WHERE user_id = %s AND country = %s AND session_token != %s",
-            (user_id, country, session_token)
-        )
-        is_new_country = cursor.fetchone()['count'] == 0
-    
-    # Calculate risk score for new device/country only
-    risk_score = 0
-    if is_new_device:
-        risk_score += 2
-    if is_new_country:
-        risk_score += 2
-    
-    # Add failed attempts to risk score (each failed attempt = +2)
-    total_risk_score = risk_score + (previous_failed * 2)
-    
-    if existing:
-        # Update existing session and reset failed_attempts on successful login
-        cursor.execute(
-            """UPDATE active_sessions 
-               SET last_activity = %s, risk_score = %s, ip_address = %s, 
-                   previous_failed_attempts = %s, failed_attempts = 0
-               WHERE session_token = %s""",
-            (datetime.utcnow(), total_risk_score, ip_address, previous_failed, session_token)
-        )
-    else:
-        # Create new session
-        cursor.execute(
-            """INSERT INTO active_sessions 
-               (user_id, session_token, ip_address, user_agent, device_fingerprint, country, 
-                risk_score, is_new_device, is_new_country, previous_failed_attempts, last_activity, created_at)
-               VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
-            (user_id, session_token, ip_address, user_agent, device_fingerprint, country,
-             total_risk_score, is_new_device, is_new_country, previous_failed, datetime.utcnow(), datetime.utcnow())
-        )
-    db.commit()
-    return total_risk_score
+        device_session = cursor.fetchone()
+        previous_failed = device_session['failed_attempts'] if device_session else 0
+        print(f"DEBUG: Previous failed attempts: {previous_failed}")
+        
+        # Check if this is a new device for this user (exclude current session)
+        is_new_device = False
+        if not existing or existing['device_fingerprint'] != device_fingerprint:
+            cursor.execute(
+                "SELECT COUNT(*) as count FROM active_sessions WHERE user_id = %s AND device_fingerprint = %s AND session_token != %s",
+                (user_id, device_fingerprint, session_token)
+            )
+            is_new_device = cursor.fetchone()['count'] == 0
+        print(f"DEBUG: Is new device: {is_new_device}")
+        
+        # Check if this is a new country for this user (exclude current session)
+        is_new_country = False
+        if country and (not existing or existing['country'] != country):
+            cursor.execute(
+                "SELECT COUNT(*) as count FROM active_sessions WHERE user_id = %s AND country = %s AND session_token != %s",
+                (user_id, country, session_token)
+            )
+            is_new_country = cursor.fetchone()['count'] == 0
+        print(f"DEBUG: Is new country: {is_new_country}")
+        
+        # Calculate risk score for new device/country only
+        risk_score = 0
+        if is_new_device:
+            risk_score += 2
+        if is_new_country:
+            risk_score += 2
+        
+        # Add failed attempts to risk score (each failed attempt = +2)
+        total_risk_score = risk_score + (previous_failed * 2)
+        print(f"DEBUG: Total risk score: {total_risk_score}")
+        
+        if existing:
+            print("DEBUG: Updating existing session...")
+            # Update existing session and reset failed_attempts on successful login
+            cursor.execute(
+                """UPDATE active_sessions 
+                   SET last_activity = %s, risk_score = %s, ip_address = %s, 
+                       previous_failed_attempts = %s, failed_attempts = 0
+                   WHERE session_token = %s""",
+                (datetime.utcnow(), total_risk_score, ip_address, previous_failed, session_token)
+            )
+        else:
+            print("DEBUG: Creating new session...")
+            # Create new session
+            cursor.execute(
+                """INSERT INTO active_sessions 
+                   (user_id, session_token, ip_address, user_agent, device_fingerprint, country, 
+                    risk_score, is_new_device, is_new_country, previous_failed_attempts, last_activity, created_at)
+                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+                (user_id, session_token, ip_address, user_agent, device_fingerprint, country,
+                 total_risk_score, is_new_device, is_new_country, previous_failed, datetime.utcnow(), datetime.utcnow())
+            )
+        
+        print("DEBUG: Committing transaction...")
+        db.commit()
+        print("DEBUG: Session created/updated successfully")
+        print("="*80 + "\n")
+        return total_risk_score
+    except Exception as e:
+        print(f"DEBUG: EXCEPTION in create_or_update_session: {type(e).__name__}")
+        print(f"DEBUG: Exception message: {str(e)}")
+        import traceback
+        print("DEBUG: Full traceback:")
+        traceback.print_exc()
+        print("="*80 + "\n")
+        # Return 0 risk score on error to allow login to continue
+        return 0
 
 
 def increment_session_failed_attempts(session_token: str):
