@@ -1,10 +1,10 @@
 import os
 import sys
 
-# Ensure run.py is properly imported
+# Import app and socketio at module level for Render
+from run import app, socketio
+
 if __name__ == "__main__":
-    from run import app, socketio
-    
     port = int(os.environ.get("PORT", 5001))
     host = "0.0.0.0"
     debug = os.environ.get("FLASK_ENV") == "development"
