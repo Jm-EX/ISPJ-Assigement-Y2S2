@@ -1,5 +1,5 @@
-import psycopg2
-import psycopg2.extras
+import psycopg
+from psycopg.rows import dict_row
 from datetime import datetime
 from flask import current_app, g, request
 from werkzeug.security import generate_password_hash
@@ -11,17 +11,17 @@ def get_db():
         # Check if DATABASE_URL is provided (Render PostgreSQL)
         database_url = os.environ.get("DATABASE_URL")
         if database_url:
-            g.db = psycopg2.connect(database_url, cursor_factory=psycopg2.extras.RealDictCursor)
+            g.db = psycopg.connect(database_url, row_factory=dict_row)
             g.db.autocommit = True
         else:
             # Fallback to individual config values for local development
-            g.db = psycopg2.connect(
+            g.db = psycopg.connect(
                 host=current_app.config["MYSQL_HOST"],
                 port=current_app.config["MYSQL_PORT"],
                 user=current_app.config["MYSQL_USER"],
                 password=current_app.config["MYSQL_PASSWORD"],
-                database=current_app.config["MYSQL_DATABASE"],
-                cursor_factory=psycopg2.extras.RealDictCursor
+                dbname=current_app.config["MYSQL_DATABASE"],
+                row_factory=dict_row
             )
             g.db.autocommit = True
     return g.db
@@ -37,16 +37,16 @@ def init_db(app):
     # Check if DATABASE_URL is provided (Render PostgreSQL)
     database_url = os.environ.get("DATABASE_URL")
     if database_url:
-        conn = psycopg2.connect(database_url)
+        conn = psycopg.connect(database_url)
         conn.autocommit = True
     else:
         # For local development, connect to default postgres database first
-        conn = psycopg2.connect(
+        conn = psycopg.connect(
             host=app.config["MYSQL_HOST"],
             port=app.config["MYSQL_PORT"],
             user=app.config["MYSQL_USER"],
             password=app.config["MYSQL_PASSWORD"],
-            database="postgres"
+            dbname="postgres"
         )
         conn.autocommit = True
     try:
@@ -55,12 +55,12 @@ def init_db(app):
         if not database_url:
             cursor.execute(f"CREATE DATABASE IF NOT EXISTS {app.config['MYSQL_DATABASE']}")
             conn.close()
-            conn = psycopg2.connect(
+            conn = psycopg.connect(
                 host=app.config["MYSQL_HOST"],
                 port=app.config["MYSQL_PORT"],
                 user=app.config["MYSQL_USER"],
                 password=app.config["MYSQL_PASSWORD"],
-                database=app.config["MYSQL_DATABASE"]
+                dbname=app.config["MYSQL_DATABASE"]
             )
             conn.autocommit = True
             cursor = conn.cursor()
