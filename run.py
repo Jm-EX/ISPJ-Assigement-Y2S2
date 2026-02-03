@@ -23,6 +23,7 @@ routes_socketio.init_app(app)
 if __name__ == "__main__":
     import os
     port = int(os.environ.get("PORT", 5001))
-    host = "127.0.0.1"
+    host = "0.0.0.0"
+    debug = os.environ.get("FLASK_ENV") == "development"
     print(f"Running on http://{host}:{port}")
-    socketio.run(app, debug=True, host=host, port=port)
+    socketio.run(app, debug=debug, host=host, port=port)
