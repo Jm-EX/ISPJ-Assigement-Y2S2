@@ -1,0 +1,9 @@
+from run import app, socketio
+import os
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5001))
+    host = "0.0.0.0"
+    debug = os.environ.get("FLASK_ENV") == "development"
+    print(f"Running on http://{host}:{port}")
+    socketio.run(app, debug=debug, host=host, port=port)
