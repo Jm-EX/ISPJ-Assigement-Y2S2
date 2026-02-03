@@ -281,7 +281,7 @@ def booking_confirmation():
 
 
 def get_gemini_response(message):
-    """Get response from Gemini AI with fallback to multiple models"""
+    """Get response from Gemini AI with fallback to multiple models and retry logic"""
     
     print("\n" + "="*80)
     print("DEBUG: get_gemini_response called")
@@ -290,26 +290,30 @@ def get_gemini_response(message):
     print(f"DEBUG: GEMINI_API_KEY present: {bool(os.environ.get('GEMINI_API_KEY'))}")
     print("="*80)
     
-    # Try multiple models in order of preference
+    # Try multiple models in order of preference (avoid gemini-2.5-pro which has stricter limits)
     models_to_try = [
-        'gemini-1.5-flash',
+        'gemini-1.5-flash',  # Best for free tier - higher limits
+        'gemini-1.5-flash-latest',
         'gemini-pro',
-        'gemini-1.0-pro',
-        'gemini-1.5-flash',
-        'gemini-pro-latest'
+        'gemini-1.0-pro'
     ]
     
     for model_name in models_to_try:
-        try:
-            print(f"DEBUG: Trying model: {model_name}")
-            logging.info(f"Trying model: {model_name}")
-            temp_model = genai.GenerativeModel(model_name)
-            
-            print(f"DEBUG: Getting Gemini response for: {message[:50]}...")
-            logging.info(f"Getting Gemini response for: {message}")
-            
-            # Hotel-specific prompt
-            hotel_context = """Knowledge Base:
+        # Retry logic for rate limits
+        max_retries = 2
+        retry_delay = 2  # Start with 2 seconds
+        
+        for attempt in range(max_retries):
+            try:
+                print(f"DEBUG: Trying model: {model_name} (attempt {attempt + 1}/{max_retries})")
+                logging.info(f"Trying model: {model_name} (attempt {attempt + 1}/{max_retries})")
+                temp_model = genai.GenerativeModel(model_name)
+                
+                print(f"DEBUG: Getting Gemini response for: {message[:50]}...")
+                logging.info(f"Getting Gemini response for: {message}")
+                
+                # Hotel-specific prompt
+                hotel_context = """Knowledge Base:
 
 Check-in: 3:00 PM | Check-out: 11:00 AM.
 
@@ -335,23 +339,37 @@ Focus: Only answer questions about the hotel or the local area.
 Refusal: If a user asks about politics, coding, or unrelated topics, say: \"I'm here to assist with your stay at MGM Resorts. I'm afraid I can't help with that topic.\"
 
 Tone: Professional, welcoming, and luxury-oriented."""
-            
-            full_prompt = f"{hotel_context}\n\nCustomer question: {message}"
-            print(f"DEBUG: Generating content with {model_name}...")
-            response = temp_model.generate_content(full_prompt)
-            
-            print(f"DEBUG: Gemini response received from {model_name}: {response.text[:100]}...")
-            logging.info(f"Gemini response received from {model_name}: {response.text[:100]}...")
-            print("="*80 + "\n")
-            return response.text
-            
-        except Exception as e:
-            print(f"DEBUG: Model {model_name} failed: {type(e).__name__}: {str(e)}")
-            logging.warning(f"Model {model_name} failed: {str(e)}")
-            import traceback
-            print("DEBUG: Traceback:")
-            traceback.print_exc()
-            continue  # Try next model
+                
+                full_prompt = f"{hotel_context}\n\nCustomer question: {message}"
+                print(f"DEBUG: Generating content with {model_name}...")
+                response = temp_model.generate_content(full_prompt)
+                
+                print(f"DEBUG: Gemini response received from {model_name}: {response.text[:100]}...")
+                logging.info(f"Gemini response received from {model_name}: {response.text[:100]}...")
+                print("="*80 + "\n")
+                return response.text
+                
+            except Exception as e:
+                error_type = type(e).__name__
+                error_msg = str(e)
+                print(f"DEBUG: Model {model_name} attempt {attempt + 1} failed: {error_type}: {error_msg}")
+                logging.warning(f"Model {model_name} attempt {attempt + 1} failed: {error_msg}")
+                
+                # Check if it's a rate limit error
+                if "429" in error_msg or "quota" in error_msg.lower() or "rate" in error_msg.lower():
+                    if attempt < max_retries - 1:
+                        print(f"DEBUG: Rate limit hit, waiting {retry_delay} seconds before retry...")
+                        import time
+                        time.sleep(retry_delay)
+                        retry_delay *= 2  # Exponential backoff
+                        continue
+                    else:
+                        print(f"DEBUG: Max retries reached for {model_name}, trying next model")
+                        break
+                else:
+                    # Non-rate-limit error, try next model immediately
+                    print(f"DEBUG: Non-rate-limit error, trying next model")
+                    break
     
     # All models failed
     print("DEBUG: All Gemini models failed")
