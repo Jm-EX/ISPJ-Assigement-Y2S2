@@ -2,6 +2,7 @@ from flask import Flask
 from flask_mail import Mail
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from flask_cors import CORS
 from datetime import timedelta
 import os
 
@@ -14,6 +15,7 @@ limiter = Limiter(
 
 def create_app():
     app = Flask(__name__)
+    CORS(app, resources={r"/*": {"origins": "*"}})
 
     app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-secret-key-change-me")
     app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=5)
@@ -87,8 +89,11 @@ def create_app():
     @app.after_request
     def set_security_headers(response):
         response.headers['X-Frame-Options'] = 'DENY'
-        response.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data:; font-src 'self' https://cdnjs.cloudflare.com; connect-src 'self'; frame-ancestors 'none';"
+        response.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.socket.io https://cdnjs.cloudflare.com https://unpkg.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://unpkg.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://cdnjs.cloudflare.com; connect-src 'self' ws: wss: http://localhost:5001 http://127.0.0.1:5001; frame-ancestors 'none';"
         response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
         return response
 
     return app

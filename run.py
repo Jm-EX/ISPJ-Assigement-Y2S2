@@ -14,7 +14,7 @@ from app import create_app
 from flask_socketio import SocketIO
 
 app = create_app()
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 
 # Import and register socketio events
 from app.routes import socketio as routes_socketio

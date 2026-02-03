@@ -362,6 +362,7 @@ function toggleSupportMode() {
     const headerTitle = document.querySelector('.chat-header h4');
     const supportButton = document.querySelector('.human-support-btn span');
     const supportButtonIcon = document.querySelector('.human-support-btn i');
+    let switchMessage;
     
     if (isHumanMode) {
         // Switch to Human Support mode
@@ -375,7 +376,7 @@ function toggleSupportMode() {
         aiConnected = false;
         
         // Add system message about switching to human mode
-        const switchMessage = "👋 You're now connected with Concierge Support. A human agent will assist you shortly. AI responses have been disabled.";
+        switchMessage = "👋 You're now connected with Concierge Support. A human agent will assist you shortly. AI responses have been disabled.";
         addMessageToChat('System', switchMessage, 'system');
     } else {
         // Switch to AI Support mode
@@ -389,7 +390,7 @@ function toggleSupportMode() {
         aiConnected = true;
         
         // Add system message about switching to AI mode
-        const switchMessage = "🤖 You're now connected with AI Support. I can help you with hotel information and booking questions.";
+        switchMessage = "🤖 You're now connected with AI Support. I can help you with hotel information and booking questions.";
         addMessageToChat('System', switchMessage, 'system');
     }
     
