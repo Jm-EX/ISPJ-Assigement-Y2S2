@@ -531,6 +531,13 @@ def create_sub_admin(username: str, email: str, password_hash: str, role: str, p
     db = get_db()
     cursor = db.cursor()
     import json
+    
+    # Check if username or email already exists
+    cursor.execute("SELECT id FROM users WHERE username = %s OR email = %s", (username, email))
+    existing = cursor.fetchone()
+    if existing:
+        raise ValueError("Username or email already exists")
+    
     cursor.execute(
         """
         INSERT INTO users (username, email, password_hash, is_admin, role, permissions, created_at)
