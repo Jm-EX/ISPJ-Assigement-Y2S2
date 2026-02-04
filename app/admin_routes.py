@@ -55,30 +55,50 @@ def portal():
 
 @admin.post("/admin/delete-user/<int:user_id>")
 def delete_user_route(user_id):
+    print(f"\n{'='*80}")
+    print(f"ADMIN DEBUG: delete_user_route called for user_id: {user_id}")
+    
     if not session.get("user_id"):
+        print(f"ADMIN DEBUG: Not authenticated")
         return jsonify({"error": "Not authenticated"}), 401
     if not session.get("is_admin"):
+        print(f"ADMIN DEBUG: Not authorized")
         return jsonify({"error": "Not authorized"}), 403
     
     # Check if user has permission to delete users
     current_user_id = session.get("user_id")
+    print(f"ADMIN DEBUG: Current user_id: {current_user_id}")
     
     # Master admin (role=None) and super admins always have permission
     # Sub-admins need explicit delete_user permission
     if not check_permission(current_user_id, 'delete_user'):
+        print(f"ADMIN DEBUG: No permission to delete users")
         return jsonify({"error": "You do not have permission to delete users"}), 403
     
     if user_id == session.get("user_id"):
+        print(f"ADMIN DEBUG: Cannot delete own account")
         return jsonify({"error": "Cannot delete your own account"}), 400
     
     # Prevent deletion of master admin account (Admin1!)
     from app.auth_db import get_user_by_id
     target_user = get_user_by_id(user_id)
+    print(f"ADMIN DEBUG: Target user: {target_user.get('username') if target_user else 'None'}")
     if target_user and target_user.get('username') == 'Admin1!':
+        print(f"ADMIN DEBUG: Cannot delete master admin")
         return jsonify({"error": "Cannot delete the master admin account"}), 403
     
-    delete_user(user_id)
-    return jsonify({"success": True})
+    try:
+        print(f"ADMIN DEBUG: Calling delete_user({user_id})")
+        delete_user(user_id)
+        print(f"ADMIN DEBUG: delete_user completed successfully")
+        print(f"{'='*80}\n")
+        return jsonify({"success": True})
+    except Exception as e:
+        print(f"ADMIN ERROR: Exception in delete_user_route: {type(e).__name__}: {str(e)}")
+        import traceback
+        print(f"ADMIN ERROR: Traceback: {traceback.format_exc()}")
+        print(f"{'='*80}\n")
+        return jsonify({"error": str(e)}), 500
 
 
 @admin.post("/admin/create-sub-admin")
