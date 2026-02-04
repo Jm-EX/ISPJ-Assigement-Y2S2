@@ -536,7 +536,7 @@ def create_sub_admin(username: str, email: str, password_hash: str, role: str, p
         INSERT INTO users (username, email, password_hash, is_admin, role, permissions, created_at)
         VALUES (%s, %s, %s, %s, %s, %s, %s)
         """,
-        (username, email, password_hash, True, role, json.dumps(permissions), datetime.utcnow())
+        (username, email, password_hash, 1, role, json.dumps(permissions), datetime.utcnow())
     )
     return cursor.lastrowid
 
