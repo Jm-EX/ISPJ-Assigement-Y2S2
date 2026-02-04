@@ -512,7 +512,17 @@ def get_all_users():
 def delete_user(user_id: int):
     db = get_db()
     cursor = db.cursor()
+    
+    # Delete from all related tables first to avoid foreign key constraint errors
     cursor.execute("DELETE FROM passkey_credentials WHERE user_id = %s", (user_id,))
+    cursor.execute("DELETE FROM otp_challenges WHERE user_id = %s", (user_id,))
+    cursor.execute("DELETE FROM password_reset_tokens WHERE user_id = %s", (user_id,))
+    cursor.execute("DELETE FROM active_sessions WHERE user_id = %s", (user_id,))
+    
+    # Note: We keep security_logs for audit trail - just set user_id to NULL
+    cursor.execute("UPDATE security_logs SET user_id = NULL WHERE user_id = %s", (user_id,))
+    
+    # Finally delete the user
     cursor.execute("DELETE FROM users WHERE id = %s", (user_id,))
     db.commit()
 
