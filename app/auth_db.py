@@ -566,10 +566,13 @@ def create_sub_admin(username: str, email: str, password_hash: str, role: str, p
         """
         INSERT INTO users (username, email, password_hash, is_admin, role, permissions, created_at)
         VALUES (%s, %s, %s, %s, %s, %s, %s)
+        RETURNING id
         """,
         (username, email, password_hash, 1, role, json.dumps(permissions), datetime.utcnow())
     )
-    return cursor.lastrowid
+    result = cursor.fetchone()
+    db.commit()
+    return result['id'] if result else None
 
 
 def update_user_role(user_id: int, role: str, permissions: dict):
