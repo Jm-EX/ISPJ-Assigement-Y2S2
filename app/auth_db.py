@@ -513,18 +513,42 @@ def delete_user(user_id: int):
     db = get_db()
     cursor = db.cursor()
     
-    # Delete from all related tables first to avoid foreign key constraint errors
-    cursor.execute("DELETE FROM passkey_credentials WHERE user_id = %s", (user_id,))
-    cursor.execute("DELETE FROM otp_challenges WHERE user_id = %s", (user_id,))
-    cursor.execute("DELETE FROM password_reset_tokens WHERE user_id = %s", (user_id,))
-    cursor.execute("DELETE FROM active_sessions WHERE user_id = %s", (user_id,))
-    
-    # Note: We keep security_logs for audit trail - just set user_id to NULL
-    cursor.execute("UPDATE security_logs SET user_id = NULL WHERE user_id = %s", (user_id,))
-    
-    # Finally delete the user
-    cursor.execute("DELETE FROM users WHERE id = %s", (user_id,))
-    db.commit()
+    try:
+        print(f"\n{'='*80}")
+        print(f"DEBUG: delete_user called for user_id: {user_id}")
+        
+        # Delete from all related tables first to avoid foreign key constraint errors
+        cursor.execute("DELETE FROM passkey_credentials WHERE user_id = %s", (user_id,))
+        print(f"DEBUG: Deleted {cursor.rowcount} passkey_credentials")
+        
+        cursor.execute("DELETE FROM otp_challenges WHERE user_id = %s", (user_id,))
+        print(f"DEBUG: Deleted {cursor.rowcount} otp_challenges")
+        
+        cursor.execute("DELETE FROM password_reset_tokens WHERE user_id = %s", (user_id,))
+        print(f"DEBUG: Deleted {cursor.rowcount} password_reset_tokens")
+        
+        cursor.execute("DELETE FROM active_sessions WHERE user_id = %s", (user_id,))
+        print(f"DEBUG: Deleted {cursor.rowcount} active_sessions")
+        
+        # Note: We keep security_logs for audit trail - just set user_id to NULL
+        cursor.execute("UPDATE security_logs SET user_id = NULL WHERE user_id = %s", (user_id,))
+        print(f"DEBUG: Updated {cursor.rowcount} security_logs")
+        
+        # Finally delete the user
+        cursor.execute("DELETE FROM users WHERE id = %s", (user_id,))
+        print(f"DEBUG: Deleted {cursor.rowcount} users")
+        
+        db.commit()
+        print(f"DEBUG: Database commit successful")
+        print(f"{'='*80}\n")
+        
+    except Exception as e:
+        print(f"ERROR: Exception in delete_user: {type(e).__name__}: {str(e)}")
+        import traceback
+        print(f"ERROR: Traceback: {traceback.format_exc()}")
+        print(f"{'='*80}\n")
+        db.rollback()
+        raise
 
 
 def create_sub_admin(username: str, email: str, password_hash: str, role: str, permissions: dict):
