@@ -204,38 +204,6 @@
 {% endblock %}
 
 {% block content %}
-<!-- Add Socket.IO script for admin dashboard -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
-<script>
-// Initialize Socket.IO for admin dashboard
-const adminSocket = io();
-console.log('ADMIN DEBUG: Socket.IO initialized for admin dashboard');
-
-// Listen for new customer messages
-adminSocket.on('new_customer_message', function(data) {
-    console.log('ADMIN DEBUG: New customer message received:', data);
-    
-    // Refresh active users to show new message
-    loadActiveChatUsers();
-    
-    // If we have this user's chat expanded, refresh it
-    if (currentChatUser && currentChatUser.sessionId === data.user_room.replace('user_', '')) {
-        loadUserChatMessages(currentChatUser.sessionId, currentChatUser.room);
-    }
-});
-
-// Handle connection
-adminSocket.on('connect', function() {
-    console.log('ADMIN DEBUG: Admin Socket.IO connected');
-    // Join admin room to receive customer messages in human mode
-    adminSocket.emit('join_chat', {room: 'customer_service'});
-});
-
-adminSocket.on('disconnect', function() {
-    console.log('ADMIN DEBUG: Admin Socket.IO disconnected');
-});
-</script>
-
 <div class="admin-dashboard">
   <div class="dashboard-header">
     <h1>Admin Dashboard</h1>
@@ -266,24 +234,6 @@ adminSocket.on('disconnect', function() {
       <h3>Total Users</h3>
       <div class="stat-value">{{ stats.total_users }}</div>
       <div class="stat-label">Registered user accounts</div>
-    </div>
-    
-    <div class="stat-card">
-      <h3>Chat Messages</h3>
-      <div class="stat-value">{{ chat_stats.total_messages }}</div>
-      <div class="stat-label">Total messages sent</div>
-    </div>
-    
-    <div class="stat-card warning">
-      <h3>Unread Chats</h3>
-      <div class="stat-value">{{ chat_stats.unread_messages }}</div>
-      <div class="stat-label">Messages awaiting response</div>
-    </div>
-    
-    <div class="stat-card">
-      <h3>Active Rooms</h3>
-      <div class="stat-value">{{ chat_stats.active_rooms }}</div>
-      <div class="stat-label">Chat rooms active (24h)</div>
     </div>
   </div>
 
@@ -404,9 +354,7 @@ adminSocket.on('disconnect', function() {
           <td>
             <button 
               class="btn-delete" 
-              data-user-id="{{ user.id }}"
-              data-username="{{ user.username }}"
-              onclick="deleteUser(this.dataset.userId, this.dataset.username)"
+              onclick="deleteUser({{ user.id }}, '{{ user.username }}')"
               {% if user.id == session.get('user_id') or user.username == 'Admin1!' %}disabled{% endif %}>
               {% if user.id == session.get('user_id') %}You{% elif user.username == 'Admin1!' %}Master{% else %}Delete{% endif %}
             </button>
@@ -488,9 +436,7 @@ adminSocket.on('disconnect', function() {
           <td>
             <button 
               class="btn-delete" 
-              data-session-id="{{ sess.id }}"
-              data-username="{{ sess.username }}"
-              onclick="logoutSession(this.dataset.sessionId, this.dataset.username)"
+              onclick="logoutSession({{ sess.id }}, '{{ sess.username }}')"
               style="font-size: 12px; padding: 6px 12px;">
               Logout
             </button>
@@ -546,62 +492,6 @@ adminSocket.on('disconnect', function() {
       <p>No security logs available</p>
     </div>
     {% endif %}
-  </div>
-
-  <!-- Chat Management Section -->
-  <div class="dashboard-section">
-    <div class="section-header">
-      <h2>Chat Management</h2>
-      <div>
-        <button onclick="loadActiveChatUsers()" style="padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; margin-right: 8px;">
-          Refresh Users
-        </button>
-      </div>
-    </div>
-    
-    <!-- Active Chat Users -->
-    <div id="activeChatUsers" style="max-height: 400px; overflow-y: auto; border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; margin-bottom: 16px; background: #fafafa;">
-      <div class="empty-state">
-        <p>Loading active chat users...</p>
-      </div>
-    </div>
-    
-    <!-- Expanded Chat View -->
-    <div id="expandedChatView" style="display: none; border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; margin-bottom: 16px; background: #fafafa;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #e0e0e0;">
-        <div>
-          <h3 id="chatUserInfo" style="margin: 0; color: #333;"></h3>
-          <p id="chatUserDetails" style="margin: 4px 0 0 0; color: #666; font-size: 14px;"></p>
-        </div>
-        <button onclick="closeExpandedChat()" style="padding: 6px 12px; background: #f44336; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer;">
-          Close
-        </button>
-      </div>
-      
-      <!-- Chat Messages -->
-      <div id="expandedChatMessages" style="max-height: 300px; overflow-y: auto; border: 1px solid #e0e0e0; border-radius: 6px; padding: 12px; margin-bottom: 16px; background: white;">
-        <div class="empty-state">
-          <p>Loading messages...</p>
-        </div>
-      </div>
-      
-      <!-- Admin Chat Input -->
-      <div style="display: flex; gap: 12px; align-items: flex-end;">
-        <input 
-          type="text" 
-          id="expandedChatInput" 
-          placeholder="Type your response..." 
-          style="flex: 1; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px;"
-          onkeypress="if(event.key === 'Enter') sendExpandedChatMessage();"
-        >
-        <button 
-          onclick="sendExpandedChatMessage()" 
-          style="padding: 12px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;"
-        >
-          Send
-        </button>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -704,232 +594,5 @@ async function logoutSession(sessionId, username) {
     console.error(error);
   }
 }
-
-// =========================
-// Chat Management Functions
-// =========================
-
-let currentChatUser = null;
-
-// Load active chat users on page load
-document.addEventListener('DOMContentLoaded', function() {
-  loadActiveChatUsers();
-});
-
-function loadActiveChatUsers() {
-  fetch('/admin/active-chat-users')
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        displayActiveChatUsers(data.users);
-      } else {
-        console.error('Error loading active chat users:', data.error);
-      }
-    })
-    .catch(error => {
-      console.error('Error loading active chat users:', error);
-    });
-}
-
-function displayActiveChatUsers(users) {
-  const container = document.getElementById('activeChatUsers');
-  
-  if (users.length === 0) {
-    container.innerHTML = '<div class="empty-state"><p>No active chat users in the last 24 hours</p></div>';
-    return;
-  }
-  
-  let html = '';
-  users.forEach(user => {
-    const unreadBadge = user.unread_count > 0 ? 
-      `<span style="background: #ff5252; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px; margin-left: 8px;">${user.unread_count} new</span>` : '';
-    
-    const lastMessageTime = new Date(user.last_message_time).toLocaleString();
-    
-    html += `
-      <div style="padding: 12px; border: 1px solid #e0e0e0; border-radius: 6px; margin-bottom: 8px; background: white; cursor: pointer; transition: all 0.2s;" 
-           onmouseover="this.style.background='#f5f5f5'" 
-           onmouseout="this.style.background='white'"
-           onclick="expandChat('${user.session_id}', '${user.display_name}', '${user.email}', '${user.room}')">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <div>
-            <strong style="color: #333;">${user.display_name}</strong>
-            <div style="font-size: 12px; color: #666; margin-top: 2px;">
-              ${user.email} • ${lastMessageTime}
-            </div>
-          </div>
-          <div>
-            ${unreadBadge}
-            <button style="padding: 4px 8px; background: #667eea; color: white; border: none; border-radius: 4px; font-size: 12px; cursor: pointer;">
-              View Chat
-            </button>
-          </div>
-        </div>
-      </div>
-    `;
-  });
-  
-  container.innerHTML = html;
-}
-
-function expandChat(sessionId, displayName, email, room) {
-  currentChatUser = { sessionId, displayName, email, room };
-  
-  // Update chat info
-  document.getElementById('chatUserInfo').textContent = displayName;
-  document.getElementById('chatUserDetails').textContent = `${email} • Session: ${sessionId}`;
-  
-  // Show expanded chat view
-  document.getElementById('expandedChatView').style.display = 'block';
-  
-  // Load chat messages for this user
-  loadUserChatMessages(sessionId, room);
-  
-  // Mark messages as read
-  markUserMessagesAsRead(room);
-}
-
-function closeExpandedChat() {
-  document.getElementById('expandedChatView').style.display = 'none';
-  currentChatUser = null;
-}
-
-function loadUserChatMessages(sessionId, room) {
-  fetch(`/admin/chat-messages?room=${encodeURIComponent(room)}&limit=50`)
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        displayUserChatMessages(data.messages);
-      } else {
-        console.error('Error loading chat messages:', data.error);
-      }
-    })
-    .catch(error => {
-      console.error('Error loading chat messages:', error);
-    });
-}
-
-function displayUserChatMessages(messages) {
-  const container = document.getElementById('expandedChatMessages');
-  
-  if (messages.length === 0) {
-    container.innerHTML = '<div class="empty-state"><p>No messages yet</p></div>';
-    return;
-  }
-  
-  // Sort messages by timestamp (oldest first)
-  messages.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-  
-  let html = '';
-  messages.forEach(msg => {
-    const isUnread = msg.admin_read === 0;
-    const senderClass = msg.sender_type === 'admin' ? 'admin' : 
-                         msg.sender_type === 'ai' ? 'ai' : 'customer';
-    const senderName = msg.sender_type === 'admin' ? '{{ session.get("username", "Admin") }}' : 
-                      msg.sender_type === 'ai' ? 'AI Support' : msg.username;
-    
-    html += `
-      <div style="margin-bottom: 12px; padding: 8px; border-radius: 6px; background: ${msg.sender_type === 'admin' ? '#e3f2fd' : msg.sender_type === 'ai' ? '#f3e5f5' : '#fff'}; border-left: 4px solid ${msg.sender_type === 'admin' ? '#1976d2' : msg.sender_type === 'ai' ? '#7b1fa2' : '#666'};">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-          <strong style="color: ${msg.sender_type === 'admin' ? '#1976d2' : msg.sender_type === 'ai' ? '#7b1fa2' : '#333'};">${senderName}</strong>
-          <span style="font-size: 12px; color: #666;">${new Date(msg.timestamp).toLocaleTimeString()}</span>
-          ${isUnread ? '<span style="background: #ff5252; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px; margin-left: 8px;">NEW</span>' : ''}
-        </div>
-        <div style="color: #333; line-height: 1.4;">${msg.message}</div>
-        ${msg.user_email ? `<div style="font-size: 11px; color: #888; margin-top: 4px;">${msg.user_email}</div>` : ''}
-      </div>
-    `;
-  });
-  
-  container.innerHTML = html;
-  container.scrollTop = container.scrollHeight;
-}
-
-function sendExpandedChatMessage() {
-  if (!currentChatUser) {
-    alert('Please select a user chat first');
-    return;
-  }
-  
-  const input = document.getElementById('expandedChatInput');
-  const message = input.value.trim();
-  
-  if (!message) {
-    return;
-  }
-  
-  // Send via HTTP to save to database first
-  const data = {
-    message: message,
-    room: currentChatUser.room,
-    target_room: `user_${currentChatUser.sessionId}`
-  };
-  
-  fetch('/admin/send-chat', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data)
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.success) {
-      input.value = '';
-      
-      // Also emit via Socket.IO for real-time delivery
-      const messageData = {
-        'msg': message,
-        'sender': '{{ session.get("username", "Admin") }}',
-        'timestamp': new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-        'sender_type': 'admin'
-      };
-      
-      // Send to specific user room via Socket.IO
-      adminSocket.emit('send_message', {
-        msg: message,
-        sender: '{{ session.get("username", "Admin") }}',
-        room: currentChatUser.room,
-        target_room: `user_${currentChatUser.sessionId}`
-      });
-      
-      console.log('ADMIN DEBUG: Message sent via Socket.IO to room:', `user_${currentChatUser.sessionId}`);
-      
-      // Reload messages to show the new admin message
-      loadUserChatMessages(currentChatUser.sessionId, currentChatUser.room);
-    } else {
-      alert('Error sending message: ' + data.error);
-    }
-  })
-  .catch(error => {
-    console.error('Error sending message:', error);
-    alert('Error sending message');
-  });
-}
-
-function markUserMessagesAsRead(room) {
-  fetch('/admin/mark-chat-read', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ room: room })
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.success) {
-      // Refresh active users to update unread counts
-      loadActiveChatUsers();
-    }
-  })
-  .catch(error => {
-    console.error('Error marking messages as read:', error);
-  });
-}
-
-// Auto-refresh chat users every 30 seconds
-setInterval(() => {
-  loadActiveChatUsers();
-}, 30000);
 </script>
 {% endblock %}
