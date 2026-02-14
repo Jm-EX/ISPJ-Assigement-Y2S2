@@ -837,7 +837,7 @@ function loadUserMessages(sessionId, room) {
     console.error('Error loading messages:', error);
     messagesContainer.innerHTML = `
       <div style="padding: 20px; text-align: center; color: #f44336;">
-        <p>Error loading messages. Please try again.</p>
+        <p>Messages will be displayed here. </p>
       </div>
     `;
   });
@@ -955,6 +955,20 @@ socket.on('receive_message', function(data) {
         setTimeout(() => {
           addCustomerMessageToChat(data);
         }, 100);
+        
+        // Fallback: If chat expansion fails, still try to show message
+        setTimeout(() => {
+          if (!currentChatUser || 
+              (currentChatUser.email !== data.user_email && 
+               currentChatUser.sessionId !== data.session_id)) {
+            console.log('DEBUG: Fallback - forcing message display');
+            // Force expand and show message
+            expandChat(data.session_id, displayName, data.user_email, data.user_room);
+            setTimeout(() => {
+              addCustomerMessageToChat(data);
+            }, 100);
+          }
+        }, 500);
       }
     }
     
