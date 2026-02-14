@@ -493,6 +493,62 @@
     </div>
     {% endif %}
   </div>
+
+  <!-- Chat Management Section -->
+  <div class="dashboard-section">
+    <div class="section-header">
+      <h2>Concierge Chat</h2>
+      <div>
+        <button onclick="refreshActiveUsers()" style="padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; margin-right: 8px;">
+          Refresh Users
+        </button>
+      </div>
+    </div>
+    
+    <!-- Active Users List -->
+    <div id="activeUsersList" style="margin-bottom: 20px;">
+      <div class="empty-state">
+        <p>Loading active users...</p>
+      </div>
+    </div>
+    
+    <!-- Expanded Chat View -->
+    <div id="expandedChatView" style="display: none; border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; margin-bottom: 16px; background: #fafafa;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #e0e0e0;">
+        <div>
+          <h3 id="chatUserInfo" style="margin: 0; color: #333;"></h3>
+          <p id="chatUserDetails" style="margin: 4px 0 0 0; color: #666; font-size: 14px;"></p>
+        </div>
+        <button onclick="closeExpandedChat()" style="padding: 6px 12px; background: #f44336; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer;">
+          Close
+        </button>
+      </div>
+      
+      <!-- Chat Messages -->
+      <div id="expandedChatMessages" style="max-height: 400px; overflow-y: auto; border: 1px solid #e0e0e0; border-radius: 6px; padding: 12px; margin-bottom: 16px; background: white;">
+        <div class="empty-state">
+          <p>Loading messages...</p>
+        </div>
+      </div>
+      
+      <!-- Admin Chat Input -->
+      <div style="display: flex; gap: 12px; align-items: flex-end;">
+        <input 
+          type="text" 
+          id="expandedChatInput" 
+          placeholder="Type your response..." 
+          style="flex: 1; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px;"
+          onkeypress="if(event.key === 'Enter') sendAdminMessage();"
+        >
+        <button 
+          onclick="sendAdminMessage()" 
+          style="padding: 12px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;"
+        >
+          Send
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -593,6 +649,121 @@ async function logoutSession(sessionId, username) {
     alert('An error occurred while logging out the session.');
     console.error(error);
   }
+}
+
+// =========================
+// Chat Management Functions
+// =========================
+
+let currentChatUser = null;
+
+// Load active users
+function refreshActiveUsers() {
+  const usersList = document.getElementById('activeUsersList');
+  usersList.innerHTML = '<div class="empty-state"><p>Loading active users...</p></div>';
+  
+  // For now, show placeholder until we add API
+  setTimeout(() => {
+    usersList.innerHTML = `
+      <div style="padding: 20px; text-align: center; color: #666;">
+        <p>Active users will appear here when they use concierge support.</p>
+        <p style="font-size: 12px; margin-top: 10px;">This will be connected to the database functions we created.</p>
+      </div>
+    `;
+  }, 1000);
+}
+
+// Expand chat for specific user
+function expandChat(sessionId, username, email, room) {
+  currentChatUser = { sessionId, username, email, room };
+  
+  // Update chat info
+  document.getElementById('chatUserInfo').textContent = username;
+  document.getElementById('chatUserDetails').textContent = `${email} • Session: ${sessionId}`;
+  
+  // Show expanded chat view
+  document.getElementById('expandedChatView').style.display = 'block';
+  
+  // Load chat messages for this user
+  loadUserMessages(sessionId, room);
+  
+  console.log('Expanded chat for user:', username);
+}
+
+// Close expanded chat
+function closeExpandedChat() {
+  document.getElementById('expandedChatView').style.display = 'none';
+  currentChatUser = null;
+  console.log('Closed expanded chat');
+}
+
+// Load user messages
+function loadUserMessages(sessionId, room) {
+  const messagesContainer = document.getElementById('expandedChatMessages');
+  messagesContainer.innerHTML = '<div class="empty-state"><p>Loading messages...</p></div>';
+  
+  // For now, show placeholder until we add API
+  setTimeout(() => {
+    messagesContainer.innerHTML = `
+      <div style="padding: 20px; text-align: center; color: #666;">
+        <p>Chat messages will appear here.</p>
+        <p style="font-size: 12px; margin-top: 10px;">This will load from the database functions we created.</p>
+      </div>
+    `;
+  }, 1000);
+}
+
+// Send admin message
+function sendAdminMessage() {
+  const input = document.getElementById('expandedChatInput');
+  const message = input.value.trim();
+  
+  if (!message) {
+    return;
+  }
+  
+  if (!currentChatUser) {
+    alert('Please select a user to chat with');
+    return;
+  }
+  
+  // For now, just log the message
+  console.log('Admin message to', currentChatUser.username, ':', message);
+  
+  // Add message to local display
+  const messagesContainer = document.getElementById('expandedChatMessages');
+  
+  // Remove empty state if it exists
+  const emptyState = messagesContainer.querySelector('.empty-state');
+  if (emptyState) {
+    emptyState.remove();
+  }
+  
+  // Create admin message element
+  const messageDiv = document.createElement('div');
+  messageDiv.style.cssText = `
+    margin-bottom: 12px; 
+    padding: 8px 12px; 
+    border-radius: 8px; 
+    background: #e3f2fd;
+    border-left: 4px solid #1976d2;
+  `;
+  
+  messageDiv.innerHTML = `
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+      <strong style="color: #1976d2;">You (Admin)</strong>
+      <span style="font-size: 12px; color: #666;">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+    </div>
+    <div style="color: #333; line-height: 1.4;">${message}</div>
+  `;
+  
+  messagesContainer.appendChild(messageDiv);
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  
+  // Clear input
+  input.value = '';
+  
+  console.log('Admin message sent:', message);
 }
 </script>
 {% endblock %}
