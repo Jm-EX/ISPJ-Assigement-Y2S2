@@ -687,3 +687,53 @@ def on_admin_mark_read(data):
     except Exception as e:
         print(f"DEBUG: Error marking messages as read: {e}")
         emit('messages_marked_read', {'status': 'error', 'message': str(e)})
+
+
+# =========================
+# API Routes
+# =========================
+
+@main.post('/api/chat-history')
+def api_chat_history():
+    """API endpoint to get chat history for admin dashboard"""
+    if not session.get("user_id") or not session.get("is_admin"):
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    try:
+        data = request.get_json()
+        session_id = data.get('session_id')
+        room = data.get('room')
+        
+        if not session_id or not room:
+            return jsonify({'error': 'Missing session_id or room'}), 400
+        
+        # Get chat history from database
+        chat_history = get_chat_history(
+            session_id=session_id,
+            room=room,
+            limit=50
+        )
+        
+        # Convert to JSON-serializable format
+        messages = []
+        for msg in chat_history:
+            messages.append({
+                'id': msg['id'],
+                'session_id': msg['session_id'],
+                'username': msg['username'],
+                'user_email': msg['user_email'],
+                'message': msg['message'],
+                'sender_type': msg['sender_type'],
+                'room': msg['room'],
+                'timestamp': msg['timestamp'].isoformat() if msg['timestamp'] else None,
+                'admin_read': msg['admin_read']
+            })
+        
+        return jsonify({
+            'status': 'success',
+            'messages': messages
+        })
+        
+    except Exception as e:
+        print(f"DEBUG: Error in chat history API: {e}")
+        return jsonify({'error': str(e)}), 500
