@@ -416,14 +416,13 @@ def on_join(data):
     else:
         user_room_id = f"guest_{session_id}"
     
-    # Join both rooms
-    join_room(room)  # Main room (customer_service)
+    # Join only user-specific room for admin replies
     join_room(user_room_id)  # User-specific room for admin replies
     
-    print(f"DEBUG: User joined main room: {room}")
     print(f"DEBUG: User joined private room: {user_room_id}")
     
-    # Load and send chat history
+    # Emit status to user's private room only
+    emit('status', {'msg': 'Connected to customer support'}, room=user_room_id)
     try:
         chat_history = get_chat_history(
             session_id=user_email if user_email else session_id,
