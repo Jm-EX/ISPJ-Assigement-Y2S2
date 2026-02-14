@@ -1,6 +1,6 @@
 import psycopg
 from psycopg.rows import dict_row
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask import current_app, g, request
 from werkzeug.security import generate_password_hash
 import os
@@ -1020,3 +1020,52 @@ def get_chat_stats():
         'unread_messages': unread_messages,
         'active_rooms': active_rooms
     }
+
+
+def cleanup_old_messages():
+    """Delete messages older than 12 hours"""
+    db = get_db()
+    cursor = db.cursor()
+    
+    # Delete messages older than 12 hours
+    cutoff_time = datetime.now() - timedelta(hours=12)
+    cursor.execute(
+        "DELETE FROM chat_messages WHERE timestamp < %s",
+        (cutoff_time,)
+    )
+    
+    deleted_count = cursor.rowcount
+    logging.info(f"Cleaned up {deleted_count} old chat messages (older than 12 hours)")
+    
+    return deleted_count
+
+
+def get_user_chat_history(user_id=None, session_id=None, room=None, limit=50):
+    """Get chat history for a specific user or session"""
+    db = get_db()
+    cursor = db.cursor()
+    
+    query = """
+        SELECT cm.*, u.username as user_username, u.email as user_email
+        FROM chat_messages cm
+        LEFT JOIN users u ON cm.user_id = u.id
+        WHERE 1=1
+    """
+    params = []
+    
+    if user_id:
+        query += " AND cm.user_id = %s"
+        params.append(user_id)
+    elif session_id:
+        query += " AND cm.session_id = %s"
+        params.append(session_id)
+    
+    if room:
+        query += " AND cm.room = %s"
+        params.append(room)
+    
+    query += " ORDER BY cm.timestamp ASC LIMIT %s"
+    params.append(limit)
+    
+    cursor.execute(query, params)
+    return cursor.fetchall()

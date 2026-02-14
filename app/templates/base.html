@@ -560,26 +560,6 @@ function addMessageToChat(sender, message, senderType) {
     }
 }
 
-socket.on('receive_message', function(data) {
-    console.log('\n' + '='.repeat(80));
-    console.log('CHATBOT DEBUG: receive_message event received');
-    console.log('CHATBOT DEBUG: Data:', data);
-    console.log('CHATBOT DEBUG: Sender:', data.sender);
-    console.log('CHATBOT DEBUG: Message:', data.msg);
-    console.log('CHATBOT DEBUG: chatOpen:', chatOpen);
-    
-    if (!chatOpen && data.sender !== 'customer') {
-        console.log('CHATBOT DEBUG: Chat closed, showing badge');
-        document.getElementById('chat-badge').style.display = 'block';
-    }
-    // Using 'support' as the class for AI/Admin replies
-    const type = data.sender === 'customer' ? 'customer' : 'support';
-    console.log('CHATBOT DEBUG: Message type:', type);
-    addMessageToChat(data.sender, data.msg, type);
-    console.log('CHATBOT DEBUG: Message added to chat');
-    console.log('='.repeat(80));
-});
-
 socket.on('status', function(data) {
     console.log('\n' + '='.repeat(80));
     console.log('CHATBOT DEBUG: status event received');

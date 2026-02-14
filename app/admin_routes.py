@@ -236,6 +236,7 @@ def send_chat_route():
     data = request.get_json()
     message = data.get("message", "").strip()
     room = data.get("room", "default")
+    target_room = data.get("target_room")  # Specific user room to reply to
     
     if not message:
         return jsonify({"error": "Message cannot be empty"}), 400
@@ -251,8 +252,21 @@ def send_chat_route():
             room=room
         )
         
-        # Note: Socket.IO emission will be handled by the client-side JavaScript
-        # that calls this endpoint and then refreshes the chat messages
+        # Emit via Socket.IO to specific user room if provided, otherwise to main room
+        from app.routes import socketio
+        message_data = {
+            'msg': message,
+            'sender': session.get("username", "Admin Support"),
+            'timestamp': datetime.now().strftime('%H:%M'),
+            'sender_type': 'admin'
+        }
+        
+        if target_room:
+            # Send to specific user room
+            socketio.emit('receive_message', message_data, room=target_room)
+        else:
+            # Send to main room (for general announcements)
+            socketio.emit('receive_message', message_data, room=room)
         
         return jsonify({"success": True})
     except Exception as e:
