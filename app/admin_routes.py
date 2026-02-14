@@ -74,6 +74,35 @@ def portal():
     return render_template("admin_portal.html", stats=stats, users=users, security_logs=security_logs, active_sessions=active_sessions, chat_stats=chat_stats_data)
 
 
+@admin.get('/api/chat/history')
+def get_chat_history_api():
+    """API endpoint to get chat history for admin dashboard"""
+    if not session.get("user_id"):
+        return jsonify({"error": "Not authenticated"}), 401
+    
+    session_id = request.args.get('session_id')
+    room = request.args.get('room', 'customer_service')
+    
+    try:
+        chat_history = get_chat_history(session_id=session_id, room=room, limit=50)
+        
+        # Format messages for frontend
+        formatted_messages = []
+        for msg in chat_history:
+            formatted_messages.append({
+                'id': msg['id'],
+                'message': msg['message'],
+                'username': msg['username'],
+                'sender_type': msg['sender_type'],
+                'timestamp': msg['timestamp'].isoformat() if msg['timestamp'] else None,
+                'user_email': msg['user_email']
+            })
+        
+        return jsonify({"messages": formatted_messages})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 @admin.post("/admin/delete-user/<int:user_id>")
 def delete_user_route(user_id):
     print(f"\n{'='*80}")
