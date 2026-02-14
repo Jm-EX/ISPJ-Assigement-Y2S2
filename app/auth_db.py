@@ -1069,3 +1069,28 @@ def get_user_chat_history(user_id=None, session_id=None, room=None, limit=50):
     
     cursor.execute(query, params)
     return cursor.fetchall()
+
+
+def get_active_chat_users():
+    """Get unique users who have sent messages in the last 24 hours"""
+    db = get_db()
+    cursor = db.cursor()
+    
+    # Get unique users with their latest message and unread count
+    cursor.execute("""
+        SELECT DISTINCT 
+            COALESCE(cm.user_id, 0) as user_id,
+            COALESCE(u.username, cm.username) as display_name,
+            COALESCE(u.email, 'Anonymous') as email,
+            cm.session_id,
+            MAX(cm.timestamp) as last_message_time,
+            COUNT(CASE WHEN cm.admin_read = 0 AND cm.sender_type != 'admin' THEN 1 END) as unread_count,
+            cm.room
+        FROM chat_messages cm
+        LEFT JOIN users u ON cm.user_id = u.id
+        WHERE cm.timestamp >= NOW() - INTERVAL '24 hours'
+        GROUP BY COALESCE(cm.user_id, 0), COALESCE(u.username, cm.username), COALESCE(u.email, 'Anonymous'), cm.session_id, cm.room
+        ORDER BY last_message_time DESC
+    """)
+    
+    return cursor.fetchall()

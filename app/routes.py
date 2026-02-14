@@ -510,7 +510,8 @@ def on_message(data):
     message_data = {
         'msg': message,
         'sender': sender,
-        'timestamp': datetime.now().strftime('%H:%M')
+        'timestamp': datetime.now().strftime('%H:%M'),
+        'sender_type': 'customer' if sender == 'customer' else 'admin'
     }
     
     # Send to user's private room (so they see their own message)
@@ -569,6 +570,7 @@ def on_message(data):
             'msg': message,
             'sender': sender,
             'timestamp': datetime.now().strftime('%H:%M'),
+            'sender_type': 'customer',
             'user_room': user_room  # Include user room for admin to reply
         }
         emit('new_customer_message', admin_message_data, room=room)
@@ -579,11 +581,16 @@ def on_message(data):
         if sender != 'customer':
             # Admin message - send to specific user's room
             target_user_room = data.get('target_room', user_room)
-            emit('receive_message', message_data, room=target_user_room)
+            admin_message_data = {
+                'msg': message,
+                'sender': sender,
+                'timestamp': datetime.now().strftime('%H:%M'),
+                'sender_type': 'admin'
+            }
+            emit('receive_message', admin_message_data, room=target_user_room)
             print(f"DEBUG: Admin message sent to target room: {target_user_room}")
-        
-        # Save admin message to database (already done above)
-        pass
+        # Note: AI messages are already handled above in the AI response section
+        # Customer messages in AI/Human mode are also handled above
     
     print("="*80 + "\n")
 
