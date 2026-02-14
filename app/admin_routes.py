@@ -1,5 +1,5 @@
 from flask import Blueprint, redirect, render_template, session, url_for, request, jsonify, flash
-from app.auth_db import get_login_stats, get_all_users, delete_user, get_security_logs, create_sub_admin, update_user_role, get_user_permissions, get_active_sessions, delete_session, save_chat_message, get_chat_messages, mark_chat_messages_as_read, get_chat_stats
+from app.auth_db import get_login_stats, get_all_users, delete_user, get_security_logs, create_sub_admin, update_user_role, get_user_permissions, get_active_sessions, delete_session, save_chat_message, get_chat_messages, mark_chat_messages_as_read, get_chat_stats, get_active_chat_users
 from werkzeug.security import generate_password_hash
 from datetime import datetime
 import json
@@ -225,6 +225,21 @@ def mark_chat_read_route():
         return jsonify({"error": str(e)}), 500
 
 
+@admin.get("/admin/active-chat-users")
+def get_active_chat_users_route():
+    """Get active chat users for admin dashboard"""
+    if not session.get("user_id"):
+        return jsonify({"error": "Not authenticated"}), 401
+    if not session.get("is_admin"):
+        return jsonify({"error": "Not authorized"}), 403
+    
+    try:
+        active_users = get_active_chat_users()
+        return jsonify({"success": True, "users": active_users})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 @admin.post("/admin/send-chat")
 def send_chat_route():
     """Send chat message as admin"""
@@ -236,14 +251,18 @@ def send_chat_route():
     data = request.get_json()
     message = data.get("message", "").strip()
     room = data.get("room", "default")
+    target_room = data.get("target_room")  # Specific user room to reply to
     
     if not message:
         return jsonify({"error": "Message cannot be empty"}), 400
     
+    if not target_room:
+        return jsonify({"error": "Target room is required for sending messages"}), 400
+    
     try:
         # Save to database
         save_chat_message(
-            session_id=request.sid if hasattr(request, 'sid') else 'admin',
+            session_id='admin_web_panel',
             user_id=session.get("user_id"),
             username=session.get("username", "Admin"),
             message=message,
@@ -251,9 +270,7 @@ def send_chat_route():
             room=room
         )
         
-        # Note: Socket.IO emission will be handled by the client-side JavaScript
-        # that calls this endpoint and then refreshes the chat messages
-        
+        # Return success - the frontend will handle Socket.IO emission via the existing connection
         return jsonify({"success": True})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
