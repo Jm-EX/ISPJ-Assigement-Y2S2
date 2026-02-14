@@ -14,12 +14,8 @@ from app import create_app
 
 app = create_app()
 
-# Initialize chat system
-from app.chat_routes import init_chat
-init_chat()
-
-# Import socketio from chat routes and initialize it with the app
-from app.chat_routes import socketio
+# Import socketio from routes and initialize it with the app
+from app.routes import socketio
 socketio.init_app(
     app, 
     cors_allowed_origins="*", 
