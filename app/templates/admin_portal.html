@@ -931,11 +931,31 @@ socket.on('receive_message', function(data) {
     addOrUpdateActiveUser(data);
     
     // If this user is currently selected, add message to chat
+    console.log('DEBUG: Checking if message should display:');
+    console.log('DEBUG: currentChatUser:', currentChatUser);
+    console.log('DEBUG: data.user_email:', data.user_email);
+    console.log('DEBUG: data.session_id:', data.session_id);
+    console.log('DEBUG: currentChatUser.email:', currentChatUser ? currentChatUser.email : 'null');
+    console.log('DEBUG: currentChatUser.sessionId:', currentChatUser ? currentChatUser.sessionId : 'null');
+    
     if (currentChatUser && 
         ((currentChatUser.email && currentChatUser.email === data.user_email) ||
          (!currentChatUser.email && currentChatUser.sessionId === data.session_id))) {
       
+      console.log('DEBUG: Condition matched - calling addCustomerMessageToChat');
       addCustomerMessageToChat(data);
+    } else {
+      console.log('DEBUG: Condition failed - message not displayed');
+      // Auto-expand chat if this is a new user message
+      if (!currentChatUser) {
+        console.log('DEBUG: Auto-expanding chat for new user');
+        const displayName = data.sender || 'Guest';
+        expandChat(data.session_id, displayName, data.user_email, data.user_room);
+        // Add message after a short delay to allow chat to expand
+        setTimeout(() => {
+          addCustomerMessageToChat(data);
+        }, 100);
+      }
     }
     
     // Update unread count
