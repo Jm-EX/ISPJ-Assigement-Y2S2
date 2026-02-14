@@ -590,15 +590,6 @@ def on_message(data):
         print(f"DEBUG: Forwarding message to admin room: customer_service")
         emit('new_customer_message', admin_message_data, room='customer_service')
         
-        # Also send confirmation back to user
-        user_confirmation = {
-            'msg': message,
-            'sender': 'You',
-            'timestamp': datetime.now().strftime('%H:%M'),
-            'sender_type': 'user'
-        }
-        emit('receive_message', user_confirmation, room=user_room_id)
-        
         print("="*80 + "\n")
         logging.info(f"User {session_id} message forwarded to admin")
     else:

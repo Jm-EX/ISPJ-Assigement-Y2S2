@@ -209,6 +209,7 @@
   opacity: 0.3;
 }
 </style>
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -747,10 +748,14 @@ function sendAdminMessage() {
     return;
   }
   
-  // For now, just log the message
-  console.log('Admin message to', currentChatUser.username, ':', message);
+  // Send message via Socket.IO
+  socket.emit('admin_send_message', {
+    message: message,
+    user_room: currentChatUser.room,
+    user_email: currentChatUser.email
+  });
   
-  // Add message to local display
+  // Add message to local display immediately for better UX
   const messagesContainer = document.getElementById('expandedChatMessages');
   
   // Remove empty state if it exists
@@ -783,7 +788,158 @@ function sendAdminMessage() {
   // Clear input
   input.value = '';
   
-  console.log('Admin message sent:', message);
+  console.log('Admin message sent via Socket.IO:', message);
+}
+
+// =========================
+// Socket.IO Connection
+// =========================
+
+// Connect to Socket.IO
+const socket = io();
+
+// Socket.IO event handlers
+socket.on('connect', () => {
+  console.log('Admin connected to Socket.IO');
+  
+  // Join customer service room
+  socket.emit('admin_join');
+});
+
+socket.on('admin_joined', (data) => {
+  console.log('Admin joined customer service:', data);
+  if (data.status === 'success') {
+    console.log('Successfully connected to customer service');
+  }
+});
+
+socket.on('new_customer_message', (data) => {
+  console.log('New customer message received:', data);
+  
+  // Add to active users list or update existing
+  addOrUpdateActiveUser(data);
+  
+  // If this user is currently selected, add message to chat
+  if (currentChatUser && 
+      ((currentChatUser.email && currentChatUser.email === data.user_email) ||
+       (!currentChatUser.email && currentChatUser.sessionId === data.session_id))) {
+    
+    addCustomerMessageToChat(data);
+  }
+  
+  // Update unread count
+  updateUnreadCount();
+});
+
+socket.on('admin_message_sent', (data) => {
+  console.log('Admin message sent confirmation:', data);
+  if (data.status === 'success') {
+    console.log('Message sent successfully');
+  }
+});
+
+socket.on('messages_marked_read', (data) => {
+  console.log('Messages marked as read:', data);
+  if (data.status === 'success') {
+    updateUnreadCount();
+  }
+});
+
+// Add or update active user in the list
+function addOrUpdateActiveUser(messageData) {
+  const usersList = document.getElementById('activeUsersList');
+  
+  // Remove empty state if it exists
+  const emptyState = usersList.querySelector('.empty-state');
+  if (emptyState) {
+    emptyState.remove();
+  }
+  
+  // Check if user already exists
+  const userKey = messageData.user_email || messageData.session_id;
+  let userElement = document.getElementById(`user_${userKey}`);
+  
+  if (!userElement) {
+    // Create new user element
+    userElement = document.createElement('div');
+    userElement.id = `user_${userKey}`;
+    userElement.style.cssText = `
+      padding: 16px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      background: white;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    `;
+    
+    usersList.appendChild(userElement);
+  }
+  
+  // Update user content
+  const displayName = messageData.sender || 'Guest';
+  const displayInfo = messageData.user_email || `Session: ${messageData.session_id.substring(0, 8)}...`;
+  
+  userElement.innerHTML = `
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <strong style="color: #333;">${displayName}</strong><br>
+        <small style="color: #666;">${displayInfo}</small><br>
+        <small style="color: #999;">Last message: ${messageData.timestamp}</small>
+      </div>
+      <button onclick="expandChat('${messageData.user_room}', '${displayName}', '${messageData.user_email || ''}', '${messageData.session_id}')" 
+              style="padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer;">
+        Chat
+      </button>
+    </div>
+  `;
+  
+  // Add hover effect
+  userElement.addEventListener('mouseenter', () => {
+    userElement.style.backgroundColor = '#f8f9fa';
+  });
+  
+  userElement.addEventListener('mouseleave', () => {
+    userElement.style.backgroundColor = 'white';
+  });
+}
+
+// Add customer message to chat
+function addCustomerMessageToChat(messageData) {
+  const messagesContainer = document.getElementById('expandedChatMessages');
+  
+  // Remove empty state if it exists
+  const emptyState = messagesContainer.querySelector('.empty-state');
+  if (emptyState) {
+    emptyState.remove();
+  }
+  
+  // Create customer message element
+  const messageDiv = document.createElement('div');
+  messageDiv.style.cssText = `
+    margin-bottom: 12px; 
+    padding: 8px 12px; 
+    border-radius: 8px; 
+    background: #f5f5f5;
+    border-left: 4px solid #666;
+  `;
+  
+  messageDiv.innerHTML = `
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+      <strong style="color: #666;">${messageData.sender}</strong>
+      <span style="font-size: 12px; color: #666;">${messageData.timestamp}</span>
+    </div>
+    <div style="color: #333; line-height: 1.4;">${messageData.msg}</div>
+  `;
+  
+  messagesContainer.appendChild(messageDiv);
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+// Update unread count (placeholder for now)
+function updateUnreadCount() {
+  // This would be updated with real data from the database
+  console.log('Updating unread count...');
 }
 </script>
 {% endblock %}
