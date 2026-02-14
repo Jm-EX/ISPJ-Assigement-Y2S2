@@ -53,6 +53,14 @@
   background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
 }
 
+.stat-card.info {
+  background: linear-gradient(135deg, #00bcd4 0%, #4facfe 100%);
+}
+
+.stat-card.primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
 .stat-card h3 {
   font-size: 14px;
   font-weight: 600;
@@ -228,6 +236,18 @@
       <h3>Account Lockouts</h3>
       <div class="stat-value">{{ stats.account_lockouts }}</div>
       <div class="stat-label">Accounts temporarily locked</div>
+    </div>
+    
+    <div class="stat-card info">
+      <h3>Chat Messages</h3>
+      <div class="stat-value" id="totalChatMessages">{{ chat_stats.total_messages or 0 }}</div>
+      <div class="stat-label">Total messages sent</div>
+    </div>
+    
+    <div class="stat-card primary">
+      <h3>Unread Chats</h3>
+      <div class="stat-value" id="unreadChatMessages">{{ chat_stats.unread_messages or 0 }}</div>
+      <div class="stat-label">Messages awaiting response</div>
     </div>
     
     <div class="stat-card">

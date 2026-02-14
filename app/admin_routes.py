@@ -1,5 +1,5 @@
 from flask import Blueprint, redirect, render_template, session, url_for, request, jsonify, flash
-from app.auth_db import get_login_stats, get_all_users, delete_user, get_security_logs, create_sub_admin, update_user_role, get_user_permissions, get_active_sessions, delete_session
+from app.auth_db import get_login_stats, get_all_users, delete_user, get_security_logs, create_sub_admin, update_user_role, get_user_permissions, get_active_sessions, delete_session, get_active_conversations
 from werkzeug.security import generate_password_hash
 import json
 
@@ -40,6 +40,21 @@ def portal():
     users = get_all_users()
     security_logs = get_security_logs(limit=50)
     
+    # Get chat statistics
+    chat_stats = get_active_conversations(hours=24)  # Get last 24 hours
+    total_messages = 0
+    unread_messages = 0
+    
+    for conv in chat_stats:
+        # This would be enhanced with actual message counting when we implement the full function
+        total_messages += 1  # Placeholder - each conversation represents at least one message
+        unread_messages += conv.get('unread_count', 0)
+    
+    chat_stats_data = {
+        'total_messages': total_messages,
+        'unread_messages': unread_messages
+    }
+    
     # Get active sessions - master admin always has access, sub-admins need permission
     active_sessions = []
     current_user_id = session.get("user_id")
@@ -50,7 +65,7 @@ def portal():
     if role is None or role == 'super_admin' or role == 'master_admin' or check_permission(current_user_id, 'view_active_sessions'):
         active_sessions = get_active_sessions()
     
-    return render_template("admin_portal.html", stats=stats, users=users, security_logs=security_logs, active_sessions=active_sessions)
+    return render_template("admin_portal.html", stats=stats, users=users, security_logs=security_logs, active_sessions=active_sessions, chat_stats=chat_stats_data)
 
 
 @admin.post("/admin/delete-user/<int:user_id>")
