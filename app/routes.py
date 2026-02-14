@@ -520,6 +520,8 @@ def on_message(data):
             username = sender
             user_email = None
             
+        print(f"DEBUG: About to save message - User ID: {user_id}, Username: {username}, Email: {user_email}")
+        
         save_chat_message(
             session_id=session_id,
             user_id=user_id,
@@ -530,8 +532,19 @@ def on_message(data):
             user_email=user_email
         )
         print(f"DEBUG: Message saved to database for user: {username} (ID: {user_id})")
+        
+        # Verify the message was saved by checking count
+        from app.auth_db import get_db
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute("SELECT COUNT(*) FROM chat_messages WHERE session_id = %s", (session_id,))
+        count = cursor.fetchone()[0]
+        print(f"DEBUG: Total messages for this session: {count}")
+        
     except Exception as e:
         print(f"DEBUG: Error saving message: {e}")
+        import traceback
+        traceback.print_exc()
         logging.error(f"Error saving chat message: {e}")
     
     # Create message data

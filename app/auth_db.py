@@ -943,12 +943,21 @@ def save_chat_message(session_id, user_id, username, message, sender_type, room,
     """Save a chat message to the database"""
     db = get_db()
     cursor = db.cursor()
-    cursor.execute(
-        """INSERT INTO chat_messages 
-           (session_id, user_id, username, message, sender_type, room, timestamp, user_email) 
-           VALUES (%s, %s, %s, %s, %s, %s, NOW(), %s)""",
-        (session_id, user_id, username, message, sender_type, room, user_email)
-    )
+    print(f"DB DEBUG: Saving message - Session: {session_id}, User: {username}, Room: {room}")
+    
+    try:
+        cursor.execute(
+            """INSERT INTO chat_messages 
+               (session_id, user_id, username, message, sender_type, room, timestamp, user_email) 
+               VALUES (%s, %s, %s, %s, %s, %s, NOW(), %s)""",
+            (session_id, user_id, username, message, sender_type, room, user_email)
+        )
+        db.commit()
+        print(f"DB DEBUG: Message saved and committed to database")
+    except Exception as e:
+        print(f"DB ERROR: Failed to save message: {e}")
+        db.rollback()
+        raise
 
 
 def get_chat_messages(room=None, limit=50, unread_only=False):
