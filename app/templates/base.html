@@ -301,33 +301,7 @@
     </div>
 </footer>
 
-<div id="chat-widget">
-    <div id="chat-tab" onclick="toggleChat()">
-        <i class="fas fa-comments"></i> Chat Support
-        <span id="chat-badge" class="chat-badge" style="display: none;">1</span>
-    </div>
-    
-    <div id="chat-popup" class="chat-popup">
-        <div class="chat-header">
-            <h4>AI Support</h4>
-            <div class="header-buttons">
-                <button onclick="toggleSupportMode()" class="human-support-btn" title="Switch to Human Support">
-                    <i class="fas fa-user-tie"></i>
-                    <span>Concierge Support</span>
-                </button>
-                <button onclick="toggleChat()" class="chat-close">&times;</button>
-            </div>
-        </div>
-        
-        <div id="chat-messages" class="chat-messages">
-            </div>
-        
-        <div class="chat-input">
-            <input type="text" id="message-input" placeholder="Ask about check-in..." onkeypress="handleKeyPress(event)">
-            <button onclick="sendMessage()">Send</button>
-        </div>
-    </div>
-</div>
+{% include 'chat_widget.html' %}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">

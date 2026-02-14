@@ -32,6 +32,13 @@ def create_app():
     app.config["MYSQL_USER"] = os.environ.get("MYSQL_USER", "root")
     app.config["MYSQL_PASSWORD"] = os.environ.get("MYSQL_PASSWORD", "")
     app.config["MYSQL_DATABASE"] = os.environ.get("MYSQL_DATABASE", "ispj_hotel")
+    
+    # PostgreSQL configuration for chat system
+    app.config["DB_HOST"] = os.environ.get("DB_HOST", "localhost")
+    app.config["DB_PORT"] = os.environ.get("DB_PORT", "5432")
+    app.config["DB_USER"] = os.environ.get("DB_USER", "postgres")
+    app.config["DB_PASSWORD"] = os.environ.get("DB_PASSWORD", "")
+    app.config["DB_NAME"] = os.environ.get("DB_NAME", "ispj_chat")
 
     app.config["MAIL_SERVER"] = os.environ.get("SMTP_SERVER")
     app.config["MAIL_PORT"] = int(os.environ.get("SMTP_PORT", 587))
@@ -89,6 +96,10 @@ def create_app():
 
     from app.admin_routes import admin
     app.register_blueprint(admin)
+
+    # Register chat blueprint
+    from app.chat_routes import chat_bp
+    app.register_blueprint(chat_bp)
 
     from app.auth_db import close_db, init_db, seed_admin
     app.teardown_appcontext(close_db)
