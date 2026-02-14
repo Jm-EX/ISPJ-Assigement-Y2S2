@@ -723,15 +723,81 @@ function loadUserMessages(sessionId, room) {
   const messagesContainer = document.getElementById('expandedChatMessages');
   messagesContainer.innerHTML = '<div class="empty-state"><p>Loading messages...</p></div>';
   
-  // For now, show placeholder until we add API
-  setTimeout(() => {
+  // Request chat history from server
+  fetch('/api/chat-history', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      session_id: sessionId,
+      room: room
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    messagesContainer.innerHTML = ''; // Clear loading state
+    
+    if (data.messages && data.messages.length > 0) {
+      data.messages.forEach(msg => {
+        const messageDiv = document.createElement('div');
+        
+        if (msg.sender_type === 'user') {
+          // Customer message
+          messageDiv.style.cssText = `
+            margin-bottom: 12px; 
+            padding: 8px 12px; 
+            border-radius: 8px; 
+            background: #f5f5f5;
+            border-left: 4px solid #666;
+          `;
+          messageDiv.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <strong style="color: #666;">${msg.username}</strong>
+              <span style="font-size: 12px; color: #666;">${new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+            </div>
+            <div style="color: #333; line-height: 1.4;">${msg.message}</div>
+          `;
+        } else {
+          // Admin message
+          messageDiv.style.cssText = `
+            margin-bottom: 12px; 
+            padding: 8px 12px; 
+            border-radius: 8px; 
+            background: #e3f2fd;
+            border-left: 4px solid #1976d2;
+          `;
+          messageDiv.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <strong style="color: #1976d2;">${msg.username}</strong>
+              <span style="font-size: 12px; color: #666;">${new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+            </div>
+            <div style="color: #333; line-height: 1.4;">${msg.message}</div>
+          `;
+        }
+        
+        messagesContainer.appendChild(messageDiv);
+      });
+      
+      // Scroll to bottom
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    } else {
+      // No messages
+      messagesContainer.innerHTML = `
+        <div style="padding: 20px; text-align: center; color: #666;">
+          <p>No messages yet. Start a conversation!</p>
+        </div>
+      `;
+    }
+  })
+  .catch(error => {
+    console.error('Error loading messages:', error);
     messagesContainer.innerHTML = `
-      <div style="padding: 20px; text-align: center; color: #666;">
-        <p>Chat messages will appear here.</p>
-        <p style="font-size: 12px; margin-top: 10px;">This will load from the database functions we created.</p>
+      <div style="padding: 20px; text-align: center; color: #f44336;">
+        <p>Error loading messages. Please try again.</p>
       </div>
     `;
-  }, 1000);
+  });
 }
 
 // Send admin message
