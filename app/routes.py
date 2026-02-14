@@ -696,50 +696,52 @@ def on_admin_mark_read(data):
 @main.post('/api/chat-history')
 def api_chat_history():
     """API endpoint to get chat history for admin dashboard"""
-    print(f"DEBUG: Chat history API called")
-    
     if not session.get("user_id") or not session.get("is_admin"):
-        print(f"DEBUG: Unauthorized - user_id: {session.get('user_id')}, is_admin: {session.get('is_admin')}")
         return jsonify({'error': 'Unauthorized'}), 401
     
     try:
         data = request.get_json()
-        print(f"DEBUG: Request data: {data}")
-        
         session_id = data.get('session_id')
         room = data.get('room')
         
-        print(f"DEBUG: session_id: {session_id}, room: {room}")
-        
         if not session_id or not room:
-            print(f"DEBUG: Missing parameters")
             return jsonify({'error': 'Missing session_id or room'}), 400
         
-        # Get chat history from database
-        print(f"DEBUG: Calling get_chat_history...")
-        chat_history = get_chat_history(
-            session_id=session_id,
-            room=room,
-            limit=50
-        )
-        print(f"DEBUG: Got {len(chat_history)} messages from database")
+        print(f"DEBUG: Calling get_chat_history with session_id={session_id}, room={room}")
+        try:
+            chat_history = get_chat_history(
+                session_id=session_id,
+                room=room,
+                limit=50
+            )
+            print(f"DEBUG: get_chat_history returned {len(chat_history)} items")
+            
+        except Exception as db_error:
+            print(f"DEBUG: Database error in get_chat_history: {db_error}")
+            import traceback
+            print(f"DEBUG: Database traceback: {traceback.format_exc()}")
+            return jsonify({'error': f'Database error: {str(db_error)}'}), 500
         
         # Convert to JSON-serializable format
         messages = []
-        for msg in chat_history:
-            messages.append({
-                'id': msg['id'],
-                'session_id': msg['session_id'],
-                'username': msg['username'],
-                'user_email': msg['user_email'],
-                'message': msg['message'],
-                'sender_type': msg['sender_type'],
-                'room': msg['room'],
-                'timestamp': msg['timestamp'].isoformat() if msg['timestamp'] else None,
-                'admin_read': msg['admin_read']
-            })
+        try:
+            for msg in chat_history:
+                print(f"DEBUG: Processing message: {msg}")
+                messages.append({
+                    'id': msg['id'],
+                    'session_id': msg['session_id'],
+                    'username': msg['username'],
+                    'user_email': msg['user_email'],
+                    'message': msg['message'],
+                    'sender_type': msg['sender_type'],
+                    'room': msg['room'],
+                    'timestamp': msg['timestamp'].isoformat() if msg['timestamp'] else None,
+                    'admin_read': msg['admin_read']
+                })
+        except Exception as json_error:
+            print(f"DEBUG: JSON serialization error: {json_error}")
+            return jsonify({'error': f'JSON error: {str(json_error)}'}), 500
         
-        print(f"DEBUG: Returning {len(messages)} messages")
         return jsonify({
             'status': 'success',
             'messages': messages
@@ -747,6 +749,4 @@ def api_chat_history():
         
     except Exception as e:
         print(f"DEBUG: Error in chat history API: {e}")
-        import traceback
-        print(f"DEBUG: Traceback: {traceback.format_exc()}")
         return jsonify({'error': str(e)}), 500

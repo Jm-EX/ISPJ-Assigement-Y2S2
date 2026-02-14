@@ -861,7 +861,10 @@ function sendAdminMessage() {
 // Socket.IO Connection
 // =========================
 
-// Socket.IO event handlers (socket already declared in base.html)
+// Connect to Socket.IO
+const socket = io();
+
+// Socket.IO event handlers
 socket.on('connect', () => {
   console.log('Admin connected to Socket.IO');
   

@@ -284,31 +284,42 @@ def get_chat_history(session_id=None, user_id=None, room=None, limit=50):
     db = get_db()
     cursor = db.cursor()
     
+    # Simple query without complex JOIN
     query = """
-        SELECT cm.*, u.username as user_username, u.email as user_email
-        FROM chat_messages cm
-        LEFT JOIN users u ON cm.user_id = u.id
+        SELECT id, session_id, user_id, username, user_email, message, sender_type, room, timestamp, admin_read
+        FROM chat_messages 
         WHERE 1=1
     """
     params = []
     
     if session_id:
-        query += " AND cm.session_id = %s"
+        query += " AND session_id = %s"
         params.append(session_id)
     
     if user_id:
-        query += " AND cm.user_id = %s"
+        query += " AND user_id = %s"
         params.append(user_id)
     
     if room:
-        query += " AND cm.room = %s"
+        query += " AND room = %s"
         params.append(room)
     
-    query += " ORDER BY cm.timestamp ASC LIMIT %s"
+    query += " ORDER BY timestamp ASC LIMIT %s"
     params.append(limit)
     
-    cursor.execute(query, params)
-    return cursor.fetchall()
+    print(f"DEBUG: get_chat_history query: {query}")
+    print(f"DEBUG: get_chat_history params: {params}")
+    
+    try:
+        cursor.execute(query, params)
+        result = cursor.fetchall()
+        print(f"DEBUG: get_chat_history result count: {len(result)}")
+        return result
+    except Exception as e:
+        print(f"DEBUG: get_chat_history error: {e}")
+        import traceback
+        print(f"DEBUG: get_chat_history traceback: {traceback.format_exc()}")
+        return []
 
 
 def get_active_conversations(hours=24):
