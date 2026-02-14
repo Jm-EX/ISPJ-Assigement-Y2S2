@@ -243,7 +243,7 @@ def send_chat_route():
     try:
         # Save to database
         save_chat_message(
-            session_id=request.sid,
+            session_id=request.sid if hasattr(request, 'sid') else 'admin',
             user_id=session.get("user_id"),
             username=session.get("username", "Admin"),
             message=message,
@@ -251,14 +251,8 @@ def send_chat_route():
             room=room
         )
         
-        # Emit via Socket.IO (will be handled in routes.py)
-        from app.routes import socketio
-        socketio.emit('receive_message', {
-            'msg': message,
-            'sender': session.get("username", "Admin Support"),
-            'timestamp': datetime.now().strftime('%H:%M'),
-            'sender_type': 'admin'
-        }, room=room)
+        # Note: Socket.IO emission will be handled by the client-side JavaScript
+        # that calls this endpoint and then refreshes the chat messages
         
         return jsonify({"success": True})
     except Exception as e:
