@@ -40,24 +40,26 @@ def portal():
     users = get_all_users()
     security_logs = get_security_logs(limit=50)
     
-    # Get chat statistics - TEMPORARILY DISABLED
-    # chat_stats = get_active_conversations(hours=24)  # Get last 24 hours
-    # total_messages = 0
-    # unread_messages = 0
-    
-    # for conv in chat_stats:
-    #     total_messages += 1  # Placeholder - each conversation represents at least one message
-    #     unread_messages += conv.get('unread_count', 0)
-    
-    # chat_stats_data = {
-    #     'total_messages': total_messages,
-    #     'unread_messages': unread_messages
-    # }
-    
-    chat_stats_data = {
-        'total_messages': 0,
-        'unread_messages': 0
-    }
+    # Get chat statistics
+    try:
+        chat_stats = get_active_conversations(hours=24)  # Get last 24 hours
+        total_messages = 0
+        unread_messages = 0
+        
+        for conv in chat_stats:
+            total_messages += 1  # Each conversation represents at least one message
+            unread_messages += conv.get('unread_count', 0)
+        
+        chat_stats_data = {
+            'total_messages': total_messages,
+            'unread_messages': unread_messages
+        }
+    except Exception as e:
+        print(f"Error getting chat stats: {e}")
+        chat_stats_data = {
+            'total_messages': 0,
+            'unread_messages': 0
+        }
     
     # Get active sessions - master admin always has access, sub-admins need permission
     active_sessions = []

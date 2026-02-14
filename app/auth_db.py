@@ -313,19 +313,19 @@ def get_active_conversations(hours=24):
     db = get_db()
     cursor = db.cursor()
     
-    # Simplified query to avoid potential SQL issues
+    # Use simpler SQL syntax to avoid compatibility issues
     cursor.execute("""
         SELECT 
-            cm.session_id,
-            cm.user_id,
-            cm.username,
-            cm.user_email,
-            cm.room,
-            MAX(cm.timestamp) as last_message_time,
-            COUNT(*) FILTER (WHERE cm.admin_read = FALSE AND cm.sender_type != 'admin') as unread_count
-        FROM chat_messages cm
-        WHERE cm.timestamp >= NOW() - INTERVAL %s hours
-        GROUP BY cm.session_id, cm.user_id, cm.username, cm.user_email, cm.room
+            session_id,
+            user_id,
+            username,
+            user_email,
+            room,
+            MAX(timestamp) as last_message_time,
+            SUM(CASE WHEN admin_read = FALSE AND sender_type != 'admin' THEN 1 ELSE 0 END) as unread_count
+        FROM chat_messages
+        WHERE timestamp >= NOW() - INTERVAL %s hours
+        GROUP BY session_id, user_id, username, user_email, room
         ORDER BY last_message_time DESC
     """, (hours,))
     
