@@ -547,28 +547,13 @@ def on_message(data):
             }
             emit('receive_message', error_message, room=room)
     elif sender == 'customer' and user_modes.get(session_id) == 'human':
-        # In human mode, forward message to admin and save to database
+        # In human mode, forward message directly to admin (no database save)
         print(f"DEBUG: User is in Human mode - forwarding to admin")
         
-        # Get user info for database storage
+        # Get user info for admin display
         user_id = session.get('user_id') if 'user_id' in session else None
         username = session.get('username', 'Guest') if 'username' in session else 'Guest'
         user_email = session.get('email') if 'email' in session else None
-        
-        # Save message to database
-        try:
-            save_chat_message(
-                session_id=session_id,
-                user_id=user_id,
-                username=username,
-                user_email=user_email,
-                message=message,
-                sender_type='user',
-                room='customer_service'
-            )
-            print(f"DEBUG: Message saved to database")
-        except Exception as e:
-            print(f"DEBUG: Error saving message: {e}")
         
         # Create unique room identifier for this user
         if user_email:
@@ -576,7 +561,7 @@ def on_message(data):
         else:
             user_room_id = f"guest_{session_id}"
         
-        # Forward message to admin room
+        # Forward message to admin room (no database save)
         admin_message_data = {
             'msg': message,
             'sender': username,
@@ -629,17 +614,23 @@ def on_admin_send_message(data):
     
     print(f"DEBUG: Admin sending message to {user_room}: {message}")
     
-    # Save admin message to database
+    # Log the original customer message to database first (for context)
     try:
+        # Get the original customer message data that triggered this admin response
+        # This would ideally come from the new_customer_message event data
+        # For now, we'll save the admin message with user context
+        
         # Extract user info from room identifier
         if user_email:
+            target_session_id = user_email
+            target_username = user_email.split('@')[0]  # Extract username from email
             target_user_email = user_email
-            target_session_id = user_email  # For logged-in users
         else:
-            # Extract session_id from guest room
             target_session_id = user_room.replace('guest_', '')
+            target_username = 'Guest'
             target_user_email = None
         
+        # Save admin message to database
         save_chat_message(
             session_id=target_session_id,
             user_id=None,  # Admin messages don't have user_id
