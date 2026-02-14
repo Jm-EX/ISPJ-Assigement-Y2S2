@@ -9,6 +9,7 @@ import stripe
 import requests
 from flask_socketio import SocketIO, emit, join_room, leave_room
 import google.generativeai as genai
+from app.auth_db import save_chat_message, get_chat_history, mark_messages_as_read
 
 # =========================
 # Setup
@@ -407,8 +408,45 @@ def on_join(data):
     print(f"DEBUG: Session ID: {session_id}")
     user_modes[session_id] = 'ai'  # Default to AI mode
     print(f"DEBUG: User mode set to: {user_modes[session_id]}")
-    join_room(room)
-    print(f"DEBUG: User joined room: {room}")
+    
+    # Create user-specific room for private messaging
+    user_email = session.get('email') if 'email' in session else None
+    if user_email:
+        user_room_id = f"user_{user_email}"
+    else:
+        user_room_id = f"guest_{session_id}"
+    
+    # Join both rooms
+    join_room(room)  # Main room (customer_service)
+    join_room(user_room_id)  # User-specific room for admin replies
+    
+    print(f"DEBUG: User joined main room: {room}")
+    print(f"DEBUG: User joined private room: {user_room_id}")
+    
+    # Load and send chat history
+    try:
+        chat_history = get_chat_history(
+            session_id=user_email if user_email else session_id,
+            room='customer_service',
+            limit=50
+        )
+        
+        print(f"DEBUG: Loaded {len(chat_history)} chat history messages")
+        
+        # Send chat history to user
+        for msg in chat_history:
+            history_data = {
+                'msg': msg['message'],
+                'sender': msg['username'] if msg['sender_type'] == 'user' else 'Admin',
+                'timestamp': msg['timestamp'].strftime('%H:%M') if msg['timestamp'] else datetime.now().strftime('%H:%M'),
+                'sender_type': msg['sender_type']
+            }
+            emit('receive_message', history_data, room=user_room_id)
+            
+        print(f"DEBUG: Chat history sent to user")
+    except Exception as e:
+        print(f"DEBUG: Error loading chat history: {e}")
+    
     emit('status', {'msg': 'Connected to customer support'}, room=room)
     print(f"DEBUG: Status emitted to room")
     print("="*80 + "\n")
@@ -509,12 +547,162 @@ def on_message(data):
             }
             emit('receive_message', error_message, room=room)
     elif sender == 'customer' and user_modes.get(session_id) == 'human':
-        # In human mode, don't generate AI responses
-        print(f"DEBUG: User is in Human mode - no AI response generated")
+        # In human mode, forward message to admin and save to database
+        print(f"DEBUG: User is in Human mode - forwarding to admin")
+        
+        # Get user info for database storage
+        user_id = session.get('user_id') if 'user_id' in session else None
+        username = session.get('username', 'Guest') if 'username' in session else 'Guest'
+        user_email = session.get('email') if 'email' in session else None
+        
+        # Save message to database
+        try:
+            save_chat_message(
+                session_id=session_id,
+                user_id=user_id,
+                username=username,
+                user_email=user_email,
+                message=message,
+                sender_type='user',
+                room='customer_service'
+            )
+            print(f"DEBUG: Message saved to database")
+        except Exception as e:
+            print(f"DEBUG: Error saving message: {e}")
+        
+        # Create unique room identifier for this user
+        if user_email:
+            user_room_id = f"user_{user_email}"
+        else:
+            user_room_id = f"guest_{session_id}"
+        
+        # Forward message to admin room
+        admin_message_data = {
+            'msg': message,
+            'sender': username,
+            'timestamp': datetime.now().strftime('%H:%M'),
+            'sender_type': 'customer',
+            'user_room': user_room_id,
+            'user_email': user_email,
+            'session_id': session_id
+        }
+        
+        print(f"DEBUG: Forwarding message to admin room: customer_service")
+        emit('new_customer_message', admin_message_data, room='customer_service')
+        
+        # Also send confirmation back to user
+        user_confirmation = {
+            'msg': message,
+            'sender': 'You',
+            'timestamp': datetime.now().strftime('%H:%M'),
+            'sender_type': 'user'
+        }
+        emit('receive_message', user_confirmation, room=user_room_id)
+        
         print("="*80 + "\n")
-        logging.info(f"User {session_id} is in Human mode - no AI response generated")
+        logging.info(f"User {session_id} message forwarded to admin")
     else:
         # Handle admin/staff messages (forward to room)
         print(f"DEBUG: Message from non-customer sender or no mode set - no AI response")
         print("="*80 + "\n")
         pass
+
+
+# =========================
+# Admin Chat Events
+# =========================
+
+@socketio.on('admin_join')
+def on_admin_join():
+    """Admin joins the customer service room"""
+    session_id = request.sid
+    print(f"DEBUG: Admin {session_id} joining customer_service room")
+    join_room('customer_service')
+    
+    # Send confirmation to admin
+    emit('admin_joined', {'status': 'success', 'message': 'Connected to customer service'})
+    print(f"DEBUG: Admin joined customer_service room")
+
+
+@socketio.on('admin_send_message')
+def on_admin_send_message(data):
+    """Admin sends message to specific user"""
+    session_id = request.sid
+    message = data.get('message', '')
+    user_room = data.get('user_room', '')
+    user_email = data.get('user_email', '')
+    
+    if not message or not user_room:
+        print(f"DEBUG: Invalid admin message data: {data}")
+        return
+    
+    print(f"DEBUG: Admin sending message to {user_room}: {message}")
+    
+    # Save admin message to database
+    try:
+        # Extract user info from room identifier
+        if user_email:
+            target_user_email = user_email
+            target_session_id = user_email  # For logged-in users
+        else:
+            # Extract session_id from guest room
+            target_session_id = user_room.replace('guest_', '')
+            target_user_email = None
+        
+        save_chat_message(
+            session_id=target_session_id,
+            user_id=None,  # Admin messages don't have user_id
+            username='Admin',
+            user_email=None,
+            message=message,
+            sender_type='admin',
+            room='customer_service'
+        )
+        print(f"DEBUG: Admin message saved to database")
+    except Exception as e:
+        print(f"DEBUG: Error saving admin message: {e}")
+    
+    # Create admin message data
+    admin_message_data = {
+        'msg': message,
+        'sender': 'Admin',
+        'timestamp': datetime.now().strftime('%H:%M'),
+        'sender_type': 'admin'
+    }
+    
+    # Send message to specific user room
+    emit('receive_message', admin_message_data, room=user_room)
+    
+    # Also send confirmation back to admin
+    emit('admin_message_sent', {
+        'status': 'success', 
+        'message': 'Message sent',
+        'user_room': user_room
+    })
+    
+    print(f"DEBUG: Admin message sent to {user_room}")
+    print("="*80 + "\n")
+
+
+@socketio.on('admin_mark_read')
+def on_admin_mark_read(data):
+    """Admin marks messages as read for a user"""
+    user_room = data.get('user_room', '')
+    user_email = data.get('user_email', '')
+    
+    print(f"DEBUG: Admin marking messages as read for {user_room}")
+    
+    try:
+        # Extract session_id for marking as read
+        if user_email:
+            target_session_id = user_email
+        else:
+            target_session_id = user_room.replace('guest_', '')
+        
+        mark_messages_as_read(session_id=target_session_id, room='customer_service')
+        print(f"DEBUG: Messages marked as read for {target_session_id}")
+        
+        emit('messages_marked_read', {'status': 'success', 'user_room': user_room})
+    except Exception as e:
+        print(f"DEBUG: Error marking messages as read: {e}")
+        emit('messages_marked_read', {'status': 'error', 'message': str(e)})
