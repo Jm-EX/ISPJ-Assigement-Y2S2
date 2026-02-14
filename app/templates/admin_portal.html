@@ -216,10 +216,14 @@ adminSocket.on('new_customer_message', function(data) {
     console.log('ADMIN DEBUG: New customer message received:', data);
     
     // Refresh active users to show new message
-    loadActiveChatUsers();
+    console.log('ADMIN DEBUG: Refreshing active users...');
+    loadActiveChatUsers().then(() => {
+        console.log('ADMIN DEBUG: Active users refreshed');
+    });
     
     // If we have this user's chat expanded, refresh it
     if (currentChatUser && currentChatUser.sessionId === data.user_room.replace('user_', '')) {
+        console.log('ADMIN DEBUG: Refreshing current chat messages...');
         loadUserChatMessages(currentChatUser.sessionId, currentChatUser.room);
     }
 });
@@ -228,7 +232,7 @@ adminSocket.on('new_customer_message', function(data) {
 adminSocket.on('connect', function() {
     console.log('ADMIN DEBUG: Admin Socket.IO connected');
     // Join admin room to receive customer messages in human mode
-    adminSocket.emit('join_chat', {room: 'customer_service'});
+    adminSocket.emit('admin_join', {room: 'customer_service'});
 });
 
 adminSocket.on('disconnect', function() {
@@ -751,10 +755,13 @@ function toggleDropdown(dropdownId) {
 }
 
 function loadActiveChatUsers() {
-  fetch('/admin/active-chat-users')
+  console.log('ADMIN DEBUG: Loading active chat users...');
+  return fetch('/admin/active-chat-users')
     .then(response => response.json())
     .then(data => {
+      console.log('ADMIN DEBUG: Active chat users response:', data);
       if (data.success) {
+        console.log('ADMIN DEBUG: Users received:', data.users);
         displayActiveChatUsers(data.users);
       } else {
         console.error('Error loading active chat users:', data.error);
@@ -766,9 +773,14 @@ function loadActiveChatUsers() {
 }
 
 function displayActiveChatUsers(users) {
+  console.log('ADMIN DEBUG: Displaying active chat users:', users);
+  
   // Separate users into unread and read
   const unreadUsers = users.filter(user => user.unread_count > 0);
   const readUsers = users.filter(user => user.unread_count === 0);
+  
+  console.log('ADMIN DEBUG: Unread users:', unreadUsers);
+  console.log('ADMIN DEBUG: Read users:', readUsers);
   
   // Update counts
   document.getElementById('unreadCount').textContent = unreadUsers.length;

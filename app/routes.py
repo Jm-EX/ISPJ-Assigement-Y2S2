@@ -447,6 +447,23 @@ def on_join(data):
     print("="*80 + "\n")
     logging.info(f"User {session_id} joined chat in AI mode with history")
 
+
+@socketio.on('admin_join')
+def on_admin_join(data):
+    """Handle admin dashboard connections"""
+    print("\n" + "="*80)
+    print("ADMIN DEBUG: admin_join event received")
+    print(f"ADMIN DEBUG: Data received: {data}")
+    room = data.get('room', 'customer_service')
+    session_id = request.sid
+    print(f"ADMIN DEBUG: Admin joining room: {room}")
+    
+    # Admin joins customer service room to receive customer messages
+    join_room(room)
+    print(f"ADMIN DEBUG: Admin joined customer service room: {room}")
+    print("="*80 + "\n")
+    logging.info(f"Admin {session_id} joined customer service room")
+
 @socketio.on('switch_to_human_mode')
 def on_switch_to_human():
     print("\n" + "="*80)
