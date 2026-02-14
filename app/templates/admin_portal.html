@@ -372,7 +372,9 @@
           <td>
             <button 
               class="btn-delete" 
-              onclick="deleteUser({{ user.id }}, '{{ user.username }}')"
+              data-user-id="{{ user.id }}"
+              data-username="{{ user.username }}"
+              onclick="deleteUser(this.dataset.userId, this.dataset.username)"
               {% if user.id == session.get('user_id') or user.username == 'Admin1!' %}disabled{% endif %}>
               {% if user.id == session.get('user_id') %}You{% elif user.username == 'Admin1!' %}Master{% else %}Delete{% endif %}
             </button>
@@ -454,7 +456,9 @@
           <td>
             <button 
               class="btn-delete" 
-              onclick="logoutSession({{ sess.id }}, '{{ sess.username }}')"
+              data-session-id="{{ sess.id }}"
+              data-username="{{ sess.username }}"
+              onclick="logoutSession(this.dataset.sessionId, this.dataset.username)"
               style="font-size: 12px; padding: 6px 12px;">
               Logout
             </button>
@@ -687,7 +691,7 @@ function displayChatMessages(messages) {
   
   let html = '';
   messages.forEach(msg => {
-    const isUnread = !msg.admin_read;
+    const isUnread = msg.admin_read === 0;
     const senderClass = msg.sender_type === 'admin' ? 'admin' : 
                          msg.sender_type === 'ai' ? 'ai' : 'customer';
     const senderName = msg.sender_type === 'admin' ? '{{ session.get("username", "Admin") }}' : 

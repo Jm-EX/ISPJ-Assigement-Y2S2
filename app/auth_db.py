@@ -206,6 +206,22 @@ def init_db(app):
             )
             """
         )
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS chat_messages (
+                id SERIAL PRIMARY KEY,
+                session_id TEXT NOT NULL,
+                user_id INT,
+                username VARCHAR(255) NOT NULL,
+                message TEXT NOT NULL,
+                sender_type VARCHAR(50) NOT NULL,
+                room VARCHAR(100) NOT NULL,
+                timestamp TIMESTAMP NOT NULL,
+                admin_read SMALLINT NOT NULL DEFAULT 0,
+                FOREIGN KEY (user_id) REFERENCES users (id)
+            )
+            """
+        )
         
         # Migration: Add totp_secret column if it doesn't exist
         try:
@@ -929,11 +945,10 @@ def save_chat_message(session_id, user_id, username, message, sender_type, room)
     cursor = db.cursor()
     cursor.execute(
         """INSERT INTO chat_messages 
-           (session_id, user_id, username, message, sender_type, room) 
-           VALUES (%s, %s, %s, %s, %s, %s)""",
+           (session_id, user_id, username, message, sender_type, room, timestamp) 
+           VALUES (%s, %s, %s, %s, %s, %s, NOW())""",
         (session_id, user_id, username, message, sender_type, room)
     )
-    db.commit()
 
 
 def get_chat_messages(room=None, limit=50, unread_only=False):
@@ -954,9 +969,9 @@ def get_chat_messages(room=None, limit=50, unread_only=False):
     
     if unread_only:
         if room:
-            query += " AND cm.admin_read = FALSE"
+            query += " AND cm.admin_read = 0"
         else:
-            query += " WHERE cm.admin_read = FALSE"
+            query += " WHERE cm.admin_read = 0"
     
     query += " ORDER BY cm.timestamp DESC LIMIT %s"
     params.append(limit)
@@ -972,13 +987,11 @@ def mark_chat_messages_as_read(room=None):
     
     if room:
         cursor.execute(
-            "UPDATE chat_messages SET admin_read = TRUE WHERE room = %s AND admin_read = FALSE",
+            "UPDATE chat_messages SET admin_read = 1 WHERE room = %s AND admin_read = 0",
             (room,)
         )
     else:
-        cursor.execute("UPDATE chat_messages SET admin_read = TRUE WHERE admin_read = FALSE")
-    
-    db.commit()
+        cursor.execute("UPDATE chat_messages SET admin_read = 1 WHERE admin_read = 0")
 
 
 def get_chat_stats():
@@ -991,7 +1004,7 @@ def get_chat_stats():
     total_messages = cursor.fetchone()['total']
     
     # Unread messages
-    cursor.execute("SELECT COUNT(*) as unread FROM chat_messages WHERE admin_read = FALSE")
+    cursor.execute("SELECT COUNT(*) as unread FROM chat_messages WHERE admin_read = 0")
     unread_messages = cursor.fetchone()['unread']
     
     # Active rooms (rooms with messages in last 24 hours)
