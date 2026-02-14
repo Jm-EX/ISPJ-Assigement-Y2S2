@@ -696,23 +696,33 @@ def on_admin_mark_read(data):
 @main.post('/api/chat-history')
 def api_chat_history():
     """API endpoint to get chat history for admin dashboard"""
+    print(f"DEBUG: Chat history API called")
+    
     if not session.get("user_id") or not session.get("is_admin"):
+        print(f"DEBUG: Unauthorized - user_id: {session.get('user_id')}, is_admin: {session.get('is_admin')}")
         return jsonify({'error': 'Unauthorized'}), 401
     
     try:
         data = request.get_json()
+        print(f"DEBUG: Request data: {data}")
+        
         session_id = data.get('session_id')
         room = data.get('room')
         
+        print(f"DEBUG: session_id: {session_id}, room: {room}")
+        
         if not session_id or not room:
+            print(f"DEBUG: Missing parameters")
             return jsonify({'error': 'Missing session_id or room'}), 400
         
         # Get chat history from database
+        print(f"DEBUG: Calling get_chat_history...")
         chat_history = get_chat_history(
             session_id=session_id,
             room=room,
             limit=50
         )
+        print(f"DEBUG: Got {len(chat_history)} messages from database")
         
         # Convert to JSON-serializable format
         messages = []
@@ -729,6 +739,7 @@ def api_chat_history():
                 'admin_read': msg['admin_read']
             })
         
+        print(f"DEBUG: Returning {len(messages)} messages")
         return jsonify({
             'status': 'success',
             'messages': messages
@@ -736,4 +747,6 @@ def api_chat_history():
         
     except Exception as e:
         print(f"DEBUG: Error in chat history API: {e}")
+        import traceback
+        print(f"DEBUG: Traceback: {traceback.format_exc()}")
         return jsonify({'error': str(e)}), 500
