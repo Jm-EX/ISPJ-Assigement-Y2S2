@@ -269,10 +269,13 @@ def save_chat_message(session_id, user_id, username, user_email, message, sender
             VALUES (%s, %s, %s, %s, %s, %s, %s)
         """, (session_id, user_id, username, user_email, message, sender_type, room))
         
+        db.commit()  # Commit the transaction to save the message
+        
         print(f"Chat message saved: {username} ({sender_type}) in {room}")
         return True
     except Exception as e:
         print(f"Error saving chat message: {e}")
+        db.rollback()  # Rollback on error
         return False
 
 
