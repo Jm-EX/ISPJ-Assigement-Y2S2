@@ -493,15 +493,26 @@ def on_message(data):
     # Save to database
     try:
         user_id = session.get('user_id') if 'user_id' in session else None
+        # Get actual username if user is logged in
+        if user_id:
+            from app.auth_db import get_user_by_id
+            user_data = get_user_by_id(user_id)
+            username = user_data['username'] if user_data else sender
+            user_email = user_data['email'] if user_data else None
+        else:
+            username = sender
+            user_email = None
+            
         save_chat_message(
             session_id=session_id,
             user_id=user_id,
-            username=sender,
+            username=username,
             message=message,
             sender_type='customer' if sender == 'customer' else 'admin',
-            room=room
+            room=room,
+            user_email=user_email
         )
-        print(f"DEBUG: Message saved to database")
+        print(f"DEBUG: Message saved to database for user: {username} (ID: {user_id})")
     except Exception as e:
         print(f"DEBUG: Error saving message: {e}")
         logging.error(f"Error saving chat message: {e}")
@@ -548,20 +559,9 @@ def on_message(data):
             import time
             time.sleep(1)
             
-            # Send AI response to user room
+            # Send AI response to user room only
             emit('receive_message', ai_message_data, room=user_room)
             print(f"DEBUG: AI response sent to user room: {user_room}")
-            
-            # Also send AI response to admin room for visibility
-            ai_admin_data = {
-                'msg': ai_response,
-                'sender': 'AI Support',
-                'timestamp': datetime.now().strftime('%H:%M'),
-                'sender_type': 'ai',
-                'user_room': user_room  # Include user room for admin context
-            }
-            emit('new_customer_message', ai_admin_data, room=room)
-            print(f"DEBUG: AI response also sent to admin room: {room}")
             
             # Log AI response
             logging.info(f"AI response: {ai_response}")
@@ -589,23 +589,10 @@ def on_message(data):
         print(f"DEBUG: Customer message sent to admin room: {room}")
         logging.info(f"User {session_id} is in Human mode - message sent to admin")
     else:
-        # Handle admin/staff messages
-        if sender != 'customer':
-            # Admin message - send to specific user's room
-            target_user_room = data.get('target_room')
-            if target_user_room:
-                admin_message_data = {
-                    'msg': message,
-                    'sender': sender,
-                    'timestamp': datetime.now().strftime('%H:%M'),
-                    'sender_type': 'admin'
-                }
-                emit('receive_message', admin_message_data, room=target_user_room)
-                print(f"DEBUG: Admin message sent to target room: {target_user_room}")
-            else:
-                print(f"DEBUG: Admin message missing target_room, not sent")
-        # Note: AI messages are already handled above in the AI response section
-        # Customer messages in AI/Human mode are also handled above
+        # This section should not be reached for admin messages
+        # Admin messages are handled via HTTP route /admin/send-chat
+        print(f"DEBUG: Unexpected message path for sender: {sender}")
+        pass
     
     print("="*80 + "\n")
 

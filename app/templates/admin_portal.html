@@ -204,38 +204,6 @@
 {% endblock %}
 
 {% block content %}
-<!-- Add Socket.IO script for admin dashboard -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
-<script>
-// Initialize Socket.IO for admin dashboard
-const adminSocket = io();
-console.log('ADMIN DEBUG: Socket.IO initialized for admin dashboard');
-
-// Listen for new customer messages
-adminSocket.on('new_customer_message', function(data) {
-    console.log('ADMIN DEBUG: New customer message received:', data);
-    
-    // Refresh active users to show new message
-    loadActiveChatUsers();
-    
-    // If we have this user's chat expanded, refresh it
-    if (currentChatUser && currentChatUser.sessionId === data.user_room.replace('user_', '')) {
-        loadUserChatMessages(currentChatUser.sessionId, currentChatUser.room);
-    }
-});
-
-// Handle connection
-adminSocket.on('connect', function() {
-    console.log('ADMIN DEBUG: Admin Socket.IO connected');
-    // Join admin room to receive customer messages in human mode
-    adminSocket.emit('join_chat', {room: 'customer_service'});
-});
-
-adminSocket.on('disconnect', function() {
-    console.log('ADMIN DEBUG: Admin Socket.IO disconnected');
-});
-</script>
-
 <div class="admin-dashboard">
   <div class="dashboard-header">
     <h1>Admin Dashboard</h1>
@@ -559,10 +527,29 @@ adminSocket.on('disconnect', function() {
       </div>
     </div>
     
-    <!-- Active Chat Users -->
-    <div id="activeChatUsers" style="max-height: 400px; overflow-y: auto; border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; margin-bottom: 16px; background: #fafafa;">
-      <div class="empty-state">
-        <p>Loading active chat users...</p>
+    <!-- Unread Chats Dropdown -->
+    <div style="margin-bottom: 16px;">
+      <button onclick="toggleDropdown('unreadChats')" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #ff5252 0%, #ff1744 100%); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+        <span>🔴 Unread Chats (<span id="unreadCount">0</span>)</span>
+        <span id="unreadDropdownIcon">▼</span>
+      </button>
+      <div id="unreadChats" style="display: none; max-height: 300px; overflow-y: auto; border: 1px solid #e0e0e0; border-radius: 8px; margin-top: 8px; background: #fafafa;">
+        <div class="empty-state">
+          <p>Loading unread chats...</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Read Chats Dropdown -->
+    <div style="margin-bottom: 16px;">
+      <button onclick="toggleDropdown('readChats')" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+        <span>✅ Read Chats (<span id="readCount">0</span>)</span>
+        <span id="readDropdownIcon">▼</span>
+      </button>
+      <div id="readChats" style="display: none; max-height: 300px; overflow-y: auto; border: 1px solid #e0e0e0; border-radius: 8px; margin-top: 8px; background: #fafafa;">
+        <div class="empty-state">
+          <p>Loading read chats...</p>
+        </div>
       </div>
     </div>
     
@@ -716,6 +703,21 @@ document.addEventListener('DOMContentLoaded', function() {
   loadActiveChatUsers();
 });
 
+// Toggle dropdown visibility
+function toggleDropdown(dropdownId) {
+  const dropdown = document.getElementById(dropdownId);
+  const iconId = dropdownId === 'unreadChats' ? 'unreadDropdownIcon' : 'readDropdownIcon';
+  const icon = document.getElementById(iconId);
+  
+  if (dropdown.style.display === 'none' || dropdown.style.display === '') {
+    dropdown.style.display = 'block';
+    icon.textContent = '▲';
+  } else {
+    dropdown.style.display = 'none';
+    icon.textContent = '▼';
+  }
+}
+
 function loadActiveChatUsers() {
   fetch('/admin/active-chat-users')
     .then(response => response.json())
@@ -732,16 +734,32 @@ function loadActiveChatUsers() {
 }
 
 function displayActiveChatUsers(users) {
-  const container = document.getElementById('activeChatUsers');
+  // Separate users into unread and read
+  const unreadUsers = users.filter(user => user.unread_count > 0);
+  const readUsers = users.filter(user => user.unread_count === 0);
+  
+  // Update counts
+  document.getElementById('unreadCount').textContent = unreadUsers.length;
+  document.getElementById('readCount').textContent = readUsers.length;
+  
+  // Display unread chats
+  displayUserList('unreadChats', unreadUsers, true);
+  
+  // Display read chats
+  displayUserList('readChats', readUsers, false);
+}
+
+function displayUserList(containerId, users, isUnread) {
+  const container = document.getElementById(containerId);
   
   if (users.length === 0) {
-    container.innerHTML = '<div class="empty-state"><p>No active chat users in the last 24 hours</p></div>';
+    container.innerHTML = `<div class="empty-state"><p>No ${isUnread ? 'unread' : 'read'} chats available</p></div>`;
     return;
   }
   
   let html = '';
   users.forEach(user => {
-    const unreadBadge = user.unread_count > 0 ? 
+    const unreadBadge = isUnread ? 
       `<span style="background: #ff5252; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px; margin-left: 8px;">${user.unread_count} new</span>` : '';
     
     const lastMessageTime = new Date(user.last_message_time).toLocaleString();
@@ -858,7 +876,7 @@ function sendExpandedChatMessage() {
     return;
   }
   
-  // Send via HTTP to save to database first
+  // Send via HTTP to save to database and emit via Socket.IO
   const data = {
     message: message,
     room: currentChatUser.room,
@@ -877,23 +895,7 @@ function sendExpandedChatMessage() {
     if (data.success) {
       input.value = '';
       
-      // Also emit via Socket.IO for real-time delivery
-      const messageData = {
-        'msg': message,
-        'sender': '{{ session.get("username", "Admin") }}',
-        'timestamp': new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-        'sender_type': 'admin'
-      };
-      
-      // Send to specific user room via Socket.IO
-      adminSocket.emit('send_message', {
-        msg: message,
-        sender: '{{ session.get("username", "Admin") }}',
-        room: currentChatUser.room,
-        target_room: `user_${currentChatUser.sessionId}`
-      });
-      
-      console.log('ADMIN DEBUG: Message sent via Socket.IO to room:', `user_${currentChatUser.sessionId}`);
+      console.log('ADMIN DEBUG: Message saved to database, will be sent via Socket.IO');
       
       // Reload messages to show the new admin message
       loadUserChatMessages(currentChatUser.sessionId, currentChatUser.room);
@@ -918,7 +920,7 @@ function markUserMessagesAsRead(room) {
   .then(response => response.json())
   .then(data => {
     if (data.success) {
-      // Refresh active users to update unread counts
+      // Refresh active users to update unread counts and move user to read section
       loadActiveChatUsers();
     }
   })

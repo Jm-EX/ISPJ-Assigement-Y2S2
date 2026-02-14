@@ -939,15 +939,15 @@ def delete_session(session_id: int):
 # Chat Functions
 # =========================
 
-def save_chat_message(session_id, user_id, username, message, sender_type, room):
+def save_chat_message(session_id, user_id, username, message, sender_type, room, user_email=None):
     """Save a chat message to the database"""
     db = get_db()
     cursor = db.cursor()
     cursor.execute(
         """INSERT INTO chat_messages 
-           (session_id, user_id, username, message, sender_type, room, timestamp) 
-           VALUES (%s, %s, %s, %s, %s, %s, NOW())""",
-        (session_id, user_id, username, message, sender_type, room)
+           (session_id, user_id, username, message, sender_type, room, timestamp, user_email) 
+           VALUES (%s, %s, %s, %s, %s, %s, NOW(), %s)""",
+        (session_id, user_id, username, message, sender_type, room, user_email)
     )
 
 
@@ -1054,8 +1054,8 @@ def get_user_chat_history(user_id=None, session_id=None, room=None, limit=50):
     params = []
     
     if user_id:
-        query += " AND cm.user_id = %s"
-        params.append(user_id)
+        query += " AND (cm.user_id = %s OR (cm.user_id = 0 AND cm.username = (SELECT username FROM users WHERE id = %s)))"
+        params.extend([user_id, user_id])
     elif session_id:
         query += " AND cm.session_id = %s"
         params.append(session_id)
@@ -1072,36 +1072,47 @@ def get_user_chat_history(user_id=None, session_id=None, room=None, limit=50):
 
 
 def get_active_chat_users():
-    """Get unique users who have sent messages in the last 24 hours, grouped by session_id"""
+    """Get unique users who have sent messages in the last 24 hours, grouped by user_id or session_id"""
     db = get_db()
     cursor = db.cursor()
     
-    # Get the latest message for each session_id and join with user info
+    # Get the latest message for each user, prioritizing logged-in users
     cursor.execute("""
         WITH latest_messages AS (
-            SELECT DISTINCT ON (session_id) 
+            SELECT DISTINCT ON (
+                CASE WHEN user_id > 0 THEN user_id ELSE session_id END
+            ) 
                 session_id,
                 user_id,
                 username,
+                user_email,
                 room,
-                timestamp as last_message_time
+                timestamp as last_message_time,
+                ROW_NUMBER() OVER (
+                    PARTITION BY CASE WHEN user_id > 0 THEN user_id ELSE session_id END
+                    ORDER BY timestamp DESC
+                ) as rn
             FROM chat_messages 
             WHERE timestamp >= NOW() - INTERVAL '24 hours'
-            ORDER BY session_id, timestamp DESC
+            ORDER BY 
+                CASE WHEN user_id > 0 THEN user_id ELSE session_id END,
+                timestamp DESC
         )
         SELECT 
             COALESCE(lm.user_id, 0) as user_id,
             COALESCE(u.username, lm.username) as display_name,
-            COALESCE(u.email, 'Anonymous') as email,
+            COALESCE(u.email, lm.user_email, 'Anonymous') as email,
             lm.session_id,
             lm.last_message_time,
             COUNT(CASE WHEN cm.admin_read = 0 AND cm.sender_type != 'admin' THEN 1 END) as unread_count,
             lm.room
         FROM latest_messages lm
-        LEFT JOIN chat_messages cm ON lm.session_id = cm.session_id
+        LEFT JOIN chat_messages cm ON 
+            (lm.user_id > 0 AND cm.user_id = lm.user_id) OR 
+            (lm.user_id = 0 AND cm.session_id = lm.session_id)
         LEFT JOIN users u ON lm.user_id = u.id
-        WHERE cm.timestamp >= NOW() - INTERVAL '24 hours'
-        GROUP BY lm.session_id, lm.user_id, lm.username, lm.room, lm.last_message_time, u.username, u.email
+        WHERE lm.rn = 1 AND cm.timestamp >= NOW() - INTERVAL '24 hours'
+        GROUP BY lm.session_id, lm.user_id, lm.username, lm.user_email, lm.room, lm.last_message_time, u.username, u.email
         ORDER BY lm.last_message_time DESC
     """)
     

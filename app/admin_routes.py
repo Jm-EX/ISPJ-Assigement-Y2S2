@@ -267,10 +267,26 @@ def send_chat_route():
             username=session.get("username", "Admin"),
             message=message,
             sender_type="admin",
-            room=room
+            room=room,
+            user_email=session.get("email")  # Add admin email
         )
         
-        # Return success - the frontend will handle Socket.IO emission via the existing connection
+        # Emit via Socket.IO to specific user room only
+        from app.routes import socketio
+        message_data = {
+            'msg': message,
+            'sender': session.get("username", "Admin Support"),
+            'timestamp': datetime.now().strftime('%H:%M'),
+            'sender_type': 'admin'
+        }
+        
+        # Ensure we only emit to the user's private room
+        if target_room and target_room.startswith('user_'):
+            socketio.emit('receive_message', message_data, room=target_room)
+            print(f"ADMIN DEBUG: Message sent via Socket.IO to user room: {target_room}")
+        else:
+            print(f"ADMIN DEBUG: Invalid target_room format: {target_room}, message not sent")
+        
         return jsonify({"success": True})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
