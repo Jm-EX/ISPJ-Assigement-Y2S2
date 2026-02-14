@@ -573,7 +573,7 @@ def on_message(data):
         }
         
         print(f"DEBUG: Forwarding message to admin room: customer_service")
-        emit('new_customer_message', admin_message_data, room='customer_service')
+        emit('receive_message', admin_message_data, room='customer_service')
         
         print("="*80 + "\n")
         logging.info(f"User {session_id} message forwarded to admin")

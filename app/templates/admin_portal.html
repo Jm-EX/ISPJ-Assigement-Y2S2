@@ -813,22 +813,26 @@ socket.on('admin_joined', (data) => {
   }
 });
 
-socket.on('new_customer_message', (data) => {
-  console.log('New customer message received:', data);
+socket.on('receive_message', function(data) {
+  console.log('Admin received message:', data);
   
-  // Add to active users list or update existing
-  addOrUpdateActiveUser(data);
-  
-  // If this user is currently selected, add message to chat
-  if (currentChatUser && 
-      ((currentChatUser.email && currentChatUser.email === data.user_email) ||
-       (!currentChatUser.email && currentChatUser.sessionId === data.session_id))) {
+  // If it's a customer message, add to active users and display
+  if (data.sender_type === 'customer') {
+    // Add to active users list or update existing
+    addOrUpdateActiveUser(data);
     
-    addCustomerMessageToChat(data);
+    // If this user is currently selected, add message to chat
+    if (currentChatUser && 
+        ((currentChatUser.email && currentChatUser.email === data.user_email) ||
+         (!currentChatUser.email && currentChatUser.sessionId === data.session_id))) {
+      
+      addCustomerMessageToChat(data);
+    }
+    
+    // Update unread count
+    updateUnreadCount();
   }
-  
-  // Update unread count
-  updateUnreadCount();
+  // Admin messages are handled locally in sendAdminMessage function
 });
 
 socket.on('admin_message_sent', (data) => {
