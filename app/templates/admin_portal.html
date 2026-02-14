@@ -895,14 +895,6 @@ function sendExpandedChatMessage() {
       
       console.log('ADMIN DEBUG: Message sent via Socket.IO to room:', `user_${currentChatUser.sessionId}`);
       
-      // Also emit directly to user's room for redundancy
-      adminSocket.emit('receive_message', {
-        msg: message,
-        sender: '{{ session.get("username", "Admin") }}',
-        timestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-        sender_type: 'admin'
-      }, `user_${currentChatUser.sessionId}`);
-      
       // Reload messages to show the new admin message
       loadUserChatMessages(currentChatUser.sessionId, currentChatUser.room);
     } else {

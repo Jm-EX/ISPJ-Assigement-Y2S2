@@ -548,8 +548,20 @@ def on_message(data):
             import time
             time.sleep(1)
             
+            # Send AI response to user room
             emit('receive_message', ai_message_data, room=user_room)
             print(f"DEBUG: AI response sent to user room: {user_room}")
+            
+            # Also send AI response to admin room for visibility
+            ai_admin_data = {
+                'msg': ai_response,
+                'sender': 'AI Support',
+                'timestamp': datetime.now().strftime('%H:%M'),
+                'sender_type': 'ai',
+                'user_room': user_room  # Include user room for admin context
+            }
+            emit('new_customer_message', ai_admin_data, room=room)
+            print(f"DEBUG: AI response also sent to admin room: {room}")
             
             # Log AI response
             logging.info(f"AI response: {ai_response}")
@@ -580,15 +592,18 @@ def on_message(data):
         # Handle admin/staff messages
         if sender != 'customer':
             # Admin message - send to specific user's room
-            target_user_room = data.get('target_room', user_room)
-            admin_message_data = {
-                'msg': message,
-                'sender': sender,
-                'timestamp': datetime.now().strftime('%H:%M'),
-                'sender_type': 'admin'
-            }
-            emit('receive_message', admin_message_data, room=target_user_room)
-            print(f"DEBUG: Admin message sent to target room: {target_user_room}")
+            target_user_room = data.get('target_room')
+            if target_user_room:
+                admin_message_data = {
+                    'msg': message,
+                    'sender': sender,
+                    'timestamp': datetime.now().strftime('%H:%M'),
+                    'sender_type': 'admin'
+                }
+                emit('receive_message', admin_message_data, room=target_user_room)
+                print(f"DEBUG: Admin message sent to target room: {target_user_room}")
+            else:
+                print(f"DEBUG: Admin message missing target_room, not sent")
         # Note: AI messages are already handled above in the AI response section
         # Customer messages in AI/Human mode are also handled above
     

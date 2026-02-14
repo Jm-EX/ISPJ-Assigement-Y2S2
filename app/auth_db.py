@@ -1072,25 +1072,37 @@ def get_user_chat_history(user_id=None, session_id=None, room=None, limit=50):
 
 
 def get_active_chat_users():
-    """Get unique users who have sent messages in the last 24 hours"""
+    """Get unique users who have sent messages in the last 24 hours, grouped by session_id"""
     db = get_db()
     cursor = db.cursor()
     
-    # Get unique users with their latest message and unread count
+    # Get the latest message for each session_id and join with user info
     cursor.execute("""
-        SELECT DISTINCT 
-            COALESCE(cm.user_id, 0) as user_id,
-            COALESCE(u.username, cm.username) as display_name,
+        WITH latest_messages AS (
+            SELECT DISTINCT ON (session_id) 
+                session_id,
+                user_id,
+                username,
+                room,
+                timestamp as last_message_time
+            FROM chat_messages 
+            WHERE timestamp >= NOW() - INTERVAL '24 hours'
+            ORDER BY session_id, timestamp DESC
+        )
+        SELECT 
+            COALESCE(lm.user_id, 0) as user_id,
+            COALESCE(u.username, lm.username) as display_name,
             COALESCE(u.email, 'Anonymous') as email,
-            cm.session_id,
-            MAX(cm.timestamp) as last_message_time,
+            lm.session_id,
+            lm.last_message_time,
             COUNT(CASE WHEN cm.admin_read = 0 AND cm.sender_type != 'admin' THEN 1 END) as unread_count,
-            cm.room
-        FROM chat_messages cm
-        LEFT JOIN users u ON cm.user_id = u.id
+            lm.room
+        FROM latest_messages lm
+        LEFT JOIN chat_messages cm ON lm.session_id = cm.session_id
+        LEFT JOIN users u ON lm.user_id = u.id
         WHERE cm.timestamp >= NOW() - INTERVAL '24 hours'
-        GROUP BY COALESCE(cm.user_id, 0), COALESCE(u.username, cm.username), COALESCE(u.email, 'Anonymous'), cm.session_id, cm.room
-        ORDER BY last_message_time DESC
+        GROUP BY lm.session_id, lm.user_id, lm.username, lm.room, lm.last_message_time, u.username, u.email
+        ORDER BY lm.last_message_time DESC
     """)
     
     return cursor.fetchall()
