@@ -659,16 +659,21 @@ def on_admin_send_message(data):
             target_user_email = None
         
         # Save admin message to database
-        save_chat_message(
-            session_id=target_session_id,
-            user_id=None,  # Admin messages don't have user_id
-            username='Admin',
-            user_email=None,
-            message=message,
-            sender_type='admin',
-            room='customer_service'
-        )
-        print(f"DEBUG: Admin message saved to database")
+        try:
+            save_chat_message(
+                session_id=target_session_id,
+                user_id=None,  # Admin messages don't have user_id
+                username='Admin',
+                user_email=None,
+                message=message,
+                sender_type='admin',
+                room='customer_service'
+            )
+            print(f"DEBUG: Admin message saved to database")
+        except Exception as e:
+            print(f"DEBUG: Error saving admin message: {e}")
+            import traceback
+            print(f"DEBUG: Admin save traceback: {traceback.format_exc()}")
     except Exception as e:
         print(f"DEBUG: Error saving admin message: {e}")
     
