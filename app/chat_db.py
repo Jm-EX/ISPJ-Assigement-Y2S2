@@ -33,82 +33,34 @@ def close_db(_exc=None):
 
 
 def init_chat_db(app):
-    # Check if DATABASE_URL is provided (Render PostgreSQL)
-    database_url = os.environ.get("DATABASE_URL")
-    if database_url:
-        conn = psycopg.connect(database_url)
-        conn.autocommit = True
-    else:
-        # For local development, connect to default postgres database first
-        conn = psycopg.connect(
-            host=app.config["MYSQL_HOST"],
-            port=app.config["MYSQL_PORT"],
-            user=app.config["MYSQL_USER"],
-            password=current_app.config["MYSQL_PASSWORD"],
-            dbname="postgres"
-        )
-        conn.autocommit = True
-    
-    cursor = conn.cursor()
-    
-    # Create database if it doesn't exist
-    db_name = app.config["MYSQL_DATABASE"]
-    cursor.execute("SELECT 1 FROM pg_database WHERE datname = %s", (db_name,))
-    if not cursor.fetchone():
-        cursor.execute(f"CREATE DATABASE {db_name}")
-        print(f"Created database: {db_name}")
-    
-    # Connect to the target database
-    if database_url:
-        conn = psycopg.connect(database_url)
-        conn.autocommit = True
-    else:
-        conn = psycopg.connect(
-            host=app.config["MYSQL_HOST"],
-            port=app.config["MYSQL_PORT"],
-            user=app.config["MYSQL_USER"],
-            password=current_app.config["MYSQL_PASSWORD"],
-            dbname=db_name
-        )
-        conn.autocommit = True
-    
-    cursor = conn.cursor()
-    
-    # Create chat_messages table
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS chat_messages (
-            id SERIAL PRIMARY KEY,
-            session_id VARCHAR(255) NOT NULL,
-            user_id INTEGER,
-            username VARCHAR(255) NOT NULL,
-            user_email VARCHAR(255),
-            message TEXT NOT NULL,
-            sender_type VARCHAR(50) NOT NULL,
-            room VARCHAR(100) NOT NULL,
-            timestamp TIMESTAMP NOT NULL DEFAULT NOW(),
-            admin_read BOOLEAN NOT NULL DEFAULT FALSE,
-            FOREIGN KEY (user_id) REFERENCES users (id)
-        )
-    """)
-    
-    # Create indexes for better performance
-    cursor.execute("""
-        CREATE INDEX IF NOT EXISTS idx_chat_messages_session_id ON chat_messages(session_id)
-    """)
-    
-    cursor.execute("""
-        CREATE INDEX IF NOT EXISTS idx_chat_messages_user_id ON chat_messages(user_id)
-    """)
-    
-    cursor.execute("""
-        CREATE INDEX IF NOT EXISTS idx_chat_messages_timestamp ON chat_messages(timestamp)
-    """)
-    
-    cursor.execute("""
-        CREATE INDEX IF NOT EXISTS idx_chat_messages_room ON chat_messages(room)
-    """)
-    
-    print("Chat database initialized successfully")
+    """
+    Initialize chat database.
+    Note: Table creation should be done via SQL file: create_chat_messages_table.sql
+    This function just verifies the table exists.
+    """
+    try:
+        db = get_db()
+        cursor = db.cursor()
+        
+        # Check if chat_messages table exists
+        cursor.execute("""
+            SELECT EXISTS (
+                SELECT FROM information_schema.tables 
+                WHERE table_schema = 'public' 
+                AND table_name = 'chat_messages'
+            );
+        """)
+        
+        table_exists = cursor.fetchone()[0]
+        
+        if table_exists:
+            print("Chat messages table exists and is ready")
+        else:
+            print("WARNING: chat_messages table not found. Please run create_chat_messages_table.sql")
+            
+    except Exception as e:
+        print(f"Error checking chat database: {e}")
+        print("Please ensure create_chat_messages_table.sql has been executed")
 
 
 def save_chat_message(session_id, user_id, username, user_email, message, sender_type, room):
