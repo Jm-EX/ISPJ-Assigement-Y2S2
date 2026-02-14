@@ -9,7 +9,7 @@ import stripe
 import requests
 from flask_socketio import SocketIO, emit, join_room, leave_room
 import google.generativeai as genai
-from app.auth_db import save_chat_message, get_user_chat_history, cleanup_old_messages
+from app.auth_db import save_chat_message
 
 # =========================
 # Setup
@@ -406,63 +406,14 @@ def on_join(data):
     session_id = request.sid
     print(f"DEBUG: Room: {room}")
     print(f"DEBUG: Session ID: {session_id}")
-    
-    # Create user-specific room for private messaging
-    user_room = f"user_{session_id}"
-    join_room(user_room)
-    
-    # Also join main room for admin communication
-    join_room(room)
-    
     user_modes[session_id] = 'ai'  # Default to AI mode
     print(f"DEBUG: User mode set to: {user_modes[session_id]}")
-    
-    # Load user's chat history
-    try:
-        user_id = session.get('user_id') if 'user_id' in session else None
-        chat_history = get_user_chat_history(
-            user_id=user_id,
-            session_id=session_id,
-            room=room,
-            limit=50
-        )
-        
-        # Send chat history to user
-        for msg in chat_history:
-            emit('receive_message', {
-                'msg': msg['message'],
-                'sender': msg['username'],
-                'timestamp': msg['timestamp'].strftime('%H:%M') if msg['timestamp'] else '',
-                'sender_type': msg['sender_type']
-            }, room=user_room)
-            
-        print(f"DEBUG: Loaded {len(chat_history)} messages from history")
-        
-    except Exception as e:
-        print(f"DEBUG: Error loading chat history: {e}")
-        logging.error(f"Error loading chat history for {session_id}: {e}")
-    
-    emit('status', {'msg': 'Connected to customer support'}, room=user_room)
-    print(f"DEBUG: User joined rooms: {user_room}, {room}")
-    print("="*80 + "\n")
-    logging.info(f"User {session_id} joined chat in AI mode with history")
-
-
-@socketio.on('admin_join')
-def on_admin_join(data):
-    """Handle admin dashboard connections"""
-    print("\n" + "="*80)
-    print("ADMIN DEBUG: admin_join event received")
-    print(f"ADMIN DEBUG: Data received: {data}")
-    room = data.get('room', 'customer_service')
-    session_id = request.sid
-    print(f"ADMIN DEBUG: Admin joining room: {room}")
-    
-    # Admin joins customer service room to receive customer messages
     join_room(room)
-    print(f"ADMIN DEBUG: Admin joined customer service room: {room}")
+    print(f"DEBUG: User joined room: {room}")
+    emit('status', {'msg': 'Connected to customer support'}, room=room)
+    print(f"DEBUG: Status emitted to room")
     print("="*80 + "\n")
-    logging.info(f"Admin {session_id} joined customer service room")
+    logging.info(f"User {session_id} joined chat in AI mode")
 
 @socketio.on('switch_to_human_mode')
 def on_switch_to_human():
@@ -495,86 +446,44 @@ def on_message(data):
     sender = data['sender']
     message = data['msg']
     session_id = request.sid
-    user_room = f"user_{session_id}"
-    
     print(f"DEBUG: Room: {room}")
     print(f"DEBUG: Sender: {sender}")
     print(f"DEBUG: Message: {message}")
     print(f"DEBUG: Session ID: {session_id}")
-    print(f"DEBUG: User Room: {user_room}")
     print(f"DEBUG: Current user mode: {user_modes.get(session_id, 'NOT SET')}")
     
     # Log message
     logging.info(f"Chat message from {sender}: {message}")
     
-    # Save to database
-    try:
-        user_id = session.get('user_id') if 'user_id' in session else None
-        # Get actual username if user is logged in
-        if user_id:
-            from app.auth_db import get_user_by_id
-            user_data = get_user_by_id(user_id)
-            username = user_data['username'] if user_data else sender
-            user_email = user_data['email'] if user_data else None
-        else:
-            username = sender
-            user_email = None
-            
-        print(f"DEBUG: About to save message - User ID: {user_id}, Username: {username}, Email: {user_email}")
-        
-        save_chat_message(
-            session_id=session_id,
-            user_id=user_id,
-            username=username,
-            message=message,
-            sender_type='customer' if sender == 'customer' else 'admin',
-            room=room,
-            user_email=user_email
-        )
-        print(f"DEBUG: Message saved to database for user: {username} (ID: {user_id})")
-        
-        # Verify the message was saved by checking count
-        from app.auth_db import get_db
-        db = get_db()
-        cursor = db.cursor()
-        cursor.execute("SELECT COUNT(*) FROM chat_messages WHERE session_id = %s", (session_id,))
-        count = cursor.fetchone()[0]
-        print(f"DEBUG: Total messages for this session: {count}")
-        
-    except Exception as e:
-        print(f"DEBUG: Error saving message: {e}")
-        import traceback
-        traceback.print_exc()
-        logging.error(f"Error saving chat message: {e}")
-    
-    # Create message data
+    # Broadcast customer message to everyone (including admin/staff)
     message_data = {
         'msg': message,
         'sender': sender,
-        'timestamp': datetime.now().strftime('%H:%M'),
-        'sender_type': 'customer' if sender == 'customer' else 'admin'
+        'timestamp': datetime.now().strftime('%H:%M')
     }
+    print(f"DEBUG: Broadcasting message to room: {message_data}")
+    emit('receive_message', message_data, room=room, include_self=False)
+    print(f"DEBUG: Message broadcasted")
     
-    # Send to user's private room (so they see their own message) - but NOT in concierge mode
-    if sender == 'customer' and user_modes.get(session_id) != 'human':
-        emit('receive_message', message_data, room=user_room)
-        print(f"DEBUG: Message sent to user room: {user_room}")
-    else:
-        print(f"DEBUG: Concierge mode - not echoing message back to customer")
-    
-    # Handle different modes
+    # If it's a customer message and user is in AI mode, generate AI response
+    print(f"DEBUG: Checking if AI response needed...")
+    print(f"DEBUG: sender == 'customer': {sender == 'customer'}")
     if sender == 'customer' and user_modes.get(session_id) == 'ai':
-        # AI Mode: Generate AI response
-        print(f"DEBUG: Checking if AI response needed...")
-        print(f"DEBUG: sender == 'customer': {sender == 'customer'}")
-        print(f"DEBUG: user_modes.get(session_id) == 'ai': {user_modes.get(session_id) == 'ai'}")
-        
         try:
-            # Generate AI response
-            ai_response = generate_ai_response(message)
-            print(f"DEBUG: Generated AI response: {ai_response}")
+            # Get AI response
+            ai_response = get_gemini_response(message)
             
-            # Create AI message data
+            # Save AI response to database
+            save_chat_message(
+                session_id=session_id,
+                user_id=None,
+                username='AI Support',
+                message=ai_response,
+                sender_type='ai',
+                room=room
+            )
+            
+            # Send AI response as "AI Support"
             ai_message_data = {
                 'msg': ai_response,
                 'sender': 'AI Support',
@@ -582,9 +491,11 @@ def on_message(data):
                 'sender_type': 'ai'
             }
             
-            # Send AI response to user room only
-            emit('receive_message', ai_message_data, room=user_room)
-            print(f"DEBUG: AI response sent to user room: {user_room}")
+            # Small delay to make it feel natural
+            import time
+            time.sleep(1)
+            
+            emit('receive_message', ai_message_data, room=room)
             
             # Log AI response
             logging.info(f"AI response: {ai_response}")
@@ -597,132 +508,23 @@ def on_message(data):
                 'timestamp': datetime.now().strftime('%H:%M'),
                 'sender_type': 'ai'
             }
-            emit('receive_message', error_message, room=user_room)
-            
+            emit('receive_message', error_message, room=room)
     elif sender == 'customer' and user_modes.get(session_id) == 'human':
-        # Concierge Mode: Send to admin only, not back to customer
-        admin_message_data = {
-            'msg': message,
-            'sender': sender,
-            'timestamp': datetime.now().strftime('%H:%M'),
-            'sender_type': 'customer',
-            'user_room': user_room,  # Include user room for admin to reply
-            'session_id': session_id,  # Include session ID for admin identification
-            'username': username  # Include username for admin identification
-        }
-        emit('new_customer_message', admin_message_data, room='customer_service')
-        print(f"DEBUG: Customer message sent to admin room: customer_service")
-        logging.info(f"User {session_id} is in Concierge mode - message sent to admin")
+        # In human mode, don't generate AI responses
+        logging.info(f"User {session_id} is in Human mode - no AI response generated")
     else:
-        # This section should not be reached for admin messages
-        # Admin messages are handled via HTTP route /admin/send-chat
-        print(f"DEBUG: Unexpected message path for sender: {sender}")
-        pass
-    
-    print("="*80 + "\n")
-
-
-@socketio.on('admin_send_message')
-def on_admin_send_message(data):
-    """Handle admin sending direct message to customer in concierge mode"""
-    print("\n" + "="*80)
-    print("ADMIN DEBUG: admin_send_message event received")
-    print(f"ADMIN DEBUG: Data received: {data}")
-    
-    target_room = data.get('target_room')  # User's private room
-    message = data.get('message')
-    admin_name = data.get('admin_name', 'Admin Support')
-    
-    print(f"ADMIN DEBUG: Target room: {target_room}")
-    print(f"ADMIN DEBUG: Message: {message}")
-    print(f"ADMIN DEBUG: Admin name: {admin_name}")
-    
-    if not target_room or not message:
-        print("ADMIN ERROR: Missing target_room or message")
-        return
-    
-    try:
-        # Extract session_id from user_room (format: user_sessionId)
-        session_id = target_room.replace('user_', '')
-        print(f"ADMIN DEBUG: Extracted session ID: {session_id}")
-        
-        # Get user info for database save
-        from app.auth_db import get_user_by_id
-        user_id = session.get('user_id') if 'user_id' in session else None
-        if user_id:
-            user_data = get_user_by_id(user_id)
-            username = user_data['username'] if user_data else 'Unknown User'
-            user_email = user_data['email'] if user_data else None
-        else:
-            username = 'Customer'
-            user_email = None
-        
+        # Handle admin/staff messages (forward to room)
         # Save admin message to database
-        save_chat_message(
-            session_id='admin_web_panel',
-            user_id=session.get("user_id"),
-            username=admin_name,
-            message=message,
-            sender_type="admin",
-            room=target_room,
-            user_email=session.get("email")
-        )
-        print(f"ADMIN DEBUG: Admin message saved to database")
-        
-        # Create admin message data
-        admin_message_data = {
-            'msg': message,
-            'sender': admin_name,
-            'timestamp': datetime.now().strftime('%H:%M'),
-            'sender_type': 'admin'
-        }
-        
-        # Send directly to user's private room
-        emit('receive_message', admin_message_data, room=target_room)
-        print(f"ADMIN DEBUG: Admin message sent to user room: {target_room}")
-        logging.info(f"Admin sent message to user {session_id}: {message}")
-        
-    except Exception as e:
-        print(f"ADMIN ERROR: Error sending message: {e}")
-        import traceback
-        traceback.print_exc()
-        logging.error(f"Error sending admin message: {e}")
-    
-    print("="*80 + "\n")
-
-
-@socketio.on('disconnect')
-def on_disconnect():
-    """Handle user disconnection"""
-    session_id = request.sid
-    user_room = f"user_{session_id}"
-    
-    # Leave user-specific room
-    leave_room(user_room)
-    
-    # Clean up user mode
-    if session_id in user_modes:
-        del user_modes[session_id]
-    
-    print(f"DEBUG: User {session_id} disconnected")
-    logging.info(f"User {session_id} disconnected from chat")
-
-
-# Schedule cleanup of old messages (run every hour)
-import threading
-import time
-
-def cleanup_scheduler():
-    """Run cleanup of old messages every hour"""
-    while True:
-        try:
-            cleanup_old_messages()
-        except Exception as e:
-            logging.error(f"Error in cleanup scheduler: {e}")
-        
-        # Sleep for 1 hour
-        time.sleep(3600)
-
-# Start cleanup scheduler in background thread
-cleanup_thread = threading.Thread(target=cleanup_scheduler, daemon=True)
-cleanup_thread.start()
+        if sender != 'customer':
+            try:
+                save_chat_message(
+                    session_id=session_id,
+                    user_id=session.get('user_id') if 'user_id' in session else None,
+                    username=sender,
+                    message=message,
+                    sender_type='admin',
+                    room=room
+                )
+            except Exception as e:
+                logging.error(f"Error saving admin chat message: {str(e)}")
+        pass

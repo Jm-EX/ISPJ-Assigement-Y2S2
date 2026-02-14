@@ -375,9 +375,6 @@ function toggleChat() {
 function toggleSupportMode() {
     console.log('\n' + '='.repeat(80));
     console.log('CHATBOT DEBUG: toggleSupportMode called');
-    console.log('CHATBOT DEBUG: Socket.IO connected:', socket.connected);
-    console.log('CHATBOT DEBUG: Socket ID:', socket.id);
-    
     isHumanMode = !isHumanMode;
     console.log('CHATBOT DEBUG: isHumanMode:', isHumanMode);
     
@@ -385,21 +382,6 @@ function toggleSupportMode() {
     const supportButton = document.querySelector('.human-support-btn span');
     const supportButtonIcon = document.querySelector('.human-support-btn i');
     let switchMessage;
-    
-    if (!headerTitle) {
-        console.error('CHATBOT ERROR: Header title element not found');
-        return;
-    }
-    
-    if (!supportButton) {
-        console.error('CHATBOT ERROR: Support button element not found');
-        return;
-    }
-    
-    if (!supportButtonIcon) {
-        console.error('CHATBOT ERROR: Support button icon element not found');
-        return;
-    }
     
     if (isHumanMode) {
         console.log('CHATBOT DEBUG: Switching to Human Support mode');
@@ -509,9 +491,7 @@ function sendMessage() {
         chatHistory.push(messageObj);
         console.log('CHATBOT DEBUG: Message added to history');
         
-        // Always display customer's own message (server won't echo in concierge mode)
         addMessageToChat('You', msg, 'customer');
-        
         input.value = '';
         console.log('CHATBOT DEBUG: Message sent successfully');
         console.log('='.repeat(80));
@@ -578,10 +558,44 @@ function addMessageToChat(sender, message, senderType) {
         };
         chatHistory.push(messageObj);
     }
-        
+}
+
+socket.on('receive_message', function(data) {
+    console.log('\n' + '='.repeat(80));
+    console.log('CHATBOT DEBUG: receive_message event received');
+    console.log('CHATBOT DEBUG: Data:', data);
+    console.log('CHATBOT DEBUG: Sender:', data.sender);
+    console.log('CHATBOT DEBUG: Message:', data.msg);
+    console.log('CHATBOT DEBUG: chatOpen:', chatOpen);
+    
+    if (!chatOpen && data.sender !== 'customer') {
+        console.log('CHATBOT DEBUG: Chat closed, showing badge');
+        document.getElementById('chat-badge').style.display = 'block';
+    }
+    // Using 'support' as the class for AI/Admin replies
+    const type = data.sender === 'customer' ? 'customer' : 'support';
+    console.log('CHATBOT DEBUG: Message type:', type);
+    addMessageToChat(data.sender, data.msg, type);
+    console.log('CHATBOT DEBUG: Message added to chat');
+    console.log('='.repeat(80));
+});
+
+socket.on('status', function(data) {
+    console.log('\n' + '='.repeat(80));
+    console.log('CHATBOT DEBUG: status event received');
+    console.log('CHATBOT DEBUG: Status data:', data);
+    addMessageToChat('System', data.msg, 'system');
+    console.log('CHATBOT DEBUG: Status message added to chat');
+    console.log('='.repeat(80));
+});
+
+// Add connection event listeners for debugging
+socket.on('connect', function() {
+    console.log('\n' + '='.repeat(80));
+    console.log('CHATBOT DEBUG: Socket.IO connected');
     console.log('CHATBOT DEBUG: Socket ID:', socket.id);
     console.log('='.repeat(80));
-}
+});
 
 socket.on('disconnect', function() {
     console.log('\n' + '='.repeat(80));
@@ -592,27 +606,6 @@ socket.on('disconnect', function() {
 socket.on('connect_error', function(error) {
     console.log('\n' + '='.repeat(80));
     console.error('CHATBOT ERROR: Socket.IO connection error:', error);
-    console.log('='.repeat(80));
-});
-
-socket.on('receive_message', function(data) {
-    console.log('\n' + '='.repeat(80));
-    console.log('CHATBOT DEBUG: receive_message event received');
-    console.log('CHATBOT DEBUG: Message data:', data);
-        
-    // Add message to chat display
-    addMessageToChat(data.sender, data.msg, data.sender_type || 'support');
-        
-    // Add to history
-    const messageObj = {
-        sender: data.sender,
-        text: data.msg,
-        type: data.sender_type || 'support',
-        time: data.timestamp || new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
-    };
-    chatHistory.push(messageObj);
-        
-    console.log('CHATBOT DEBUG: Message added to chat and history');
     console.log('='.repeat(80));
 });
 </script>

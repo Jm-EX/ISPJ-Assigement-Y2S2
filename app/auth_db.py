@@ -1,6 +1,6 @@
 import psycopg
 from psycopg.rows import dict_row
-from datetime import datetime, timedelta
+from datetime import datetime
 from flask import current_app, g, request
 from werkzeug.security import generate_password_hash
 import os
@@ -202,22 +202,6 @@ def init_db(app):
                 previous_failed_attempts INT NOT NULL DEFAULT 0,
                 last_activity TIMESTAMP NOT NULL,
                 created_at TIMESTAMP NOT NULL,
-                FOREIGN KEY (user_id) REFERENCES users (id)
-            )
-            """
-        )
-        cursor.execute(
-            """
-            CREATE TABLE IF NOT EXISTS chat_messages (
-                id SERIAL PRIMARY KEY,
-                session_id TEXT NOT NULL,
-                user_id INT,
-                username VARCHAR(255) NOT NULL,
-                message TEXT NOT NULL,
-                sender_type VARCHAR(50) NOT NULL,
-                room VARCHAR(100) NOT NULL,
-                timestamp TIMESTAMP NOT NULL,
-                admin_read SMALLINT NOT NULL DEFAULT 0,
                 FOREIGN KEY (user_id) REFERENCES users (id)
             )
             """
@@ -939,25 +923,17 @@ def delete_session(session_id: int):
 # Chat Functions
 # =========================
 
-def save_chat_message(session_id, user_id, username, message, sender_type, room, user_email=None):
+def save_chat_message(session_id, user_id, username, message, sender_type, room):
     """Save a chat message to the database"""
     db = get_db()
     cursor = db.cursor()
-    print(f"DB DEBUG: Saving message - Session: {session_id}, User: {username}, Room: {room}")
-    
-    try:
-        cursor.execute(
-            """INSERT INTO chat_messages 
-               (session_id, user_id, username, message, sender_type, room, timestamp, user_email) 
-               VALUES (%s, %s, %s, %s, %s, %s, NOW(), %s)""",
-            (session_id, user_id, username, message, sender_type, room, user_email)
-        )
-        db.commit()
-        print(f"DB DEBUG: Message saved and committed to database")
-    except Exception as e:
-        print(f"DB ERROR: Failed to save message: {e}")
-        db.rollback()
-        raise
+    cursor.execute(
+        """INSERT INTO chat_messages 
+           (session_id, user_id, username, message, sender_type, room) 
+           VALUES (%s, %s, %s, %s, %s, %s)""",
+        (session_id, user_id, username, message, sender_type, room)
+    )
+    db.commit()
 
 
 def get_chat_messages(room=None, limit=50, unread_only=False):
@@ -978,9 +954,9 @@ def get_chat_messages(room=None, limit=50, unread_only=False):
     
     if unread_only:
         if room:
-            query += " AND cm.admin_read = 0"
+            query += " AND cm.admin_read = FALSE"
         else:
-            query += " WHERE cm.admin_read = 0"
+            query += " WHERE cm.admin_read = FALSE"
     
     query += " ORDER BY cm.timestamp DESC LIMIT %s"
     params.append(limit)
@@ -996,11 +972,13 @@ def mark_chat_messages_as_read(room=None):
     
     if room:
         cursor.execute(
-            "UPDATE chat_messages SET admin_read = 1 WHERE room = %s AND admin_read = 0",
+            "UPDATE chat_messages SET admin_read = TRUE WHERE room = %s AND admin_read = FALSE",
             (room,)
         )
     else:
-        cursor.execute("UPDATE chat_messages SET admin_read = 1 WHERE admin_read = 0")
+        cursor.execute("UPDATE chat_messages SET admin_read = TRUE WHERE admin_read = FALSE")
+    
+    db.commit()
 
 
 def get_chat_stats():
@@ -1013,7 +991,7 @@ def get_chat_stats():
     total_messages = cursor.fetchone()['total']
     
     # Unread messages
-    cursor.execute("SELECT COUNT(*) as unread FROM chat_messages WHERE admin_read = 0")
+    cursor.execute("SELECT COUNT(*) as unread FROM chat_messages WHERE admin_read = FALSE")
     unread_messages = cursor.fetchone()['unread']
     
     # Active rooms (rooms with messages in last 24 hours)
@@ -1029,114 +1007,3 @@ def get_chat_stats():
         'unread_messages': unread_messages,
         'active_rooms': active_rooms
     }
-
-
-def cleanup_old_messages():
-    """Delete messages older than 12 hours"""
-    db = get_db()
-    cursor = db.cursor()
-    
-    # Delete messages older than 12 hours
-    cutoff_time = datetime.now() - timedelta(hours=12)
-    cursor.execute(
-        "DELETE FROM chat_messages WHERE timestamp < %s",
-        (cutoff_time,)
-    )
-    
-    deleted_count = cursor.rowcount
-    logging.info(f"Cleaned up {deleted_count} old chat messages (older than 12 hours)")
-    
-    return deleted_count
-
-
-def get_user_chat_history(user_id=None, session_id=None, room=None, limit=50):
-    """Get chat history for a specific user or session"""
-    db = get_db()
-    cursor = db.cursor()
-    
-    query = """
-        SELECT cm.*, u.username as user_username, u.email as user_email
-        FROM chat_messages cm
-        LEFT JOIN users u ON cm.user_id = u.id
-        WHERE 1=1
-    """
-    params = []
-    
-    if user_id:
-        query += " AND (cm.user_id = %s OR (cm.user_id = 0 AND cm.username = (SELECT username FROM users WHERE id = %s)))"
-        params.extend([user_id, user_id])
-    elif session_id:
-        query += " AND cm.session_id = %s"
-        params.append(session_id)
-    
-    if room:
-        query += " AND cm.room = %s"
-        params.append(room)
-    
-    query += " ORDER BY cm.timestamp ASC LIMIT %s"
-    params.append(limit)
-    
-    cursor.execute(query, params)
-    return cursor.fetchall()
-
-
-def get_active_chat_users():
-    """Get unique users who have sent messages in the last 24 hours, grouped by user_id or session_id"""
-    db = get_db()
-    cursor = db.cursor()
-    
-    print("DB DEBUG: Getting active chat users...")
-    
-    # First, let's try a simpler query to see if we have any messages at all
-    cursor.execute("SELECT COUNT(*) FROM chat_messages WHERE timestamp >= NOW() - INTERVAL '24 hours'")
-    total_messages = cursor.fetchone()[0]
-    print(f"DB DEBUG: Total messages in last 24 hours: {total_messages}")
-    
-    if total_messages == 0:
-        print("DB DEBUG: No messages found in last 24 hours")
-        return []
-    
-    # Get the latest message for each user, prioritizing logged-in users
-    cursor.execute("""
-        WITH latest_messages AS (
-            SELECT DISTINCT ON (
-                CASE WHEN user_id > 0 THEN user_id ELSE session_id END
-            ) 
-                session_id,
-                user_id,
-                username,
-                user_email,
-                room,
-                timestamp as last_message_time,
-                ROW_NUMBER() OVER (
-                    PARTITION BY CASE WHEN user_id > 0 THEN user_id ELSE session_id END
-                    ORDER BY timestamp DESC
-                ) as rn
-            FROM chat_messages 
-            WHERE timestamp >= NOW() - INTERVAL '24 hours'
-            ORDER BY 
-                CASE WHEN user_id > 0 THEN user_id ELSE session_id END,
-                timestamp DESC
-        )
-        SELECT 
-            COALESCE(lm.user_id, 0) as user_id,
-            COALESCE(u.username, lm.username) as display_name,
-            COALESCE(u.email, lm.user_email, 'Anonymous') as email,
-            lm.session_id,
-            lm.last_message_time,
-            COUNT(CASE WHEN cm.admin_read = 0 AND cm.sender_type != 'admin' THEN 1 END) as unread_count,
-            lm.room
-        FROM latest_messages lm
-        LEFT JOIN chat_messages cm ON 
-            (lm.user_id > 0 AND cm.user_id = lm.user_id) OR 
-            (lm.user_id = 0 AND cm.session_id = lm.session_id)
-        LEFT JOIN users u ON lm.user_id = u.id
-        WHERE lm.rn = 1 AND cm.timestamp >= NOW() - INTERVAL '24 hours'
-        GROUP BY lm.session_id, lm.user_id, lm.username, lm.user_email, lm.room, lm.last_message_time, u.username, u.email
-        ORDER BY lm.last_message_time DESC
-    """)
-    
-    results = cursor.fetchall()
-    print(f"DB DEBUG: Query returned {len(results)} results")
-    
-    return results

@@ -1,5 +1,5 @@
 from flask import Blueprint, redirect, render_template, session, url_for, request, jsonify, flash
-from app.auth_db import get_login_stats, get_all_users, delete_user, get_security_logs, create_sub_admin, update_user_role, get_user_permissions, get_active_sessions, delete_session, save_chat_message, get_chat_messages, mark_chat_messages_as_read, get_chat_stats, get_active_chat_users
+from app.auth_db import get_login_stats, get_all_users, delete_user, get_security_logs, create_sub_admin, update_user_role, get_user_permissions, get_active_sessions, delete_session, save_chat_message, get_chat_messages, mark_chat_messages_as_read, get_chat_stats
 from werkzeug.security import generate_password_hash
 from datetime import datetime
 import json
@@ -225,28 +225,6 @@ def mark_chat_read_route():
         return jsonify({"error": str(e)}), 500
 
 
-@admin.get("/admin/active-chat-users")
-def get_active_chat_users_route():
-    """Get active chat users for admin dashboard"""
-    if not session.get("user_id"):
-        return jsonify({"error": "Not authenticated"}), 401
-    if not session.get("is_admin"):
-        return jsonify({"error": "Not authorized"}), 403
-    
-    try:
-        print("ADMIN DEBUG: Fetching active chat users...")
-        active_users = get_active_chat_users()
-        print(f"ADMIN DEBUG: Found {len(active_users)} active users")
-        for user in active_users:
-            print(f"ADMIN DEBUG: User - {user['display_name']} ({user['email']}) - Unread: {user['unread_count']}")
-        return jsonify({"success": True, "users": active_users})
-    except Exception as e:
-        print(f"ADMIN ERROR: Error fetching active users: {e}")
-        import traceback
-        traceback.print_exc()
-        return jsonify({"error": str(e)}), 500
-
-
 @admin.post("/admin/send-chat")
 def send_chat_route():
     """Send chat message as admin"""
@@ -258,41 +236,23 @@ def send_chat_route():
     data = request.get_json()
     message = data.get("message", "").strip()
     room = data.get("room", "default")
-    target_room = data.get("target_room")  # Specific user room to reply to
     
     if not message:
         return jsonify({"error": "Message cannot be empty"}), 400
     
-    if not target_room:
-        return jsonify({"error": "Target room is required for sending messages"}), 400
-    
     try:
         # Save to database
         save_chat_message(
-            session_id='admin_web_panel',
+            session_id=request.sid if hasattr(request, 'sid') else 'admin',
             user_id=session.get("user_id"),
             username=session.get("username", "Admin"),
             message=message,
             sender_type="admin",
-            room=room,
-            user_email=session.get("email")  # Add admin email
+            room=room
         )
         
-        # Emit via Socket.IO to specific user room only
-        from app.routes import socketio
-        message_data = {
-            'msg': message,
-            'sender': session.get("username", "Admin Support"),
-            'timestamp': datetime.now().strftime('%H:%M'),
-            'sender_type': 'admin'
-        }
-        
-        # Ensure we only emit to the user's private room
-        if target_room and target_room.startswith('user_'):
-            socketio.emit('receive_message', message_data, room=target_room)
-            print(f"ADMIN DEBUG: Message sent via Socket.IO to user room: {target_room}")
-        else:
-            print(f"ADMIN DEBUG: Invalid target_room format: {target_room}, message not sent")
+        # Note: Socket.IO emission will be handled by the client-side JavaScript
+        # that calls this endpoint and then refreshes the chat messages
         
         return jsonify({"success": True})
     except Exception as e:
