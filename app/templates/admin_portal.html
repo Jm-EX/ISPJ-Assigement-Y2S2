@@ -908,49 +908,52 @@ function displayUserChatMessages(messages) {
 }
 
 function sendExpandedChatMessage() {
-  if (!currentChatUser) {
-    alert('Please select a user chat first');
-    return;
-  }
-  
-  const input = document.getElementById('expandedChatInput');
-  const message = input.value.trim();
+  console.log('ADMIN DEBUG: sendExpandedChatMessage called');
+  const messageInput = document.getElementById('expandedChatInput');
+  const message = messageInput.value.trim();
   
   if (!message) {
+    console.log('ADMIN DEBUG: Empty message, not sending');
     return;
   }
   
-  // Send via HTTP to save to database and emit via Socket.IO
-  const data = {
+  if (!currentChatUser) {
+    console.log('ADMIN ERROR: No user selected for chat');
+    alert('Please select a user to chat with');
+    return;
+  }
+  
+  console.log('ADMIN DEBUG: Sending message to user:', currentChatUser);
+  console.log('ADMIN DEBUG: Message:', message);
+  
+  // Send via Socket.IO directly to user's private room
+  const messageData = {
+    target_room: `user_${currentChatUser.sessionId}`,
     message: message,
-    room: currentChatUser.room,
-    target_room: `user_${currentChatUser.sessionId}`
+    admin_name: session.get('username', 'Admin Support')
   };
   
-  fetch('/admin/send-chat', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data)
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.success) {
-      input.value = '';
-      
-      console.log('ADMIN DEBUG: Message saved to database, will be sent via Socket.IO');
-      
-      // Reload messages to show the new admin message
-      loadUserChatMessages(currentChatUser.sessionId, currentChatUser.room);
-    } else {
-      alert('Error sending message: ' + data.error);
-    }
-  })
-  .catch(error => {
-    console.error('Error sending message:', error);
-    alert('Error sending message');
-  });
+  console.log('ADMIN DEBUG: Emitting admin_send_message with data:', messageData);
+  
+  adminSocket.emit('admin_send_message', messageData);
+  
+  // Add message to local display
+  const messageDiv = document.createElement('div');
+  messageDiv.className = 'chat-message admin';
+  messageDiv.innerHTML = `
+    <strong>${session.get('username', 'Admin Support')}:</strong> 
+    <div>${message}</div>
+    <span class="chat-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+  `;
+  
+  const container = document.getElementById('expandedChatMessages');
+  container.appendChild(messageDiv);
+  container.scrollTop = container.scrollHeight;
+  
+  // Clear input
+  messageInput.value = '';
+  
+  console.log('ADMIN DEBUG: Message sent successfully');
 }
 
 function markUserMessagesAsRead(room) {

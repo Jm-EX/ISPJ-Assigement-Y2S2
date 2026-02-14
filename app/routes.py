@@ -559,35 +559,25 @@ def on_message(data):
     emit('receive_message', message_data, room=user_room)
     print(f"DEBUG: Message sent to user room: {user_room}")
     
-    # If it's a customer message and user is in AI mode, generate AI response
-    print(f"DEBUG: Checking if AI response needed...")
-    print(f"DEBUG: sender == 'customer': {sender == 'customer'}")
+    # Handle different modes
     if sender == 'customer' and user_modes.get(session_id) == 'ai':
+        # AI Mode: Generate AI response
+        print(f"DEBUG: Checking if AI response needed...")
+        print(f"DEBUG: sender == 'customer': {sender == 'customer'}")
+        print(f"DEBUG: user_modes.get(session_id) == 'ai': {user_modes.get(session_id) == 'ai'}")
+        
         try:
-            # Get AI response
-            ai_response = get_gemini_response(message)
+            # Generate AI response
+            ai_response = generate_ai_response(message)
+            print(f"DEBUG: Generated AI response: {ai_response}")
             
-            # Save AI response to database
-            save_chat_message(
-                session_id=session_id,
-                user_id=None,
-                username='AI Support',
-                message=ai_response,
-                sender_type='ai',
-                room=room
-            )
-            
-            # Send AI response to user's private room
+            # Create AI message data
             ai_message_data = {
                 'msg': ai_response,
                 'sender': 'AI Support',
                 'timestamp': datetime.now().strftime('%H:%M'),
                 'sender_type': 'ai'
             }
-            
-            # Small delay to make it feel natural
-            import time
-            time.sleep(1)
             
             # Send AI response to user room only
             emit('receive_message', ai_message_data, room=user_room)
@@ -605,36 +595,95 @@ def on_message(data):
                 'sender_type': 'ai'
             }
             emit('receive_message', error_message, room=user_room)
+            
     elif sender == 'customer' and user_modes.get(session_id) == 'human':
-        # In human mode, notify admin but don't generate AI response
-        # Send to admin room for admin to see
+        # Concierge Mode: Notify admin for direct chat
         admin_message_data = {
             'msg': message,
             'sender': sender,
             'timestamp': datetime.now().strftime('%H:%M'),
             'sender_type': 'customer',
-            'user_room': user_room  # Include user room for admin to reply
+            'user_room': user_room,  # Include user room for admin to reply
+            'session_id': session_id,  # Include session ID for admin identification
+            'username': username  # Include username for admin identification
         }
         emit('new_customer_message', admin_message_data, room='customer_service')
         print(f"DEBUG: Customer message sent to admin room: customer_service")
-        logging.info(f"User {session_id} is in Human mode - message sent to admin")
-    elif sender == 'customer':
-        # In AI mode, still notify admin about the message
-        admin_message_data = {
-            'msg': message,
-            'sender': sender,
-            'timestamp': datetime.now().strftime('%H:%M'),
-            'sender_type': 'customer',
-            'user_room': user_room  # Include user room for admin to reply
-        }
-        emit('new_customer_message', admin_message_data, room='customer_service')
-        print(f"DEBUG: Customer message sent to admin room: customer_service (AI mode)")
-        logging.info(f"User {session_id} is in AI mode - message sent to admin for monitoring")
+        logging.info(f"User {session_id} is in Concierge mode - message sent to admin")
     else:
         # This section should not be reached for admin messages
         # Admin messages are handled via HTTP route /admin/send-chat
         print(f"DEBUG: Unexpected message path for sender: {sender}")
         pass
+    
+    print("="*80 + "\n")
+
+
+@socketio.on('admin_send_message')
+def on_admin_send_message(data):
+    """Handle admin sending direct message to customer in concierge mode"""
+    print("\n" + "="*80)
+    print("ADMIN DEBUG: admin_send_message event received")
+    print(f"ADMIN DEBUG: Data received: {data}")
+    
+    target_room = data.get('target_room')  # User's private room
+    message = data.get('message')
+    admin_name = data.get('admin_name', 'Admin Support')
+    
+    print(f"ADMIN DEBUG: Target room: {target_room}")
+    print(f"ADMIN DEBUG: Message: {message}")
+    print(f"ADMIN DEBUG: Admin name: {admin_name}")
+    
+    if not target_room or not message:
+        print("ADMIN ERROR: Missing target_room or message")
+        return
+    
+    try:
+        # Extract session_id from user_room (format: user_sessionId)
+        session_id = target_room.replace('user_', '')
+        print(f"ADMIN DEBUG: Extracted session ID: {session_id}")
+        
+        # Get user info for database save
+        from app.auth_db import get_user_by_id
+        user_id = session.get('user_id') if 'user_id' in session else None
+        if user_id:
+            user_data = get_user_by_id(user_id)
+            username = user_data['username'] if user_data else 'Unknown User'
+            user_email = user_data['email'] if user_data else None
+        else:
+            username = 'Customer'
+            user_email = None
+        
+        # Save admin message to database
+        save_chat_message(
+            session_id='admin_web_panel',
+            user_id=session.get("user_id"),
+            username=admin_name,
+            message=message,
+            sender_type="admin",
+            room=target_room,
+            user_email=session.get("email")
+        )
+        print(f"ADMIN DEBUG: Admin message saved to database")
+        
+        # Create admin message data
+        admin_message_data = {
+            'msg': message,
+            'sender': admin_name,
+            'timestamp': datetime.now().strftime('%H:%M'),
+            'sender_type': 'admin'
+        }
+        
+        # Send directly to user's private room
+        emit('receive_message', admin_message_data, room=target_room)
+        print(f"ADMIN DEBUG: Admin message sent to user room: {target_room}")
+        logging.info(f"Admin sent message to user {session_id}: {message}")
+        
+    except Exception as e:
+        print(f"ADMIN ERROR: Error sending message: {e}")
+        import traceback
+        traceback.print_exc()
+        logging.error(f"Error sending admin message: {e}")
     
     print("="*80 + "\n")
 
