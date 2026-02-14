@@ -561,6 +561,7 @@ def on_message(data):
             user_room_id = f"guest_{session_id}"
         
         # Save user message to database first
+        print(f"DEBUG: Attempting to save user message to database...")
         try:
             save_chat_message(
                 session_id=session_id,
@@ -571,11 +572,20 @@ def on_message(data):
                 sender_type='user',
                 room='customer_service'
             )
-            print(f"DEBUG: User message saved to database")
+            print(f"DEBUG: User message saved to database successfully")
         except Exception as e:
             print(f"DEBUG: Error saving user message: {e}")
+            import traceback
+            print(f"DEBUG: Database save traceback: {traceback.format_exc()}")
         
         # Forward message to admin room
+        print(f"DEBUG: Checking customer_service room members before sending...")
+        try:
+            room_members = socketio.server.manager.get_participants('customer_service', None)
+            print(f"DEBUG: Room 'customer_service' has {len(room_members)} members: {room_members}")
+        except Exception as e:
+            print(f"DEBUG: Error checking room members: {e}")
+        
         admin_message_data = {
             'msg': message,
             'sender': username,
@@ -588,6 +598,7 @@ def on_message(data):
         
         print(f"DEBUG: Forwarding message to admin room: customer_service")
         emit('receive_message', admin_message_data, room='customer_service')
+        print(f"DEBUG: Message forwarded successfully")
         
         print("="*80 + "\n")
         logging.info(f"User {session_id} message forwarded to admin")
@@ -608,6 +619,9 @@ def on_admin_join():
     session_id = request.sid
     print(f"DEBUG: Admin {session_id} joining customer_service room")
     join_room('customer_service')
+    
+    # Check who is in the customer_service room
+    print(f"DEBUG: Room 'customer_service' members: {socketio.server.manager.get_participants('customer_service', None)}")
     
     # Send confirmation to admin
     emit('admin_joined', {'status': 'success', 'message': 'Connected to customer service'})

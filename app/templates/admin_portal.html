@@ -541,8 +541,11 @@
           <p id="chatUserDetails" style="margin: 4px 0 0 0; color: #666; font-size: 14px;"></p>
         </div>
         <div>
-          <button onclick="refreshChatMessages()" style="padding: 6px 12px; background: #667eea; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; margin-right: 8px;">
+          <button onclick="refreshChatMessages(false)" style="padding: 6px 12px; background: #667eea; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; margin-right: 8px;">
             Refresh
+          </button>
+          <button onclick="refreshChatMessages(true)" style="padding: 6px 12px; background: #ff9800; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; margin-right: 8px;">
+            Force Refresh
           </button>
           <button onclick="closeExpandedChat()" style="padding: 6px 12px; background: #f44336; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer;">
             Close
@@ -733,21 +736,28 @@ function closeExpandedChat() {
 }
 
 // Refresh chat messages
-function refreshChatMessages() {
+function refreshChatMessages(force = false) {
   if (currentChatUser) {
-    console.log('Refreshing messages for user:', currentChatUser.username);
-    loadUserMessages(currentChatUser.sessionId, currentChatUser.room);
+    console.log('Refreshing messages for user:', currentChatUser.username, force ? '(force)' : '');
+    
+    if (force) {
+      // Force refresh: clear everything and reload from database
+      const messagesContainer = document.getElementById('expandedChatMessages');
+      messagesContainer.innerHTML = '<div class="empty-state"><p>Loading messages...</p></div>';
+    }
+    
+    loadUserMessages(currentChatUser.sessionId, currentChatUser.room, force);
   } else {
     console.log('No current user to refresh');
   }
 }
 
 // Load user messages
-function loadUserMessages(sessionId, room) {
+function loadUserMessages(sessionId, room, force = false) {
   const messagesContainer = document.getElementById('expandedChatMessages');
   
-  // Only show loading if container is empty or has error state
-  if (!messagesContainer.innerHTML || messagesContainer.innerHTML.includes('Error') || messagesContainer.innerHTML.includes('Loading')) {
+  // Only show loading if container is empty or has error state, or if force refresh
+  if (force || !messagesContainer.innerHTML || messagesContainer.innerHTML.includes('Error') || messagesContainer.innerHTML.includes('Loading')) {
     messagesContainer.innerHTML = '<div class="empty-state"><p>Loading messages...</p></div>';
   }
   
@@ -764,10 +774,37 @@ function loadUserMessages(sessionId, room) {
   })
   .then(response => response.json())
   .then(data => {
-    messagesContainer.innerHTML = ''; // Clear loading state
+    // Clear messages if force refresh, otherwise preserve real-time ones
+    if (force) {
+      messagesContainer.innerHTML = ''; // Clear all for force refresh
+    } else {
+      // Don't clear all messages - preserve real-time ones
+      // Only clear if there are no messages or it's an error state
+      if (!messagesContainer.innerHTML || messagesContainer.innerHTML.includes('Error') || messagesContainer.innerHTML.includes('Loading')) {
+        messagesContainer.innerHTML = ''; // Clear loading state only
+      }
+    }
     
     if (data.messages && data.messages.length > 0) {
+      // Create a map of existing messages to avoid duplicates (only for non-force refresh)
+      const existingMessages = new Map();
+      if (!force) {
+        const messageElements = messagesContainer.querySelectorAll('div[style*="margin-bottom"]');
+        messageElements.forEach(el => {
+          const text = el.textContent;
+          existingMessages.set(text, true);
+        });
+      }
+      
       data.messages.forEach(msg => {
+        // Skip if message already exists (only for non-force refresh)
+        if (!force) {
+          const messageKey = `${msg.username}: ${msg.message}`;
+          if (existingMessages.has(messageKey)) {
+            return; // Skip duplicate
+          }
+        }
+        
         const messageDiv = document.createElement('div');
         
         if (msg.sender_type === 'user') {
