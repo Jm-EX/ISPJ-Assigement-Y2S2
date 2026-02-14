@@ -605,6 +605,18 @@ def on_message(data):
         emit('new_customer_message', admin_message_data, room='customer_service')
         print(f"DEBUG: Customer message sent to admin room: customer_service")
         logging.info(f"User {session_id} is in Human mode - message sent to admin")
+    elif sender == 'customer':
+        # In AI mode, still notify admin about the message
+        admin_message_data = {
+            'msg': message,
+            'sender': sender,
+            'timestamp': datetime.now().strftime('%H:%M'),
+            'sender_type': 'customer',
+            'user_room': user_room  # Include user room for admin to reply
+        }
+        emit('new_customer_message', admin_message_data, room='customer_service')
+        print(f"DEBUG: Customer message sent to admin room: customer_service (AI mode)")
+        logging.info(f"User {session_id} is in AI mode - message sent to admin for monitoring")
     else:
         # This section should not be reached for admin messages
         # Admin messages are handled via HTTP route /admin/send-chat

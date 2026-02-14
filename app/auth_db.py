@@ -1076,6 +1076,17 @@ def get_active_chat_users():
     db = get_db()
     cursor = db.cursor()
     
+    print("DB DEBUG: Getting active chat users...")
+    
+    # First, let's try a simpler query to see if we have any messages at all
+    cursor.execute("SELECT COUNT(*) FROM chat_messages WHERE timestamp >= NOW() - INTERVAL '24 hours'")
+    total_messages = cursor.fetchone()[0]
+    print(f"DB DEBUG: Total messages in last 24 hours: {total_messages}")
+    
+    if total_messages == 0:
+        print("DB DEBUG: No messages found in last 24 hours")
+        return []
+    
     # Get the latest message for each user, prioritizing logged-in users
     cursor.execute("""
         WITH latest_messages AS (
@@ -1116,4 +1127,7 @@ def get_active_chat_users():
         ORDER BY lm.last_message_time DESC
     """)
     
-    return cursor.fetchall()
+    results = cursor.fetchall()
+    print(f"DB DEBUG: Query returned {len(results)} results")
+    
+    return results

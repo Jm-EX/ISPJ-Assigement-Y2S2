@@ -234,9 +234,16 @@ def get_active_chat_users_route():
         return jsonify({"error": "Not authorized"}), 403
     
     try:
+        print("ADMIN DEBUG: Fetching active chat users...")
         active_users = get_active_chat_users()
+        print(f"ADMIN DEBUG: Found {len(active_users)} active users")
+        for user in active_users:
+            print(f"ADMIN DEBUG: User - {user['display_name']} ({user['email']}) - Unread: {user['unread_count']}")
         return jsonify({"success": True, "users": active_users})
     except Exception as e:
+        print(f"ADMIN ERROR: Error fetching active users: {e}")
+        import traceback
+        traceback.print_exc()
         return jsonify({"error": str(e)}), 500
 
 

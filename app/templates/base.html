@@ -576,7 +576,7 @@ function addMessageToChat(sender, message, senderType) {
         };
         chatHistory.push(messageObj);
     }
-    
+        
     console.log('CHATBOT DEBUG: Socket ID:', socket.id);
     console.log('='.repeat(80));
 }
@@ -590,6 +590,27 @@ socket.on('disconnect', function() {
 socket.on('connect_error', function(error) {
     console.log('\n' + '='.repeat(80));
     console.error('CHATBOT ERROR: Socket.IO connection error:', error);
+    console.log('='.repeat(80));
+});
+
+socket.on('receive_message', function(data) {
+    console.log('\n' + '='.repeat(80));
+    console.log('CHATBOT DEBUG: receive_message event received');
+    console.log('CHATBOT DEBUG: Message data:', data);
+        
+    // Add message to chat display
+    addMessageToChat(data.sender, data.msg, data.sender_type || 'support');
+        
+    // Add to history
+    const messageObj = {
+        sender: data.sender,
+        text: data.msg,
+        type: data.sender_type || 'support',
+        time: data.timestamp || new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+    };
+    chatHistory.push(messageObj);
+        
+    console.log('CHATBOT DEBUG: Message added to chat and history');
     console.log('='.repeat(80));
 });
 </script>
