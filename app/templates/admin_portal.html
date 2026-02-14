@@ -204,6 +204,38 @@
 {% endblock %}
 
 {% block content %}
+<!-- Add Socket.IO script for admin dashboard -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+<script>
+// Initialize Socket.IO for admin dashboard
+const adminSocket = io();
+console.log('ADMIN DEBUG: Socket.IO initialized for admin dashboard');
+
+// Listen for new customer messages
+adminSocket.on('new_customer_message', function(data) {
+    console.log('ADMIN DEBUG: New customer message received:', data);
+    
+    // Refresh active users to show new message
+    loadActiveChatUsers();
+    
+    // If we have this user's chat expanded, refresh it
+    if (currentChatUser && currentChatUser.sessionId === data.user_room.replace('user_', '')) {
+        loadUserChatMessages(currentChatUser.sessionId, currentChatUser.room);
+    }
+});
+
+// Handle connection
+adminSocket.on('connect', function() {
+    console.log('ADMIN DEBUG: Admin Socket.IO connected');
+    // Join admin room to receive customer messages in human mode
+    adminSocket.emit('join_chat', {room: 'customer_service'});
+});
+
+adminSocket.on('disconnect', function() {
+    console.log('ADMIN DEBUG: Admin Socket.IO disconnected');
+});
+</script>
+
 <div class="admin-dashboard">
   <div class="dashboard-header">
     <h1>Admin Dashboard</h1>
