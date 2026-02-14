@@ -957,7 +957,7 @@ function addOrUpdateActiveUser(messageData) {
         <small style="color: #666;">${displayInfo}</small><br>
         <small style="color: #999;">Last message: ${messageData.timestamp}</small>
       </div>
-      <button onclick="expandChat('${messageData.user_room}', '${displayName}', '${messageData.user_email || ''}', '${messageData.session_id}')" 
+      <button onclick="expandChat('${messageData.session_id}', '${displayName}', '${messageData.user_email || ''}', '${messageData.user_room}')" 
               style="padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer;">
         Chat
       </button>
