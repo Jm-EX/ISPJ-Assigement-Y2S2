@@ -90,10 +90,22 @@ def create_app():
     from app.admin_routes import admin
     app.register_blueprint(admin)
 
+    # Register chat blueprint
+    from app.chat_routes import chat_bp
+    app.register_blueprint(chat_bp)
+    
+    # Register chat API blueprint
+    from app.chat_api import chat_api_bp
+    app.register_blueprint(chat_api_bp)
+
     from app.auth_db import close_db, init_db, seed_admin
     app.teardown_appcontext(close_db)
     init_db(app)
     seed_admin(app)
+    
+    # Initialize chat database
+    from app.chat_db import init_chat_db
+    init_chat_db(app)
 
     @app.before_request
     def handle_preflight():

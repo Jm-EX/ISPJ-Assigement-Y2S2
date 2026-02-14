@@ -493,6 +493,62 @@
     </div>
     {% endif %}
   </div>
+
+  <!-- Chat Management Section -->
+  <div class="dashboard-section">
+    <div class="section-header">
+      <h2>Concierge Chat</h2>
+      <div>
+        <button onclick="refreshActiveUsers()" style="padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; margin-right: 8px;">
+          Refresh Users
+        </button>
+      </div>
+    </div>
+    
+    <!-- Active Users List -->
+    <div id="activeUsersList" style="margin-bottom: 20px;">
+      <div class="empty-state">
+        <p>Loading active users...</p>
+      </div>
+    </div>
+    
+    <!-- Expanded Chat View -->
+    <div id="expandedChatView" style="display: none; border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; margin-bottom: 16px; background: #fafafa;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #e0e0e0;">
+        <div>
+          <h3 id="chatUserInfo" style="margin: 0; color: #333;"></h3>
+          <p id="chatUserDetails" style="margin: 4px 0 0 0; color: #666; font-size: 14px;"></p>
+        </div>
+        <button onclick="closeExpandedChat()" style="padding: 6px 12px; background: #f44336; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer;">
+          Close
+        </button>
+      </div>
+      
+      <!-- Chat Messages -->
+      <div id="expandedChatMessages" style="max-height: 400px; overflow-y: auto; border: 1px solid #e0e0e0; border-radius: 6px; padding: 12px; margin-bottom: 16px; background: white;">
+        <div class="empty-state">
+          <p>Loading messages...</p>
+        </div>
+      </div>
+      
+      <!-- Admin Chat Input -->
+      <div style="display: flex; gap: 12px; align-items: flex-end;">
+        <input 
+          type="text" 
+          id="expandedChatInput" 
+          placeholder="Type your response..." 
+          style="flex: 1; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px;"
+          onkeypress="if(event.key === 'Enter') sendAdminMessage();"
+        >
+        <button 
+          onclick="sendAdminMessage()" 
+          style="padding: 12px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;"
+        >
+          Send
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -594,5 +650,307 @@ async function logoutSession(sessionId, username) {
     console.error(error);
   }
 }
+
+// =========================
+// Chat Management Functions
+// =========================
+
+let currentChatUser = null;
+let adminSocket = null;
+
+// Initialize Socket.IO for admin chat
+function initAdminChat() {
+  adminSocket = io();
+  
+  // Join admin monitoring room
+  adminSocket.emit('admin_join', {room: 'admin_monitor'});
+  
+  // Listen for chat notifications
+  adminSocket.on('admin_chat_notification', function(data) {
+    console.log('Admin chat notification:', data);
+    refreshActiveUsers();
+    
+    // Show notification if this is a new user message
+    if (data.sender_type === 'user' && (!currentChatUser || currentChatUser.session_id !== data.session_id)) {
+      showNotification(`New message from ${data.sender}`);
+    }
+  });
+  
+  // Listen for regular chat messages
+  adminSocket.on('chat_message', function(data) {
+    console.log('Chat message received:', data);
+    
+    // If we have this user's chat expanded, add the message
+    if (currentChatUser && currentChatUser.session_id === data.session_id) {
+      addMessageToExpandedChat(data);
+    }
+  });
+  
+  console.log('Admin chat initialized');
+}
+
+// Load active users
+function refreshActiveUsers() {
+  console.log('Refreshing active users...');
+  
+  const usersList = document.getElementById('activeUsersList');
+  usersList.innerHTML = '<div class="empty-state"><p>Loading active users...</p></div>';
+  
+  fetch('/admin/api/active-chat-users')
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        displayActiveUsers(data.users);
+      } else {
+        console.error('Error loading active users:', data.error);
+        usersList.innerHTML = '<div class="empty-state"><p>Error loading users</p></div>';
+      }
+    })
+    .catch(error => {
+      console.error('Error loading active users:', error);
+      usersList.innerHTML = '<div class="empty-state"><p>Error loading users</p></div>';
+    });
+}
+
+// Display active users
+function displayActiveUsers(users) {
+  const usersList = document.getElementById('activeUsersList');
+  
+  if (users.length === 0) {
+    usersList.innerHTML = `
+      <div style="padding: 20px; text-align: center; color: #666;">
+        <p>No active users in concierge mode</p>
+        <p style="font-size: 12px; margin-top: 10px;">Users will appear here when they switch to concierge support.</p>
+      </div>
+    `;
+    return;
+  }
+  
+  let html = '';
+  users.forEach(user => {
+    const unreadBadge = user.unread_count > 0 ? 
+      `<span style="background: #ff5252; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px; margin-left: 8px;">${user.unread_count} new</span>` : '';
+    
+    const lastMessageTime = new Date(user.last_message_time).toLocaleString();
+    
+    html += `
+      <div style="padding: 12px; border: 1px solid #e0e0e0; border-radius: 6px; margin-bottom: 8px; background: white; cursor: pointer; transition: all 0.2s;" 
+           onmouseover="this.style.background='#f5f5f5'" 
+           onmouseout="this.style.background='white'"
+           onclick="expandChat('${user.session_id}', '${user.username}', '${user.email}', '${user.room}')">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <strong style="color: #333;">${user.username}</strong>
+            <div style="font-size: 12px; color: #666; margin-top: 2px;">
+              ${user.email} • ${lastMessageTime}
+            </div>
+          </div>
+          <div>
+            ${unreadBadge}
+            <button style="padding: 4px 8px; background: #667eea; color: white; border: none; border-radius: 4px; font-size: 12px; cursor: pointer;">
+              Chat
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+  
+  usersList.innerHTML = html;
+}
+
+// Expand chat for specific user
+function expandChat(sessionId, username, email, room) {
+  currentChatUser = { sessionId, username, email, room };
+  
+  // Update chat info
+  document.getElementById('chatUserInfo').textContent = username;
+  document.getElementById('chatUserDetails').textContent = `${email} • Session: ${sessionId}`;
+  
+  // Show expanded chat view
+  document.getElementById('expandedChatView').style.display = 'block';
+  
+  // Load chat messages for this user
+  loadUserMessages(sessionId, room);
+  
+  console.log('Expanded chat for user:', username);
+}
+
+// Close expanded chat
+function closeExpandedChat() {
+  document.getElementById('expandedChatView').style.display = 'none';
+  currentChatUser = null;
+  console.log('Closed expanded chat');
+}
+
+// Load user messages
+function loadUserMessages(sessionId, room) {
+  const messagesContainer = document.getElementById('expandedChatMessages');
+  messagesContainer.innerHTML = '<div class="empty-state"><p>Loading messages...</p></div>';
+  
+  fetch(`/admin/api/chat-history?session_id=${sessionId}&room=${room}`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        displayChatMessages(data.messages);
+        // Mark messages as read
+        markMessagesAsRead(sessionId, room);
+      } else {
+        console.error('Error loading messages:', data.error);
+        messagesContainer.innerHTML = '<div class="empty-state"><p>Error loading messages</p></div>';
+      }
+    })
+    .catch(error => {
+      console.error('Error loading messages:', error);
+      messagesContainer.innerHTML = '<div class="empty-state"><p>Error loading messages</p></div>';
+    });
+}
+
+// Display chat messages
+function displayChatMessages(messages) {
+  const messagesContainer = document.getElementById('expandedChatMessages');
+  
+  if (messages.length === 0) {
+    messagesContainer.innerHTML = '<div class="empty-state"><p>No messages yet</p></div>';
+    return;
+  }
+  
+  messagesContainer.innerHTML = '';
+  messages.forEach(message => {
+    addMessageToExpandedChat(message);
+  });
+}
+
+// Mark messages as read
+function markMessagesAsRead(sessionId, room) {
+  fetch('/admin/api/mark-read', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      session_id: sessionId,
+      room: room
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      console.log('Messages marked as read');
+      refreshActiveUsers(); // Refresh to update unread counts
+    }
+  })
+  .catch(error => {
+    console.error('Error marking messages as read:', error);
+  });
+}
+
+// Add message to expanded chat
+function addMessageToExpandedChat(data) {
+  const messagesContainer = document.getElementById('expandedChatMessages');
+  
+  // Remove empty state if it exists
+  const emptyState = messagesContainer.querySelector('.empty-state');
+  if (emptyState) {
+    emptyState.remove();
+  }
+  
+  // Create message element
+  const messageDiv = document.createElement('div');
+  messageDiv.style.cssText = `
+    margin-bottom: 12px; 
+    padding: 8px 12px; 
+    border-radius: 8px; 
+    background: ${data.sender_type === 'admin' ? '#e3f2fd' : data.sender_type === 'user' ? '#f3e5f5' : '#fff3cd'};
+    border-left: 4px solid ${data.sender_type === 'admin' ? '#1976d2' : data.sender_type === 'user' ? '#7b1fa2' : '#f57c00'};
+  `;
+  
+  const senderName = data.sender_type === 'admin' ? 'You' : 
+                     data.sender_type === 'user' ? data.sender : 
+                     data.sender_type === 'system' ? 'System' : 'Unknown';
+  
+  messageDiv.innerHTML = `
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+      <strong style="color: ${data.sender_type === 'admin' ? '#1976d2' : data.sender_type === 'user' ? '#7b1fa2' : '#f57c00'};">
+        ${senderName}
+      </strong>
+      <span style="font-size: 12px; color: #666;">${data.timestamp}</span>
+    </div>
+    <div style="color: #333; line-height: 1.4;">${data.message}</div>
+  `;
+  
+  messagesContainer.appendChild(messageDiv);
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+// Send admin message
+function sendAdminMessage() {
+  const input = document.getElementById('expandedChatInput');
+  const message = input.value.trim();
+  
+  if (!message) {
+    return;
+  }
+  
+  if (!currentChatUser) {
+    alert('Please select a user to chat with');
+    return;
+  }
+  
+  // Send message via Socket.IO
+  adminSocket.emit('admin_send_message', {
+    room: currentChatUser.room,
+    message: message,
+    admin_name: '{{ session.get("username", "Admin") }}',
+    session_id: currentChatUser.sessionId
+  });
+  
+  // Add message to local display
+  addMessageToExpandedChat({
+    sender: '{{ session.get("username", "Admin") }}',
+    message: message,
+    sender_type: 'admin',
+    timestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+  });
+  
+  // Clear input
+  input.value = '';
+  
+  console.log('Admin message sent:', message);
+}
+
+// Show notification
+function showNotification(message) {
+  // Simple notification - you can enhance this
+  const notification = document.createElement('div');
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #4caf50;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 10000;
+    animation: slideIn 0.3s ease;
+  `;
+  notification.textContent = message;
+  
+  document.body.appendChild(notification);
+  
+  setTimeout(() => {
+    notification.remove();
+  }, 3000);
+}
+
+// Initialize admin chat when page loads
+document.addEventListener('DOMContentLoaded', function() {
+  initAdminChat();
+  refreshActiveUsers();
+});
 </script>
+
+<!-- Add Socket.IO script for admin chat -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
 {% endblock %}
