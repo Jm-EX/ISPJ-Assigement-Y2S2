@@ -555,9 +555,12 @@ def on_message(data):
         'sender_type': 'customer' if sender == 'customer' else 'admin'
     }
     
-    # Send to user's private room (so they see their own message)
-    emit('receive_message', message_data, room=user_room)
-    print(f"DEBUG: Message sent to user room: {user_room}")
+    # Send to user's private room (so they see their own message) - but NOT in concierge mode
+    if sender == 'customer' and user_modes.get(session_id) != 'human':
+        emit('receive_message', message_data, room=user_room)
+        print(f"DEBUG: Message sent to user room: {user_room}")
+    else:
+        print(f"DEBUG: Concierge mode - not echoing message back to customer")
     
     # Handle different modes
     if sender == 'customer' and user_modes.get(session_id) == 'ai':
@@ -597,7 +600,7 @@ def on_message(data):
             emit('receive_message', error_message, room=user_room)
             
     elif sender == 'customer' and user_modes.get(session_id) == 'human':
-        # Concierge Mode: Notify admin for direct chat
+        # Concierge Mode: Send to admin only, not back to customer
         admin_message_data = {
             'msg': message,
             'sender': sender,

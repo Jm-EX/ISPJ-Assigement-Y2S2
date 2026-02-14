@@ -509,7 +509,9 @@ function sendMessage() {
         chatHistory.push(messageObj);
         console.log('CHATBOT DEBUG: Message added to history');
         
+        // Always display customer's own message (server won't echo in concierge mode)
         addMessageToChat('You', msg, 'customer');
+        
         input.value = '';
         console.log('CHATBOT DEBUG: Message sent successfully');
         console.log('='.repeat(80));
