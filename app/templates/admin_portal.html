@@ -235,6 +235,24 @@
       <div class="stat-value">{{ stats.total_users }}</div>
       <div class="stat-label">Registered user accounts</div>
     </div>
+    
+    <div class="stat-card">
+      <h3>Chat Messages</h3>
+      <div class="stat-value">{{ chat_stats.total_messages }}</div>
+      <div class="stat-label">Total messages sent</div>
+    </div>
+    
+    <div class="stat-card warning">
+      <h3>Unread Chats</h3>
+      <div class="stat-value">{{ chat_stats.unread_messages }}</div>
+      <div class="stat-label">Messages awaiting response</div>
+    </div>
+    
+    <div class="stat-card">
+      <h3>Active Rooms</h3>
+      <div class="stat-value">{{ chat_stats.active_rooms }}</div>
+      <div class="stat-label">Chat rooms active (24h)</div>
+    </div>
   </div>
 
   <!-- Create Sub-Admin Section -->
@@ -493,6 +511,45 @@
     </div>
     {% endif %}
   </div>
+
+  <!-- Chat Management Section -->
+  <div class="dashboard-section">
+    <div class="section-header">
+      <h2>Chat Management</h2>
+      <div>
+        <button onclick="loadChatMessages()" style="padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; margin-right: 8px;">
+          Refresh Messages
+        </button>
+        <button onclick="markAllAsRead()" style="padding: 8px 16px; background: #38ef7d; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer;">
+          Mark All as Read
+        </button>
+      </div>
+    </div>
+    
+    <!-- Chat Messages Display -->
+    <div id="chatMessages" style="max-height: 400px; overflow-y: auto; border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; margin-bottom: 16px; background: #fafafa;">
+      <div class="empty-state">
+        <p>Loading chat messages...</p>
+      </div>
+    </div>
+    
+    <!-- Admin Chat Input -->
+    <div style="display: flex; gap: 12px; align-items: flex-end;">
+      <input 
+        type="text" 
+        id="adminChatInput" 
+        placeholder="Type your message as admin..." 
+        style="flex: 1; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px;"
+        onkeypress="if(event.key === 'Enter') sendAdminChat();"
+      >
+      <button 
+        onclick="sendAdminChat()" 
+        style="padding: 12px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;"
+      >
+        Send
+      </button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -594,5 +651,136 @@ async function logoutSession(sessionId, username) {
     console.error(error);
   }
 }
+
+// =========================
+// Chat Management Functions
+// =========================
+
+let currentRoom = 'default';
+
+async function loadChatMessages(room = null) {
+  try {
+    const response = await fetch(`/admin/chat-messages?room=${room || currentRoom}&limit=50`);
+    const data = await response.json();
+    
+    if (data.success) {
+      displayChatMessages(data.messages);
+    } else {
+      alert('Error loading chat messages: ' + (data.error || 'Unknown error'));
+    }
+  } catch (error) {
+    alert('An error occurred while loading chat messages.');
+    console.error(error);
+  }
+}
+
+function displayChatMessages(messages) {
+  const chatContainer = document.getElementById('chatMessages');
+  
+  if (messages.length === 0) {
+    chatContainer.innerHTML = '<div class="empty-state"><p>No chat messages found.</p></div>';
+    return;
+  }
+  
+  // Sort messages by timestamp (oldest first)
+  messages.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+  
+  let html = '';
+  messages.forEach(msg => {
+    const isUnread = !msg.admin_read;
+    const senderClass = msg.sender_type === 'admin' ? 'admin' : 
+                         msg.sender_type === 'ai' ? 'ai' : 'customer';
+    const senderName = msg.sender_type === 'admin' ? '{{ session.get("username", "Admin") }}' : 
+                      msg.sender_type === 'ai' ? 'AI Support' : msg.username;
+    
+    html += `
+      <div style="margin-bottom: 12px; padding: 8px; border-radius: 6px; background: ${msg.sender_type === 'admin' ? '#e3f2fd' : msg.sender_type === 'ai' ? '#f3e5f5' : '#fff'}; border-left: 4px solid ${msg.sender_type === 'admin' ? '#1976d2' : msg.sender_type === 'ai' ? '#7b1fa2' : '#666'};">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+          <strong style="color: ${msg.sender_type === 'admin' ? '#1976d2' : msg.sender_type === 'ai' ? '#7b1fa2' : '#333'};">${senderName}</strong>
+          <span style="font-size: 12px; color: #666;">${new Date(msg.timestamp).toLocaleTimeString()}</span>
+          ${isUnread ? '<span style="background: #ff5252; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px; margin-left: 8px;">NEW</span>' : ''}
+        </div>
+        <div style="color: #333; line-height: 1.4;">${msg.message}</div>
+        ${msg.user_email ? `<div style="font-size: 11px; color: #888; margin-top: 4px;">${msg.user_email}</div>` : ''}
+      </div>
+    `;
+  });
+  
+  chatContainer.innerHTML = html;
+  // Scroll to bottom
+  chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+
+async function sendAdminChat() {
+  const input = document.getElementById('adminChatInput');
+  const message = input.value.trim();
+  
+  if (!message) {
+    alert('Please enter a message.');
+    return;
+  }
+  
+  try {
+    const response = await fetch('/admin/send-chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        message: message,
+        room: currentRoom
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      input.value = '';
+      // Refresh messages to show the new one
+      setTimeout(() => loadChatMessages(currentRoom), 100);
+    } else {
+      alert('Error sending message: ' + (data.error || 'Unknown error'));
+    }
+  } catch (error) {
+    alert('An error occurred while sending message.');
+    console.error(error);
+  }
+}
+
+async function markAllAsRead() {
+  try {
+    const response = await fetch('/admin/mark-chat-read', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        room: currentRoom
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      // Refresh messages to update read status
+      setTimeout(() => loadChatMessages(currentRoom), 100);
+    } else {
+      alert('Error marking messages as read: ' + (data.error || 'Unknown error'));
+    }
+  } catch (error) {
+    alert('An error occurred while marking messages as read.');
+    console.error(error);
+  }
+}
+
+// Auto-refresh chat messages every 30 seconds
+setInterval(() => {
+  loadChatMessages(currentRoom);
+}, 30000);
+
+// Load initial messages when page loads
+document.addEventListener('DOMContentLoaded', () => {
+  loadChatMessages();
+});
 </script>
 {% endblock %}

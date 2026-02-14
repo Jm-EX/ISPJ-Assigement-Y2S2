@@ -917,3 +917,93 @@ def delete_session(session_id: int):
     
     cursor.execute("DELETE FROM active_sessions WHERE id = %s", (session_id,))
     db.commit()
+
+
+# =========================
+# Chat Functions
+# =========================
+
+def save_chat_message(session_id, user_id, username, message, sender_type, room):
+    """Save a chat message to the database"""
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute(
+        """INSERT INTO chat_messages 
+           (session_id, user_id, username, message, sender_type, room) 
+           VALUES (%s, %s, %s, %s, %s, %s)""",
+        (session_id, user_id, username, message, sender_type, room)
+    )
+    db.commit()
+
+
+def get_chat_messages(room=None, limit=50, unread_only=False):
+    """Get chat messages from database"""
+    db = get_db()
+    cursor = db.cursor()
+    
+    query = """
+        SELECT cm.*, u.username as user_username, u.email as user_email
+        FROM chat_messages cm
+        LEFT JOIN users u ON cm.user_id = u.id
+    """
+    params = []
+    
+    if room:
+        query += " WHERE cm.room = %s"
+        params.append(room)
+    
+    if unread_only:
+        if room:
+            query += " AND cm.admin_read = FALSE"
+        else:
+            query += " WHERE cm.admin_read = FALSE"
+    
+    query += " ORDER BY cm.timestamp DESC LIMIT %s"
+    params.append(limit)
+    
+    cursor.execute(query, params)
+    return cursor.fetchall()
+
+
+def mark_chat_messages_as_read(room=None):
+    """Mark chat messages as read by admin"""
+    db = get_db()
+    cursor = db.cursor()
+    
+    if room:
+        cursor.execute(
+            "UPDATE chat_messages SET admin_read = TRUE WHERE room = %s AND admin_read = FALSE",
+            (room,)
+        )
+    else:
+        cursor.execute("UPDATE chat_messages SET admin_read = TRUE WHERE admin_read = FALSE")
+    
+    db.commit()
+
+
+def get_chat_stats():
+    """Get chat statistics for admin dashboard"""
+    db = get_db()
+    cursor = db.cursor()
+    
+    # Total messages
+    cursor.execute("SELECT COUNT(*) as total FROM chat_messages")
+    total_messages = cursor.fetchone()['total']
+    
+    # Unread messages
+    cursor.execute("SELECT COUNT(*) as unread FROM chat_messages WHERE admin_read = FALSE")
+    unread_messages = cursor.fetchone()['unread']
+    
+    # Active rooms (rooms with messages in last 24 hours)
+    cursor.execute("""
+        SELECT COUNT(DISTINCT room) as active_rooms 
+        FROM chat_messages 
+        WHERE timestamp >= NOW() - INTERVAL '24 hours'
+    """)
+    active_rooms = cursor.fetchone()['active_rooms']
+    
+    return {
+        'total_messages': total_messages,
+        'unread_messages': unread_messages,
+        'active_rooms': active_rooms
+    }

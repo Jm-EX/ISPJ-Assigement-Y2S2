@@ -9,6 +9,7 @@ import stripe
 import requests
 from flask_socketio import SocketIO, emit, join_room, leave_room
 import google.generativeai as genai
+from app.auth_db import save_chat_message
 
 # =========================
 # Setup
@@ -467,54 +468,63 @@ def on_message(data):
     # If it's a customer message and user is in AI mode, generate AI response
     print(f"DEBUG: Checking if AI response needed...")
     print(f"DEBUG: sender == 'customer': {sender == 'customer'}")
-    print(f"DEBUG: user_modes.get(session_id): {user_modes.get(session_id)}")
     if sender == 'customer' and user_modes.get(session_id) == 'ai':
-        print(f"DEBUG: AI response will be generated")
         try:
             # Get AI response
-            print(f"DEBUG: Calling get_gemini_response with message: {message[:50]}...")
             ai_response = get_gemini_response(message)
-            print(f"DEBUG: AI response received: {ai_response[:100]}...")
+            
+            # Save AI response to database
+            save_chat_message(
+                session_id=session_id,
+                user_id=None,
+                username='AI Support',
+                message=ai_response,
+                sender_type='ai',
+                room=room
+            )
             
             # Send AI response as "AI Support"
             ai_message_data = {
                 'msg': ai_response,
                 'sender': 'AI Support',
-                'timestamp': datetime.now().strftime('%H:%M')
+                'timestamp': datetime.now().strftime('%H:%M'),
+                'sender_type': 'ai'
             }
             
             # Small delay to make it feel natural
             import time
-            print(f"DEBUG: Waiting 1 second before sending AI response...")
             time.sleep(1)
             
-            print(f"DEBUG: Emitting AI response to room: {room}")
             emit('receive_message', ai_message_data, room=room)
-            print(f"DEBUG: AI response emitted successfully")
-            print("="*80 + "\n")
             
             # Log AI response
             logging.info(f"AI response: {ai_response}")
             
         except Exception as e:
-            print(f"ERROR: Exception in AI response generation: {type(e).__name__}: {str(e)}")
-            import traceback
-            print(f"ERROR: Traceback: {traceback.format_exc()}")
-            print("="*80 + "\n")
             logging.error(f"Error generating AI response: {str(e)}")
             error_message = {
                 'msg': "I'm sorry, I'm having trouble processing your request right now. Please try again.",
                 'sender': 'AI Support',
-                'timestamp': datetime.now().strftime('%H:%M')
+                'timestamp': datetime.now().strftime('%H:%M'),
+                'sender_type': 'ai'
             }
             emit('receive_message', error_message, room=room)
     elif sender == 'customer' and user_modes.get(session_id) == 'human':
         # In human mode, don't generate AI responses
-        print(f"DEBUG: User is in Human mode - no AI response generated")
-        print("="*80 + "\n")
         logging.info(f"User {session_id} is in Human mode - no AI response generated")
     else:
         # Handle admin/staff messages (forward to room)
-        print(f"DEBUG: Message from non-customer sender or no mode set - no AI response")
-        print("="*80 + "\n")
+        # Save admin message to database
+        if sender != 'customer':
+            try:
+                save_chat_message(
+                    session_id=session_id,
+                    user_id=session.get('user_id') if 'user_id' in session else None,
+                    username=sender,
+                    message=message,
+                    sender_type='admin',
+                    room=room
+                )
+            except Exception as e:
+                logging.error(f"Error saving admin chat message: {str(e)}")
         pass

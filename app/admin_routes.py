@@ -1,6 +1,7 @@
 from flask import Blueprint, redirect, render_template, session, url_for, request, jsonify, flash
-from app.auth_db import get_login_stats, get_all_users, delete_user, get_security_logs, create_sub_admin, update_user_role, get_user_permissions, get_active_sessions, delete_session
+from app.auth_db import get_login_stats, get_all_users, delete_user, get_security_logs, create_sub_admin, update_user_role, get_user_permissions, get_active_sessions, delete_session, save_chat_message, get_chat_messages, mark_chat_messages_as_read, get_chat_stats
 from werkzeug.security import generate_password_hash
+from datetime import datetime
 import json
 
 
@@ -39,6 +40,7 @@ def portal():
     stats = get_login_stats()
     users = get_all_users()
     security_logs = get_security_logs(limit=50)
+    chat_stats = get_chat_stats()
     
     # Get active sessions - master admin always has access, sub-admins need permission
     active_sessions = []
@@ -50,7 +52,7 @@ def portal():
     if role is None or role == 'super_admin' or role == 'master_admin' or check_permission(current_user_id, 'view_active_sessions'):
         active_sessions = get_active_sessions()
     
-    return render_template("admin_portal.html", stats=stats, users=users, security_logs=security_logs, active_sessions=active_sessions)
+    return render_template("admin_portal.html", stats=stats, users=users, security_logs=security_logs, active_sessions=active_sessions, chat_stats=chat_stats)
 
 
 @admin.post("/admin/delete-user/<int:user_id>")
@@ -181,3 +183,83 @@ def logout_session_route(session_id):
         return jsonify({"success": True})
     else:
         return jsonify({"error": "You do not have permission to logout sessions"}), 403
+
+
+# =========================
+# Chat Management Routes
+# =========================
+
+@admin.get("/admin/chat-messages")
+def get_chat_messages_route():
+    """Get chat messages for admin dashboard"""
+    if not session.get("user_id"):
+        return jsonify({"error": "Not authenticated"}), 401
+    if not session.get("is_admin"):
+        return jsonify({"error": "Not authorized"}), 403
+    
+    room = request.args.get("room")
+    limit = int(request.args.get("limit", 50))
+    unread_only = request.args.get("unread_only", "false").lower() == "true"
+    
+    try:
+        messages = get_chat_messages(room=room, limit=limit, unread_only=unread_only)
+        return jsonify({"success": True, "messages": messages})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@admin.post("/admin/mark-chat-read")
+def mark_chat_read_route():
+    """Mark chat messages as read"""
+    if not session.get("user_id"):
+        return jsonify({"error": "Not authenticated"}), 401
+    if not session.get("is_admin"):
+        return jsonify({"error": "Not authorized"}), 403
+    
+    room = request.json.get("room") if request.is_json else request.form.get("room")
+    
+    try:
+        mark_chat_messages_as_read(room=room)
+        return jsonify({"success": True})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@admin.post("/admin/send-chat")
+def send_chat_route():
+    """Send chat message as admin"""
+    if not session.get("user_id"):
+        return jsonify({"error": "Not authenticated"}), 401
+    if not session.get("is_admin"):
+        return jsonify({"error": "Not authorized"}), 403
+    
+    data = request.get_json()
+    message = data.get("message", "").strip()
+    room = data.get("room", "default")
+    
+    if not message:
+        return jsonify({"error": "Message cannot be empty"}), 400
+    
+    try:
+        # Save to database
+        save_chat_message(
+            session_id=request.sid,
+            user_id=session.get("user_id"),
+            username=session.get("username", "Admin"),
+            message=message,
+            sender_type="admin",
+            room=room
+        )
+        
+        # Emit via Socket.IO (will be handled in routes.py)
+        from app.routes import socketio
+        socketio.emit('receive_message', {
+            'msg': message,
+            'sender': session.get("username", "Admin Support"),
+            'timestamp': datetime.now().strftime('%H:%M'),
+            'sender_type': 'admin'
+        }, room=room)
+        
+        return jsonify({"success": True})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
