@@ -560,7 +560,22 @@ def on_message(data):
         else:
             user_room_id = f"guest_{session_id}"
         
-        # Forward message to admin room (no database save)
+        # Save user message to database first
+        try:
+            save_chat_message(
+                session_id=session_id,
+                user_id=user_id,
+                username=username,
+                user_email=user_email,
+                message=message,
+                sender_type='user',
+                room='customer_service'
+            )
+            print(f"DEBUG: User message saved to database")
+        except Exception as e:
+            print(f"DEBUG: Error saving user message: {e}")
+        
+        # Forward message to admin room
         admin_message_data = {
             'msg': message,
             'sender': username,

@@ -540,9 +540,14 @@
           <h3 id="chatUserInfo" style="margin: 0; color: #333;"></h3>
           <p id="chatUserDetails" style="margin: 4px 0 0 0; color: #666; font-size: 14px;"></p>
         </div>
-        <button onclick="closeExpandedChat()" style="padding: 6px 12px; background: #f44336; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer;">
-          Close
-        </button>
+        <div>
+          <button onclick="refreshChatMessages()" style="padding: 6px 12px; background: #667eea; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; margin-right: 8px;">
+            Refresh
+          </button>
+          <button onclick="closeExpandedChat()" style="padding: 6px 12px; background: #f44336; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer;">
+            Close
+          </button>
+        </div>
       </div>
       
       <!-- Chat Messages -->
@@ -696,6 +701,11 @@ function refreshActiveUsers() {
 
 // Expand chat for specific user
 function expandChat(sessionId, username, email, room) {
+  // Check if reopening same user
+  const isSameUser = currentChatUser && 
+                    currentChatUser.sessionId === sessionId && 
+                    currentChatUser.room === room;
+  
   currentChatUser = { sessionId, username, email, room };
   
   // Update chat info
@@ -705,8 +715,12 @@ function expandChat(sessionId, username, email, room) {
   // Show expanded chat view
   document.getElementById('expandedChatView').style.display = 'block';
   
-  // Load chat messages for this user
-  loadUserMessages(sessionId, room);
+  // Only load messages if it's a different user or first time opening
+  if (!isSameUser) {
+    loadUserMessages(sessionId, room);
+  } else {
+    console.log('Reopening same user - messages already displayed');
+  }
   
   console.log('Expanded chat for user:', username);
 }
@@ -714,14 +728,28 @@ function expandChat(sessionId, username, email, room) {
 // Close expanded chat
 function closeExpandedChat() {
   document.getElementById('expandedChatView').style.display = 'none';
-  currentChatUser = null;
-  console.log('Closed expanded chat');
+  // Don't clear currentChatUser - keep it for persistence
+  console.log('Closed expanded chat but preserved user data');
+}
+
+// Refresh chat messages
+function refreshChatMessages() {
+  if (currentChatUser) {
+    console.log('Refreshing messages for user:', currentChatUser.username);
+    loadUserMessages(currentChatUser.sessionId, currentChatUser.room);
+  } else {
+    console.log('No current user to refresh');
+  }
 }
 
 // Load user messages
 function loadUserMessages(sessionId, room) {
   const messagesContainer = document.getElementById('expandedChatMessages');
-  messagesContainer.innerHTML = '<div class="empty-state"><p>Loading messages...</p></div>';
+  
+  // Only show loading if container is empty or has error state
+  if (!messagesContainer.innerHTML || messagesContainer.innerHTML.includes('Error') || messagesContainer.innerHTML.includes('Loading')) {
+    messagesContainer.innerHTML = '<div class="empty-state"><p>Loading messages...</p></div>';
+  }
   
   // Request chat history from server
   fetch('/api/chat-history', {
@@ -782,12 +810,14 @@ function loadUserMessages(sessionId, room) {
       // Scroll to bottom
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
     } else {
-      // No messages
-      messagesContainer.innerHTML = `
-        <div style="padding: 20px; text-align: center; color: #666;">
-          <p>No messages yet. Start a conversation!</p>
-        </div>
-      `;
+      // No messages - keep any existing real-time messages
+      if (!messagesContainer.innerHTML) {
+        messagesContainer.innerHTML = `
+          <div style="padding: 20px; text-align: center; color: #666;">
+            <p>No messages yet. Start a conversation!</p>
+          </div>
+        `;
+      }
     }
   })
   .catch(error => {
