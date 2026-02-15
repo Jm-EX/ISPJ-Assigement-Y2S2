@@ -322,6 +322,30 @@ def get_chat_history(session_id=None, user_id=None, room=None, limit=50):
         return []
 
 
+def get_all_chat_logs(limit=1000):
+    """Get all chat logs sorted by session ID and timestamp"""
+    db = get_db()
+    cursor = db.cursor()
+    
+    try:
+        cursor.execute("""
+            SELECT id, session_id, user_id, username, user_email, 
+                   message, sender_type, room, timestamp, admin_read
+            FROM chat_messages 
+            ORDER BY session_id ASC, timestamp ASC
+            LIMIT %s
+        """, (limit,))
+        
+        result = cursor.fetchall()
+        print(f"DEBUG: get_all_chat_logs result count: {len(result)}")
+        return result
+    except Exception as e:
+        print(f"DEBUG: get_all_chat_logs error: {e}")
+        import traceback
+        print(f"DEBUG: get_all_chat_logs traceback: {traceback.format_exc()}")
+        return []
+
+
 def get_active_conversations(hours=24):
     """Get active chat conversations from the last N hours"""
     db = get_db()

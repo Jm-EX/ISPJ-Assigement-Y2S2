@@ -14,7 +14,7 @@ import json
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from app.auth_db import save_chat_message, get_chat_history, mark_messages_as_read
+from app.auth_db import save_chat_message, get_chat_history, mark_messages_as_read, get_all_chat_logs
 
 # =========================
 # Setup
@@ -251,6 +251,41 @@ def allowed_file(filename):
 # =========================
 # Booking Form
 # =========================
+
+@main.route("/chat-logs", methods=["GET"])
+def chat_logs():
+    """Display all chat logs sorted by session ID"""
+    if 'admin_logged_in' not in session:
+        return redirect(url_for('main.admin_login'))
+    
+    try:
+        # Get all chat logs from database
+        logs = get_all_chat_logs(limit=2000)  # Get last 2000 messages
+        
+        # Group logs by session ID for better organization
+        sessions = {}
+        for log in logs:
+            session_id = log[1]  # session_id is at index 1
+            if session_id not in sessions:
+                sessions[session_id] = []
+            sessions[session_id].append({
+                'id': log[0],
+                'user_id': log[2],
+                'username': log[3],
+                'user_email': log[4],
+                'message': log[5],
+                'sender_type': log[6],
+                'room': log[7],
+                'timestamp': log[8],
+                'admin_read': log[9]
+            })
+        
+        return render_template("chat_logs.html", sessions=sessions)
+    except Exception as e:
+        print(f"Error loading chat logs: {e}")
+        flash("Error loading chat logs", "error")
+        return render_template("chat_logs.html", sessions={})
+
 
 @main.route("/book/<room_type>", methods=["GET", "POST"])
 def book_room_confirm(room_type):
