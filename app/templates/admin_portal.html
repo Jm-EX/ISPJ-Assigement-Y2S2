@@ -688,12 +688,32 @@ socket.on('receive_encrypted_message', async function(data) {
         if (decryptedMessage) {
             console.log('Message decrypted successfully:', decryptedMessage);
             
-            // Display the decrypted message
-            addCustomerMessageToChat({
+            // Create user data object for active user management
+            const userData = {
                 msg: decryptedMessage.msg,
                 sender: decryptedMessage.sender,
-                timestamp: decryptedMessage.timestamp
-            });
+                timestamp: decryptedMessage.timestamp,
+                sender_type: 'customer',
+                user_room: decryptedMessage.user_room || `guest_${sessionId}`,
+                user_email: decryptedMessage.user_email || null,
+                session_id: sessionId
+            };
+            
+            // Add to active users list or update existing
+            addOrUpdateActiveUser(userData);
+            
+            // If this user is currently selected, add message to chat
+            if (currentChatUser && 
+                ((currentChatUser.email && currentChatUser.email === userData.user_email) ||
+                 (!currentChatUser.email && currentChatUser.sessionId === sessionId))) {
+                
+                // Display the decrypted message
+                addCustomerMessageToChat({
+                    msg: decryptedMessage.msg,
+                    sender: decryptedMessage.sender,
+                    timestamp: decryptedMessage.timestamp
+                });
+            }
         } else {
             console.error('Failed to decrypt message');
         }
