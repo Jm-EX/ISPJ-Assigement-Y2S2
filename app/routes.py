@@ -41,19 +41,10 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 
 def generate_encryption_key(password: str, salt: bytes = None) -> bytes:
-    """Generate encryption key from password using PBKDF2"""
-    if salt is None:
-        salt = os.urandom(16)
-    
-    kdf = PBKDF2HMAC(
-        algorithm=hashes.SHA256(),
-        length=32,
-        salt=salt,
-        iterations=100000,
-        backend=default_backend()
-    )
-    key = kdf.derive(password.encode())
-    return key
+    """Generate encryption key from password using simple SHA-256 (matches client)"""
+    import hashlib
+    # Use simple SHA-256 hash to match client-side
+    return hashlib.sha256(password.encode()).digest()
 
 def encrypt_message(message: dict, key: bytes) -> str:
     """Encrypt a message using AES-GCM (matches client-side)"""

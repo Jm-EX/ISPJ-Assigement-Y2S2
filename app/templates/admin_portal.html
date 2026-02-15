@@ -579,10 +579,10 @@ const socket = io();
 
 let encryptionKeys = {}; // Store encryption keys per session
 
-// Generate encryption key from session ID (simplified for demo)
+// Generate encryption key from session ID (simple SHA-256 to match server)
 function generateClientKey(sessionId) {
     if (!encryptionKeys[sessionId]) {
-        // In production, use proper key exchange protocol
+        // Use simple SHA-256 to match server
         const password = `session_${sessionId}_${new Date().toISOString().slice(0, 10).replace(/-/g, '')}`;
         const encoder = new TextEncoder();
         const data = encoder.encode(password);
