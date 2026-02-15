@@ -1186,6 +1186,37 @@ socket.on('admin_joined', (data) => {
   }
 });
 
+// Listen for users ready for human support
+socket.on('user_ready_for_human_support', async function(data) {
+  console.log('DEBUG: User ready for human support:', data);
+  
+  const userSessionId = data.session_id;
+  console.log(`DEBUG: User ${userSessionId} is ready, initiating DH exchange`);
+  
+  try {
+    // Auto-initiate DH exchange with this user
+    const key = await getDHKey(userSessionId);
+    console.log(`DEBUG: DH exchange completed for user ${userSessionId}`);
+    
+    // Update UI to show user is ready
+    if (typeof updateUserStatus === 'function') {
+      updateUserStatus(userSessionId, 'Ready for DH');
+    } else {
+      console.log(`DEBUG: User ${userSessionId} DH exchange ready`);
+    }
+  } catch (error) {
+    console.error(`DEBUG: DH exchange failed for user ${userSessionId}:`, error);
+  }
+});
+
+// Helper function to update user status (if not already defined)
+if (typeof updateUserStatus !== 'function') {
+  function updateUserStatus(sessionId, status) {
+    console.log(`DEBUG: User ${sessionId} status: ${status}`);
+    // You can add UI updates here if needed
+  }
+}
+
 socket.on('receive_message', function(data) {
   console.log('Admin received message:', data);
   

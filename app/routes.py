@@ -646,6 +646,14 @@ def on_switch_to_human():
     print(f"DEBUG: Session ID: {session_id}")
     user_modes[session_id] = 'human'
     print(f"DEBUG: User mode switched to: human")
+    
+    # Notify admins that user is ready for human support
+    emit('user_ready_for_human_support', {
+        'session_id': session_id,
+        'message': f'User {session_id} is ready for human support'
+    }, room='customer_service')
+    
+    print(f"DEBUG: Notified admins that user {session_id} is ready for human support")
     print("="*80 + "\n")
     logging.info(f"User {session_id} switched to human mode")
 
