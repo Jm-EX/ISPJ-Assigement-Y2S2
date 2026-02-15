@@ -239,6 +239,18 @@
       <div class="stat-label">Accounts temporarily locked</div>
     </div>
     
+    <div class="stat-card info">
+      <h3>Chat Messages</h3>
+      <div class="stat-value" id="totalChatMessages">{{ chat_stats.total_messages or 0 }}</div>
+      <div class="stat-label">Total messages sent</div>
+    </div>
+    
+    <div class="stat-card primary">
+      <h3>Unread Chats</h3>
+      <div class="stat-value" id="unreadChatMessages">{{ chat_stats.unread_messages or 0 }}</div>
+      <div class="stat-label">Messages awaiting response</div>
+    </div>
+    
     <div class="stat-card">
       <h3>Total Users</h3>
       <div class="stat-value">{{ stats.total_users }}</div>
@@ -959,6 +971,9 @@ socket.on('receive_message', function(data) {
         }, 500);
       }
     }
+    
+    // Update unread count
+    updateUnreadCount();
   }
   // Admin messages are handled locally in sendAdminMessage function
 });
@@ -970,6 +985,11 @@ socket.on('admin_message_sent', (data) => {
   }
 });
 
+socket.on('messages_marked_read', (data) => {
+  console.log('Messages marked as read:', data);
+  if (data.status === 'success') {
+    updateUnreadCount();
+  }
 });
 
 // Add or update active user in the list
