@@ -488,6 +488,15 @@ def on_message(data):
     print(f"DEBUG: Session ID: {session_id}")
     print(f"DEBUG: Current user mode: {user_modes.get(session_id, 'NOT SET')}")
     
+    # Get user's private room for AI responses
+    user_email = session.get('email') if 'email' in session else None
+    if user_email:
+        user_room_id = f"user_{user_email}"
+    else:
+        user_room_id = f"guest_{session_id}"
+    
+    print(f"DEBUG: User's private room: {user_room_id}")
+    
     # Log message
     logging.info(f"Chat message from {sender}: {message}")
     
