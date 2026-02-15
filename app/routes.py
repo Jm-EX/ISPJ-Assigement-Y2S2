@@ -816,16 +816,22 @@ def on_send_encrypted_message(data):
             
             # Forward decrypted message to admin room (no need to re-encrypt)
             print(f"DEBUG: Forwarding encrypted message to admin room 'customer_service'")
-            print(f"DEBUG: Room 'customer_service' members: {socketio.server.manager.get_participants('customer_service', None)}")
+            room_members = socketio.server.manager.get_participants('customer_service', None)
+            print(f"DEBUG: Room 'customer_service' members: {room_members}")
+            print(f"DEBUG: Room members count: {len(room_members) if room_members else 0}")
             
-            emit('receive_encrypted_message', {
-                'encrypted_data': encrypted_data,  # Send original encrypted data
-                'session_id': session_id,
-                'username': username,  # Add actual username here
-                'user_email': user_email
-            }, room='customer_service')
-            
-            print(f"DEBUG: Encrypted message forwarded to admin room for session {session_id}")
+            if room_members and len(room_members) > 0:
+                print(f"DEBUG: Emitting to {len(room_members)} admin(s) in customer_service room")
+                emit('receive_encrypted_message', {
+                    'encrypted_data': encrypted_data,  # Send original encrypted data
+                    'session_id': session_id,
+                    'username': username,  # Add actual username here
+                    'user_email': user_email
+                }, room='customer_service')
+                print(f"DEBUG: Encrypted message forwarded to admin room for session {session_id}")
+            else:
+                print(f"DEBUG: WARNING: No admins in customer_service room to receive message!")
+                print(f"DEBUG: Message from user {session_id} will be lost!")
             
             print(f"DEBUG: Encrypted user message forwarded to admin room: customer_service")
         else:
