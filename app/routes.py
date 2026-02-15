@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session, current_app, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, current_app
 from werkzeug.utils import secure_filename
 from PIL import Image
 import logging
@@ -726,41 +726,6 @@ def on_admin_mark_read(data):
 # =========================
 # API Routes
 # =========================
-
-@main.post('/api/active-conversations')
-def api_active_conversations():
-    """Get active conversations with unread counts"""
-    if not session.get("user_id") or not session.get("is_admin"):
-        return jsonify({'error': 'Unauthorized'}), 401
-    
-    try:
-        # Get active conversations from database
-        conversations = get_active_conversations(hours=24)
-        
-        # Convert to JSON-serializable format
-        active_conversations = []
-        for conv in conversations:
-            active_conversations.append({
-                'session_id': conv['session_id'],
-                'user_id': conv['user_id'],
-                'username': conv['username'],
-                'user_email': conv['user_email'],
-                'room': conv['room'],
-                'last_message_time': conv['last_message_time'].isoformat() if conv['last_message_time'] else None,
-                'unread_count': conv['unread_count'] or 0
-            })
-        
-        return jsonify({
-            'status': 'success',
-            'conversations': active_conversations,
-            'total_unread': sum(conv['unread_count'] or 0 for conv in conversations)
-        })
-        
-    except Exception as e:
-        print(f"Error getting active conversations: {e}")
-        import traceback
-        print(f"Active conversations traceback: {traceback.format_exc()}")
-        return jsonify({'error': str(e)}), 500
 
 @main.post('/api/chat-history')
 def api_chat_history():
