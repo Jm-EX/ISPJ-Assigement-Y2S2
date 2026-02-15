@@ -803,9 +803,15 @@ function expandChat(sessionId, username, email, room) {
   
   // Only load messages if it's a different user or first time opening
   if (!isSameUser) {
+    // Display current user's messages (will show empty if none exist)
+    displayCurrent_userMessages();
+    
+    // Load historical messages from database
     loadUserMessages(sessionId, room);
   } else {
     console.log('Reopening same user - messages already displayed');
+    // Still refresh display in case new messages came in
+    displayCurrent_userMessages();
   }
   
   console.log('Expanded chat for user:', username);
@@ -830,12 +836,7 @@ function refreshChatMessages() {
 
 // Load user messages
 function loadUserMessages(sessionId, room) {
-  const messagesContainer = document.getElementById('expandedChatMessages');
-  
-  // Only show loading if container is empty or has error state
-  if (!messagesContainer.innerHTML || messagesContainer.innerHTML.includes('Error') || messagesContainer.innerHTML.includes('Loading')) {
-    messagesContainer.innerHTML = '<div class="empty-state"><p>Loading messages...</p></div>';
-  }
+  console.log('Loading messages for user:', sessionId, 'room:', room);
   
   // Request chat history from server
   fetch('/api/chat-history', {
@@ -850,75 +851,61 @@ function loadUserMessages(sessionId, room) {
   })
   .then(response => response.json())
   .then(data => {
-    // Don't clear existing real-time messages - just add database messages
+    console.log('Received chat history:', data);
+    
     if (data.messages && data.messages.length > 0) {
-      // Create a map of existing messages to avoid duplicates
-      const existingMessages = new Map();
-      const messageElements = messagesContainer.querySelectorAll('div[style*="margin-bottom"]');
-      messageElements.forEach(el => {
-        const text = el.textContent;
-        existingMessages.set(text, true);
-      });
-      
-      data.messages.forEach(msg => {
-        // Skip if message already exists
-        const messageKey = `${msg.username}: ${msg.message}`;
-        if (existingMessages.has(messageKey)) {
-          return; // Skip duplicate
-        }
-        
-        const messageDiv = document.createElement('div');
-        
-        if (msg.sender_type === 'user') {
-          // Customer message
-          messageDiv.style.cssText = `
-            margin-bottom: 12px; 
-            padding: 8px 12px; 
-            border-radius: 8px; 
-            background: #f5f5f5;
-            border-left: 4px solid #666;
-          `;
-          messageDiv.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-              <strong style="color: #666;">${msg.username}</strong>
-              <span style="font-size: 12px; color: #666;">${new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
-            </div>
-            <div style="color: #333; line-height: 1.4;">${msg.message}</div>
-          `;
-        } else {
-          // Admin message
-          messageDiv.style.cssText = `
-            margin-bottom: 12px; 
-            padding: 8px 12px; 
-            border-radius: 8px; 
-            background: #e3f2fd;
-            border-left: 4px solid #1976d2;
-          `;
-          messageDiv.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-              <strong style="color: #1976d2;">${msg.username}</strong>
-              <span style="font-size: 12px; color: #666;">${new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
-            </div>
-            <div style="color: #333; line-height: 1.4;">${msg.message}</div>
-          `;
-        }
-        
-        messagesContainer.appendChild(messageDiv);
-      });
-      
-      // Scroll to bottom
-      messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    } else {
-      // No messages - keep any existing real-time messages
-      if (!messagesContainer.innerHTML) {
-        messagesContainer.innerHTML = `
-          <div style="padding: 20px; text-align: center; color: #666;">
-            <p>No messages yet. Start a conversation!</p>
-          </div>
-        `;
+      // Initialize user messages array if not exists
+      if (!userMessages[sessionId]) {
+        userMessages[sessionId] = [];
       }
+      
+      // Add database messages to storage (avoid duplicates)
+      data.messages.forEach(msg => {
+        const messageData = {
+          msg: msg.message,
+          sender: msg.sender_type === 'user' ? msg.username : 'Admin',
+          timestamp: new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+          fromDatabase: true
+        };
+        
+        // Check if message already exists in storage
+        const existingMessage = userMessages[sessionId].find(existing => 
+          existing.msg === messageData.msg && 
+          existing.sender === messageData.sender &&
+          existing.fromDatabase
+        );
+        
+        if (!existingMessage) {
+          userMessages[sessionId].push(messageData);
+        }
+      });
+      
+      // Sort messages by timestamp
+      userMessages[sessionId].sort((a, b) => {
+        const timeA = new Date('1970/01/01 ' + a.timestamp);
+        const timeB = new Date('1970/01/01 ' + b.timestamp);
+        return timeA - timeB;
+      });
+      
+      // Refresh display
+      displayCurrent_userMessages();
+      console.log(`Loaded ${data.messages.length} messages for user ${sessionId}`);
+    } else {
+      console.log('No messages found for user:', sessionId);
+      // Refresh display to show empty state
+      displayCurrent_userMessages();
     }
   })
+  .catch(error => {
+    console.error('Error loading messages:', error);
+    // Show error state but don't break the display
+    const messagesContainer = document.getElementById('expandedChatMessages');
+    messagesContainer.innerHTML = `
+      <div class="empty-state" style="text-align: center; padding: 40px; color: #f44336;">
+        <p>Error loading messages. Please try again.</p>
+      </div>
+    `;
+  });
 }
 
 // Send admin message
@@ -1068,11 +1055,18 @@ socket.on('admin_message_sent', (data) => {
     // If server sent back the processed message data, display it
     if (data.message_data) {
       console.log('Displaying server-processed message:', data.message_data);
-      addCustomerMessageToChat({
-        msg: data.message_data.msg,
-        sender: data.message_data.sender,
-        timestamp: data.message_data.timestamp
-      });
+      
+      // Only display if we have a current chat user selected
+      if (currentChatUser) {
+        console.log('Displaying admin message for current user:', currentChatUser);
+        addCustomerMessageToChat({
+          msg: data.message_data.msg,
+          sender: data.message_data.sender,
+          timestamp: data.message_data.timestamp
+        });
+      } else {
+        console.log('No current chat user selected - admin message not displayed');
+      }
     } else {
       console.log('No message_data from server - using local display');
       // For cases where server doesn't send back message_data
@@ -1147,36 +1141,99 @@ function addOrUpdateActiveUser(messageData) {
   });
 }
 
-// Add customer message to chat
+// =========================
+// User Message Management
+// =========================
+
+// Store messages per user session
+let userMessages = {}; // Format: { sessionId: [messages] }
+
+// Add customer message to chat (only for current user)
 function addCustomerMessageToChat(messageData) {
-  const messagesContainer = document.getElementById('expandedChatMessages');
-  
-  // Remove empty state if it exists
-  const emptyState = messagesContainer.querySelector('.empty-state');
-  if (emptyState) {
-    emptyState.remove();
+  // Only add message if we have a current chat user
+  if (!currentChatUser) {
+    console.log('No current chat user - message not displayed');
+    return;
   }
   
-  // Create customer message element
-  const messageDiv = document.createElement('div');
-  messageDiv.style.cssText = `
-    margin-bottom: 12px; 
-    padding: 8px 12px; 
-    border-radius: 8px; 
-    background: #f5f5f5;
-    border-left: 4px solid #666;
-  `;
+  // Store message for this user
+  const userKey = currentChatUser.sessionId;
+  if (!userMessages[userKey]) {
+    userMessages[userKey] = [];
+  }
   
-  messageDiv.innerHTML = `
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-      <strong style="color: #666;">${messageData.sender}</strong>
-      <span style="font-size: 12px; color: #666;">${messageData.timestamp}</span>
-    </div>
-    <div style="color: #333; line-height: 1.4;">${messageData.msg}</div>
-  `;
+  // Add message to storage
+  userMessages[userKey].push({
+    ...messageData,
+    timestamp: messageData.timestamp || new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+  });
   
-  messagesContainer.appendChild(messageDiv);
+  // Only display if this is the current user
+  displayCurrent_userMessages();
+}
+
+// Display messages for the current user
+function displayCurrent_userMessages() {
+  const messagesContainer = document.getElementById('expandedChatMessages');
+  
+  // Clear container
+  messagesContainer.innerHTML = '';
+  
+  // Get current user's messages
+  const userKey = currentChatUser ? currentChatUser.sessionId : null;
+  if (!userKey || !userMessages[userKey]) {
+    // Show empty state
+    messagesContainer.innerHTML = `
+      <div class="empty-state" style="text-align: center; padding: 40px; color: #999;">
+        <p>No messages yet. Start a conversation!</p>
+      </div>
+    `;
+    return;
+  }
+  
+  // Display all messages for current user
+  userMessages[userKey].forEach(messageData => {
+    const messageDiv = document.createElement('div');
+    
+    // Style based on sender
+    if (messageData.sender === 'Admin' || messageData.sender === 'You (Admin)') {
+      messageDiv.style.cssText = `
+        margin-bottom: 12px; 
+        padding: 8px 12px; 
+        border-radius: 8px; 
+        background: #e3f2fd;
+        border-left: 4px solid #1976d2;
+      `;
+    } else {
+      messageDiv.style.cssText = `
+        margin-bottom: 12px; 
+        padding: 8px 12px; 
+        border-radius: 8px; 
+        background: #f5f5f5;
+        border-left: 4px solid #666;
+      `;
+    }
+    
+    messageDiv.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+        <strong style="color: ${messageData.sender === 'Admin' ? '#1976d2' : '#666'};">${messageData.sender}</strong>
+        <span style="font-size: 12px; color: #666;">${messageData.timestamp}</span>
+      </div>
+      <div style="color: #333; line-height: 1.4;">${messageData.msg}</div>
+    `;
+    
+    messagesContainer.appendChild(messageDiv);
+  });
+  
+  // Scroll to bottom
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+// Clear messages for a specific user (when needed)
+function clearUserMessages(sessionId) {
+  if (userMessages[sessionId]) {
+    userMessages[sessionId] = [];
+  }
 }
 
 // Update unread count (placeholder for now)
