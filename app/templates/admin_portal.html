@@ -706,6 +706,9 @@ function expandChat(sessionId, username, email, room) {
                     currentChatUser.sessionId === sessionId && 
                     currentChatUser.room === room;
   
+  console.log('DEBUG: isSameUser:', isSameUser);
+  console.log('DEBUG: Expanding chat for user:', username, 'Session:', sessionId);
+  
   currentChatUser = { sessionId, username, email, room };
   
   // Update chat info
@@ -715,14 +718,127 @@ function expandChat(sessionId, username, email, room) {
   // Show expanded chat view
   document.getElementById('expandedChatView').style.display = 'block';
   
-  // Only load messages if it's a different user or first time opening
-  if (!isSameUser) {
-    loadUserMessages(sessionId, room);
-  } else {
-    console.log('Reopening same user - messages already displayed');
-  }
+  // Always load complete chat history from database when expanding
+  loadCompleteChatHistory(sessionId, room);
   
   console.log('Expanded chat for user:', username);
+}
+
+// Load complete chat history from database
+function loadCompleteChatHistory(sessionId, room) {
+  const messagesContainer = document.getElementById('expandedChatMessages');
+  
+  // Show loading state
+  messagesContainer.innerHTML = '<div class="empty-state"><p>Loading chat history...</p></div>';
+  
+  console.log('DEBUG: Loading complete chat history for session:', sessionId);
+  
+  // Request complete chat history from server
+  fetch('/api/chat-history', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      session_id: sessionId,
+      room: room
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log('DEBUG: Chat history response:', data);
+    
+    // Clear container and load fresh messages
+    messagesContainer.innerHTML = '';
+    
+    if (data.messages && data.messages.length > 0) {
+      console.log(`DEBUG: Displaying ${data.messages.length} messages from database`);
+      
+      data.messages.forEach(msg => {
+        displayMessageFromDatabase(msg);
+      });
+      
+      // Scroll to bottom
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    } else {
+      console.log('DEBUG: No messages found in database');
+      // Show empty state
+      messagesContainer.innerHTML = `
+        <div style="padding: 20px; text-align: center; color: #666;">
+          <p>No messages yet. Start a conversation!</p>
+        </div>
+      `;
+    }
+  })
+  .catch(error => {
+    console.error('Error loading chat history:', error);
+    messagesContainer.innerHTML = `
+      <div style="padding: 20px; text-align: center; color: #f44336;">
+        <p>Error loading messages. Please try again.</p>
+      </div>
+    `;
+  });
+}
+
+// Display message from database
+function displayMessageFromDatabase(msg) {
+  const messagesContainer = document.getElementById('expandedChatMessages');
+  
+  const messageDiv = document.createElement('div');
+  
+  if (msg.sender_type === 'user') {
+    // Customer message
+    messageDiv.style.cssText = `
+      margin-bottom: 12px; 
+      padding: 8px 12px; 
+      border-radius: 8px; 
+      background: #f5f5f5;
+      border-left: 4px solid #666;
+    `;
+    messageDiv.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+        <strong style="color: #666;">${msg.username}</strong>
+        <span style="font-size: 12px; color: #666;">${new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+      </div>
+      <div style="color: #333; line-height: 1.4;">${msg.message}</div>
+    `;
+  } else if (msg.sender_type === 'admin_received') {
+    // Admin received message indicator
+    messageDiv.style.cssText = `
+      margin-bottom: 8px; 
+      padding: 4px 8px; 
+      border-radius: 4px; 
+      background: #fff3cd;
+      border-left: 3px solid #ffc107;
+      font-size: 12px;
+      color: #856404;
+    `;
+    messageDiv.innerHTML = `
+      <div style="display: flex; align-items: center;">
+        <span style="margin-right: 4px;">📥</span>
+        <span>Message received: ${msg.message.replace('[Received] ', '')}</span>
+        <span style="margin-left: auto; font-size: 10px;">${new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+      </div>
+    `;
+  } else {
+    // Admin message
+    messageDiv.style.cssText = `
+      margin-bottom: 12px; 
+      padding: 8px 12px; 
+      border-radius: 8px; 
+      background: #e3f2fd;
+      border-left: 4px solid #1976d2;
+    `;
+    messageDiv.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+        <strong style="color: #1976d2;">${msg.username}</strong>
+        <span style="font-size: 12px; color: #666;">${new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+      </div>
+      <div style="color: #333; line-height: 1.4;">${msg.message}</div>
+    `;
+  }
+  
+  messagesContainer.appendChild(messageDiv);
 }
 
 // Close expanded chat
@@ -736,7 +852,8 @@ function closeExpandedChat() {
 function refreshChatMessages() {
   if (currentChatUser) {
     console.log('Refreshing messages for user:', currentChatUser.username);
-    loadUserMessages(currentChatUser.sessionId, currentChatUser.room);
+    // Reload complete chat history from database
+    loadCompleteChatHistory(currentChatUser.sessionId, currentChatUser.room);
   } else {
     console.log('No current user to refresh');
   }
@@ -924,6 +1041,32 @@ socket.on('admin_joined', (data) => {
 
 socket.on('receive_message', function(data) {
   console.log('Admin received message:', data);
+  
+  // Log admin message reception to database
+  fetch('/api/log-admin-received-message', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      session_id: data.session_id,
+      user_email: data.user_email,
+      username: data.sender,
+      message: data.msg,
+      timestamp: data.timestamp
+    })
+  })
+  .then(response => response.json())
+  .then(result => {
+    if (result.status === 'success') {
+      console.log('Admin message reception logged to database');
+    } else {
+      console.log('Error logging admin reception:', result.error);
+    }
+  })
+  .catch(error => {
+    console.log('Error logging admin reception:', error);
+  });
   
   // If it's a customer message, add to active users and display
   if (data.sender_type === 'customer') {

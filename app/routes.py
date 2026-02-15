@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session, current_app
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, current_app, jsonify
 from werkzeug.utils import secure_filename
 from PIL import Image
 import logging
@@ -726,6 +726,43 @@ def on_admin_mark_read(data):
 # =========================
 # API Routes
 # =========================
+
+@main.post('/api/log-admin-received-message')
+def api_log_admin_received_message():
+    """Log when admin receives a message"""
+    if not session.get("user_id") or not session.get("is_admin"):
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    try:
+        data = request.get_json()
+        session_id = data.get('session_id')
+        user_email = data.get('user_email')
+        username = data.get('username')
+        message = data.get('message')
+        timestamp = data.get('timestamp')
+        
+        print(f"DEBUG: Admin received message - logging to database")
+        print(f"DEBUG: Session ID: {session_id}, User: {username}, Email: {user_email}")
+        
+        # Save admin received message event to database
+        save_chat_message(
+            session_id=session_id,
+            user_id=None,  # Admin received event doesn't have user_id
+            username='Admin',
+            user_email=None,
+            message=f"[Received] {message}",
+            sender_type='admin_received',
+            room='customer_service'
+        )
+        
+        print(f"DEBUG: Admin received message logged to database")
+        return jsonify({'status': 'success', 'message': 'Admin received message logged'})
+        
+    except Exception as e:
+        print(f"DEBUG: Error logging admin received message: {e}")
+        import traceback
+        print(f"DEBUG: Admin received message traceback: {traceback.format_exc()}")
+        return jsonify({'error': str(e)}), 500
 
 @main.post('/api/chat-history')
 def api_chat_history():
