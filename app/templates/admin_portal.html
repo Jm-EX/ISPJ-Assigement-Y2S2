@@ -682,8 +682,9 @@ async function logoutSession(sessionId, username) {
 // =========================
 
 let currentChatUser = null;
+let socket = null;
+let userMessageCache = {}; // Cache messages per user
 
-// Load active users
 function refreshActiveUsers() {
   const usersList = document.getElementById('activeUsersList');
   usersList.innerHTML = '<div class="empty-state"><p>Loading active users...</p></div>';
@@ -712,6 +713,18 @@ function expandChat(sessionId, username, email, room) {
   console.log('DEBUG: email:', email);
   console.log('DEBUG: room:', room);
   
+  // Save current user's messages to cache before switching
+  if (currentChatUser && !isSameUser) {
+    const messagesContainer = document.getElementById('expandedChatMessages');
+    const messageElements = messagesContainer.querySelectorAll('div[style*="margin-bottom"]');
+    const messages = [];
+    messageElements.forEach(el => {
+      messages.push(el.outerHTML);
+    });
+    userMessageCache[currentChatUser.sessionId] = messages;
+    console.log(`DEBUG: Cached ${messages.length} messages for user ${currentChatUser.sessionId}`);
+  }
+  
   currentChatUser = { sessionId, username, email, room };
   
   // Update chat info
@@ -721,8 +734,18 @@ function expandChat(sessionId, username, email, room) {
   // Show expanded chat view
   document.getElementById('expandedChatView').style.display = 'block';
   
-  // Always load messages to ensure persistence (but be smarter about duplicates)
-  loadUserMessages(sessionId, room, isSameUser);
+  // Load cached messages if available, otherwise load from database
+  if (userMessageCache[sessionId]) {
+    console.log(`DEBUG: Loading ${userMessageCache[sessionId].length} cached messages for user ${sessionId}`);
+    const messagesContainer = document.getElementById('expandedChatMessages');
+    messagesContainer.innerHTML = userMessageCache[sessionId].join('');
+    // Scroll to bottom
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  } else {
+    console.log(`DEBUG: No cached messages for user ${sessionId}, loading from database`);
+    // Load from database if no cache
+    loadUserMessages(sessionId, room, isSameUser);
+  }
   
   console.log('Expanded chat for user:', username);
 }
@@ -1094,6 +1117,16 @@ function addCustomerMessageToChat(messageData) {
   `;
   
   messagesContainer.appendChild(messageDiv);
+  
+  // Save message to cache if we have a current user
+  if (currentChatUser && currentChatUser.sessionId) {
+    if (!userMessageCache[currentChatUser.sessionId]) {
+      userMessageCache[currentChatUser.sessionId] = [];
+    }
+    userMessageCache[currentChatUser.sessionId].push(messageDiv.outerHTML);
+    console.log(`DEBUG: Cached message for user ${currentChatUser.sessionId}`);
+  }
+  
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
