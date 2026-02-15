@@ -761,7 +761,7 @@ function loadUserMessages(sessionId, room, isSameUser = false) {
     },
     body: JSON.stringify({
       session_id: sessionId,
-      room: room
+      room: 'customer_service'  // Always use customer_service for room, but filter by session_id
     })
   })
   .then(response => response.json())
