@@ -703,13 +703,14 @@ function refreshActiveUsers() {
 function expandChat(sessionId, username, email, room) {
   // Check if reopening same user (more robust check)
   const isSameUser = currentChatUser && 
-                    currentChatUser.sessionId === sessionId && 
-                    currentChatUser.username === username &&
-                    currentChatUser.email === email &&
-                    currentChatUser.room === room;
+                    currentChatUser.sessionId === sessionId;
   
   console.log('DEBUG: isSameUser:', isSameUser);
   console.log('DEBUG: currentChatUser:', currentChatUser);
+  console.log('DEBUG: sessionId:', sessionId);
+  console.log('DEBUG: username:', username);
+  console.log('DEBUG: email:', email);
+  console.log('DEBUG: room:', room);
   
   currentChatUser = { sessionId, username, email, room };
   
