@@ -822,7 +822,7 @@ def on_send_encrypted_message(data):
             
             if room_members and len(room_members) > 0:
                 print(f"DEBUG: Emitting to {len(room_members)} admin(s) in customer_service room")
-                emit('receive_encrypted_message', {
+                socketio.emit('receive_encrypted_message', {
                     'encrypted_data': encrypted_data,  # Send original encrypted data
                     'session_id': session_id,
                     'username': username,  # Add actual username here
