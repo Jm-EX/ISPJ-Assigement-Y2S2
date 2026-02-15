@@ -713,6 +713,41 @@ socket.on('receive_encrypted_message', async function(data) {
                     sender: decryptedMessage.sender,
                     timestamp: decryptedMessage.timestamp
                 });
+            } else {
+                // Auto-expand chat if this is a new user message (same logic as unencrypted)
+                if (!currentChatUser) {
+                    console.log('DEBUG: Auto-expanding chat for new encrypted message user');
+                    const displayName = decryptedMessage.sender || 'Guest';
+                    expandChat(sessionId, displayName, userData.user_email, userData.user_room);
+                    // Add message after a short delay to allow chat to expand
+                    setTimeout(() => {
+                        addCustomerMessageToChat({
+                            msg: decryptedMessage.msg,
+                            sender: decryptedMessage.sender,
+                            timestamp: decryptedMessage.timestamp
+                        });
+                    }, 100);
+                    
+                    // Fallback: If chat expansion fails, still try to show message
+                    setTimeout(() => {
+                        if (!currentChatUser || 
+                            (currentChatUser.email !== userData.user_email && 
+                             currentChatUser.sessionId !== sessionId)) {
+                            console.log('DEBUG: Fallback - forcing encrypted message display');
+                            // Force expand and show message
+                            expandChat(sessionId, displayName, userData.user_email, userData.user_room);
+                            setTimeout(() => {
+                                addCustomerMessageToChat({
+                                    msg: decryptedMessage.msg,
+                                    sender: decryptedMessage.sender,
+                                    timestamp: decryptedMessage.timestamp
+                                });
+                            }, 100);
+                        }
+                    }, 200);
+                } else {
+                    console.log('DEBUG: Encrypted message not displayed - different user selected');
+                }
             }
         } else {
             console.error('Failed to decrypt message');
