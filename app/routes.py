@@ -809,11 +809,12 @@ def on_admin_send_encrypted_message(data):
         import traceback
         print(f"DEBUG: Encrypted message traceback: {traceback.format_exc()}")
     
-    # Also send confirmation back to admin (unencrypted)
+    # Also send confirmation back to admin with decrypted message data
     emit('admin_message_sent', {
         'status': 'success', 
         'message': 'Message sent',
         'user_room': user_room,
+        'message_data': decrypted_message,  # Send back the decrypted message
         'encrypted': True
     })
     

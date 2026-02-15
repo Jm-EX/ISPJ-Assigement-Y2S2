@@ -919,14 +919,6 @@ function loadUserMessages(sessionId, room) {
       }
     }
   })
-  .catch(error => {
-    console.error('Error loading messages:', error);
-    messagesContainer.innerHTML = `
-      <div style="padding: 20px; text-align: center; color: #f44336;">
-        <p>Messages will be displayed here. </p>
-      </div>
-    `;
-  });
 }
 
 // Send admin message
@@ -972,6 +964,11 @@ async function sendAdminMessage() {
         user_email: currentChatUser.email,
         session_id: sessionId
       });
+      
+      // Clear input immediately for better UX
+      input.value = '';
+      
+      console.log('Admin message sent (encrypted) - waiting for server confirmation...');
     } else {
       console.error('Failed to encrypt message');
       alert('Failed to encrypt message. Please try again.');
@@ -985,42 +982,10 @@ async function sendAdminMessage() {
       user_room: currentChatUser.room,
       user_email: currentChatUser.email
     });
+    
+    // Clear input for better UX
+    input.value = '';
   }
-  
-  // Add message to local display immediately for better UX
-  const messagesContainer = document.getElementById('expandedChatMessages');
-  
-  // Remove empty state if it exists
-  const emptyState = messagesContainer.querySelector('.empty-state');
-  if (emptyState) {
-    emptyState.remove();
-  }
-  
-  // Create admin message element
-  const messageDiv = document.createElement('div');
-  messageDiv.style.cssText = `
-    margin-bottom: 12px; 
-    padding: 8px 12px; 
-    border-radius: 8px; 
-    background: #e3f2fd;
-    border-left: 4px solid #1976d2;
-  `;
-  
-  messageDiv.innerHTML = `
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-      <strong style="color: #1976d2;">You (Admin)</strong>
-      <span style="font-size: 12px; color: #666;">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
-    </div>
-    <div style="color: #333; line-height: 1.4;">${message}</div>
-  `;
-  
-  messagesContainer.appendChild(messageDiv);
-  messagesContainer.scrollTop = messagesContainer.scrollHeight;
-  
-  // Clear input
-  input.value = '';
-  
-  console.log('Admin message sent (with encryption):', message);
 }
 
 // =========================
@@ -1099,6 +1064,20 @@ socket.on('admin_message_sent', (data) => {
   console.log('Admin message sent confirmation:', data);
   if (data.status === 'success') {
     console.log('Message sent successfully');
+    
+    // If server sent back the processed message data, display it
+    if (data.message_data) {
+      console.log('Displaying server-processed message:', data.message_data);
+      addCustomerMessageToChat({
+        msg: data.message_data.msg,
+        sender: data.message_data.sender,
+        timestamp: data.message_data.timestamp
+      });
+    } else {
+      console.log('No message_data from server - using local display');
+      // For cases where server doesn't send back message_data
+      // The message is already displayed locally in sendAdminMessage for unencrypted
+    }
   }
 });
 
