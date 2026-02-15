@@ -677,6 +677,8 @@ socket.on('receive_encrypted_message', async function(data) {
     
     const sessionId = data.session_id;
     const encryptedData = data.encrypted_data;
+    const serverUsername = data.username; // Get username from server
+    const serverEmail = data.user_email; // Get email from server
     
     try {
         // Get or generate key for this session
@@ -691,12 +693,13 @@ socket.on('receive_encrypted_message', async function(data) {
             // Create user data object for active user management
             const userData = {
                 msg: decryptedMessage.msg,
-                sender: decryptedMessage.sender,
+                sender: serverUsername || decryptedMessage.sender, // Use server username
                 timestamp: decryptedMessage.timestamp,
                 sender_type: 'customer',
                 user_room: decryptedMessage.user_room || `guest_${sessionId}`,
-                user_email: decryptedMessage.user_email || null,
-                session_id: sessionId
+                user_email: serverEmail || decryptedMessage.user_email,
+                session_id: sessionId,
+                username: serverUsername // Store actual username
             };
             
             // Add to active users list or update existing
@@ -707,10 +710,10 @@ socket.on('receive_encrypted_message', async function(data) {
                 ((currentChatUser.email && currentChatUser.email === userData.user_email) ||
                  (!currentChatUser.email && currentChatUser.sessionId === sessionId))) {
                 
-                // Display the decrypted message
+                // Display the decrypted message with actual username
                 addCustomerMessageToChat({
                     msg: decryptedMessage.msg,
-                    sender: decryptedMessage.sender,
+                    sender: serverUsername || decryptedMessage.sender, // Use server username
                     timestamp: decryptedMessage.timestamp
                 });
             } else {
@@ -722,13 +725,13 @@ socket.on('receive_encrypted_message', async function(data) {
                 
                 if (isNewUser || isDifferentUser) {
                     console.log('DEBUG: Auto-expanding chat for new encrypted message user');
-                    const displayName = decryptedMessage.sender || 'Guest';
+                    const displayName = serverUsername || decryptedMessage.sender || 'Guest'; // Use server username
                     expandChat(sessionId, displayName, userData.user_email, userData.user_room);
                     // Add message after a short delay to allow chat to expand
                     setTimeout(() => {
                         addCustomerMessageToChat({
                             msg: decryptedMessage.msg,
-                            sender: decryptedMessage.sender,
+                            sender: serverUsername || decryptedMessage.sender, // Use server username
                             timestamp: decryptedMessage.timestamp
                         });
                     }, 100);
@@ -744,7 +747,7 @@ socket.on('receive_encrypted_message', async function(data) {
                             setTimeout(() => {
                                 addCustomerMessageToChat({
                                     msg: decryptedMessage.msg,
-                                    sender: decryptedMessage.sender,
+                                    sender: serverUsername || decryptedMessage.sender, // Use server username
                                     timestamp: decryptedMessage.timestamp
                                 });
                             }, 100);
@@ -1001,8 +1004,18 @@ socket.on('receive_message', function(data) {
   
   // If it's a customer message, add to active users and display
   if (data.sender_type === 'customer') {
+    // Ensure we have the actual username
+    const actualUsername = data.username || data.sender || 'Guest';
+    
+    // Update the data object with actual username for display
+    const updatedData = {
+      ...data,
+      sender: actualUsername, // Use actual username for display
+      username: actualUsername // Store actual username
+    };
+    
     // Add to active users list or update existing
-    addOrUpdateActiveUser(data);
+    addOrUpdateActiveUser(updatedData);
     
     // If this user is currently selected, add message to chat
     console.log('DEBUG: Checking if message should display:');
@@ -1017,7 +1030,10 @@ socket.on('receive_message', function(data) {
          (!currentChatUser.email && currentChatUser.sessionId === data.session_id))) {
       
       console.log('DEBUG: Condition matched - calling addCustomerMessageToChat');
-      addCustomerMessageToChat(data);
+      addCustomerMessageToChat({
+        ...data,
+        sender: actualUsername // Use actual username
+      });
     } else {
       console.log('DEBUG: Condition failed - message not displayed');
       // Auto-expand chat if this is a new user message or from different user
@@ -1028,11 +1044,14 @@ socket.on('receive_message', function(data) {
       
       if (isNewUser || isDifferentUser) {
         console.log('DEBUG: Auto-expanding chat for new user');
-        const displayName = data.sender || 'Guest';
+        const displayName = actualUsername; // Use actual username
         expandChat(data.session_id, displayName, data.user_email, data.user_room);
         // Add message after a short delay to allow chat to expand
         setTimeout(() => {
-          addCustomerMessageToChat(data);
+          addCustomerMessageToChat({
+            ...data,
+            sender: actualUsername // Use actual username
+          });
         }, 100);
         
         // Fallback: If chat expansion fails, still try to show message
@@ -1044,7 +1063,10 @@ socket.on('receive_message', function(data) {
             // Force expand and show message
             expandChat(data.session_id, displayName, data.user_email, data.user_room);
             setTimeout(() => {
-              addCustomerMessageToChat(data);
+              addCustomerMessageToChat({
+                ...data,
+                sender: actualUsername // Use actual username
+              });
             }, 100);
           }
         }, 500);
