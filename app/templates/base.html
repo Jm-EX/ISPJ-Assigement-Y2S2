@@ -487,6 +487,7 @@ async function getDHKey(sessionId) {
     if (existingKey) {
         const keyData = JSON.parse(existingKey);
         const importedKey = await crypto.subtle.importKey(
+            'raw', // Add missing format parameter
             keyData,
             { name: 'AES-GCM' },
             false,
