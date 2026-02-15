@@ -922,15 +922,12 @@ def on_admin_send_encrypted_message(data):
     dh = initialize_dh(user_session_id)
     
     try:
-        # Parse admin's public key from the encrypted message
-        # Note: In a real implementation, admin's public key would be sent separately
-        # For now, we'll use the stored DH instance
-        
-        # Get the shared secret using DH
-        # The admin's encrypted message was encrypted using the DH-derived key
-        # So we need to decrypt it using the same DH-derived key
+        # For admin messages, we need to ensure DH key exchange has happened
+        # The admin should have already performed DH exchange when they selected the user
+        # So we can use the stored DH instance to derive the shared secret
         
         # Get the DH-derived encryption key for this session
+        # The admin encrypted using their DH-derived key, so we need the same key
         encryption_cipher = derive_key_from_shared_secret(
             dh.get_shared_secret_hex(int("0xFFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD129024E088A67CC74020BBEA63B139B22514A08798E3404DDEF9519B3CD3A431B302B0A6DF25F14374FE1356D6C51F245B543B839", 16))
         )

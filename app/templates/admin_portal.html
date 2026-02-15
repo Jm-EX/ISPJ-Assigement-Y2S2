@@ -962,36 +962,38 @@ function refreshActiveUsers() {
   }, 1000);
 }
 
-// Expand chat for specific user
-function expandChat(sessionId, username, email, room) {
-  // Check if reopening same user
-  const isSameUser = currentChatUser && 
-                    currentChatUser.sessionId === sessionId && 
-                    currentChatUser.room === room;
   
-  currentChatUser = { sessionId, username, email, room };
+  // Expand chat for a specific user
+function expandChat(sessionId, displayName, userEmail, userRoom) {
+  currentChatUser = {
+    sessionId: sessionId,
+    displayName: displayName,
+    email: userEmail,
+    room: userRoom
+  };
   
-  // Update chat info
-  document.getElementById('chatUserInfo').textContent = username;
-  document.getElementById('chatUserDetails').textContent = `${email} • Session: ${sessionId}`;
+  // Update UI
+  const chatTitle = document.getElementById('expandedChatTitle');
+  const chatMessages = document.getElementById('expandedChatMessages');
+  const chatInput = document.getElementById('expandedChatInput');
   
-  // Show expanded chat view
-  document.getElementById('expandedChatView').style.display = 'block';
+  chatTitle.textContent = `Chat with ${displayName}`;
+  chatMessages.innerHTML = '';
+  chatInput.disabled = false;
   
-  // Only load messages if it's a different user or first time opening
-  if (!isSameUser) {
-    // Display current user's messages (will show empty if none exist)
-    displayCurrent_userMessages();
-    
-    // Load historical messages from database
-    loadUserMessages(sessionId, room);
-  } else {
-    console.log('Reopening same user - messages already displayed');
-    // Still refresh display in case new messages came in
-    displayCurrent_userMessages();
-  }
+  // Show expanded chat
+  document.getElementById('expandedChat').style.display = 'flex';
   
-  console.log('Expanded chat for user:', username);
+  // Load user messages
+  loadUserMessages(sessionId);
+  
+  // Initialize DH key exchange for this user session
+  console.log('DEBUG: Initializing DH key exchange for user:', sessionId);
+  getDHKey(sessionId).then(key => {
+    console.log('DEBUG: DH key exchange completed for user:', sessionId);
+  }).catch(error => {
+    console.error('DEBUG: DH key exchange failed for user:', sessionId, error);
+  });
 }
 
 // Close expanded chat
