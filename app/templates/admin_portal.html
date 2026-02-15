@@ -717,6 +717,7 @@ async function getDHKey(sessionId) {
     // Check if we already have a key
     const existingKey = sessionStorage.getItem(`dh_key_${sessionId}`);
     if (existingKey) {
+        console.log('DEBUG: Using existing DH key for session:', sessionId);
         const keyData = JSON.parse(existingKey);
         const importedKey = await crypto.subtle.importKey(
             'raw', // Add missing format parameter
@@ -727,6 +728,8 @@ async function getDHKey(sessionId) {
         );
         return importedKey;
     }
+    
+    console.log('DEBUG: No existing DH key, performing key exchange for session:', sessionId);
     
     // Perform key exchange if no key exists
     const key = await performKeyExchange(sessionId);
@@ -740,6 +743,7 @@ async function getDHKey(sessionId) {
         alg: 'A256GCM'
     }));
     
+    console.log('DEBUG: DH key stored for session:', sessionId);
     return key;
 }
 

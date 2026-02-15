@@ -485,6 +485,7 @@ async function getDHKey(sessionId) {
     // Check if we already have a key
     const existingKey = sessionStorage.getItem(`dh_key_${sessionId}`);
     if (existingKey) {
+        console.log('CHATBOT DEBUG: Using existing DH key for session:', sessionId);
         const keyData = JSON.parse(existingKey);
         const importedKey = await crypto.subtle.importKey(
             'raw', // Add missing format parameter
@@ -495,6 +496,8 @@ async function getDHKey(sessionId) {
         );
         return importedKey;
     }
+    
+    console.log('CHATBOT DEBUG: No existing DH key, performing key exchange for session:', sessionId);
     
     // Perform key exchange if no key exists
     const key = await performKeyExchange(sessionId);
@@ -508,6 +511,7 @@ async function getDHKey(sessionId) {
         alg: 'A256GCM'
     }));
     
+    console.log('CHATBOT DEBUG: DH key stored for session:', sessionId);
     return key;
 }
 
@@ -664,6 +668,15 @@ function toggleSupportMode() {
         console.log('CHATBOT DEBUG: Emitting switch_to_human_mode event');
         socket.emit('switch_to_human_mode');
         aiConnected = false;
+        
+        // Initialize DH key exchange for human mode
+        const sessionId = socket.id || 'unknown';
+        console.log('CHATBOT DEBUG: Initializing DH key exchange for human mode session:', sessionId);
+        getDHKey(sessionId).then(key => {
+            console.log('CHATBOT DEBUG: DH key exchange completed for human mode');
+        }).catch(error => {
+            console.error('CHATBOT DEBUG: DH key exchange failed for human mode:', error);
+        });
         
         // Add system message about switching to human mode
         switchMessage = "👋 You're now connected with Concierge Support. A human agent will assist you shortly. AI responses have been disabled.";
