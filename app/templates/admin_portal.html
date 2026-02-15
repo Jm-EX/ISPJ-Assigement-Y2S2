@@ -856,12 +856,20 @@ async function decryptMessage(encryptedData, key) {
 
 // Handle encrypted messages from server
 socket.on('receive_encrypted_message', async function(data) {
+    console.log('DEBUG: ===== ADMIN RECEIVED ENCRYPTED MESSAGE =====');
     console.log('DEBUG: Received encrypted message:', data);
+    console.log('DEBUG: Socket ID:', socket.id);
+    console.log('DEBUG: Current time:', new Date().toISOString());
     
     const sessionId = data.session_id;
     const encryptedData = data.encrypted_data;
     const serverUsername = data.username; // Get username from server
     const serverEmail = data.user_email; // Get email from server
+    
+    console.log('DEBUG: Session ID:', sessionId);
+    console.log('DEBUG: Encrypted data length:', encryptedData ? encryptedData.length : 'undefined');
+    console.log('DEBUG: Username:', serverUsername);
+    console.log('DEBUG: Email:', serverEmail);
     
     try {
         // Check if we need to do DH exchange for this user

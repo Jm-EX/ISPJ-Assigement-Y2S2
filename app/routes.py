@@ -815,12 +815,17 @@ def on_send_encrypted_message(data):
             }
             
             # Forward decrypted message to admin room (no need to re-encrypt)
+            print(f"DEBUG: Forwarding encrypted message to admin room 'customer_service'")
+            print(f"DEBUG: Room 'customer_service' members: {socketio.server.manager.get_participants('customer_service', None)}")
+            
             emit('receive_encrypted_message', {
                 'encrypted_data': encrypted_data,  # Send original encrypted data
                 'session_id': session_id,
                 'username': username,  # Add actual username here
                 'user_email': user_email
             }, room='customer_service')
+            
+            print(f"DEBUG: Encrypted message forwarded to admin room for session {session_id}")
             
             print(f"DEBUG: Encrypted user message forwarded to admin room: customer_service")
         else:
