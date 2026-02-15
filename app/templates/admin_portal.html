@@ -766,21 +766,30 @@ function loadUserMessages(sessionId, room, isSameUser = false) {
   })
   .then(response => response.json())
   .then(data => {
-    // Don't clear existing real-time messages - just add database messages
+    // Clear container for new user, preserve for same user
+    if (!isSameUser) {
+      messagesContainer.innerHTML = ''; // Clear all for different user
+    }
+    
     if (data.messages && data.messages.length > 0) {
-      // Create a map of existing messages to avoid duplicates
+      // Only check for duplicates if it's the same user
       const existingMessages = new Map();
-      const messageElements = messagesContainer.querySelectorAll('div[style*="margin-bottom"]');
-      messageElements.forEach(el => {
-        const text = el.textContent;
-        existingMessages.set(text, true);
-      });
+      if (isSameUser) {
+        const messageElements = messagesContainer.querySelectorAll('div[style*="margin-bottom"]');
+        messageElements.forEach(el => {
+          const text = el.textContent.trim();
+          existingMessages.set(text, true);
+        });
+      }
       
       data.messages.forEach(msg => {
-        // Skip if message already exists
-        const messageKey = `${msg.username}: ${msg.message}`;
-        if (existingMessages.has(messageKey)) {
-          return; // Skip duplicate
+        // Better duplicate detection with user context
+        if (isSameUser) {
+          const displayName = msg.sender_type === 'admin' ? 'Admin' : msg.username;
+          const messageKey = `${displayName}: ${msg.message}`;
+          if (existingMessages.has(messageKey)) {
+            return; // Skip duplicate for same user
+          }
         }
         
         const messageDiv = document.createElement('div');
@@ -812,7 +821,7 @@ function loadUserMessages(sessionId, room, isSameUser = false) {
           `;
           messageDiv.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-              <strong style="color: #1976d2;">${msg.username}</strong>
+              <strong style="color: #1976d2;">Admin</strong>
               <span style="font-size: 12px; color: #666;">${new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
             </div>
             <div style="color: #333; line-height: 1.4;">${msg.message}</div>
@@ -948,9 +957,11 @@ socket.on('receive_message', function(data) {
       addCustomerMessageToChat(data);
     } else {
       console.log('DEBUG: Condition failed - message not displayed');
-      // Auto-expand chat if this is a new user message
-      if (!currentChatUser) {
-        console.log('DEBUG: Auto-expanding chat for new user');
+      // Auto-expand chat if this is a new user message OR if it's a different user
+      if (!currentChatUser || 
+          (currentChatUser.email !== data.user_email && 
+           currentChatUser.sessionId !== data.session_id)) {
+        console.log('DEBUG: Auto-expanding chat for new/different user');
         const displayName = data.sender || 'Guest';
         expandChat(data.session_id, displayName, data.user_email, data.user_room);
         // Add message after a short delay to allow chat to expand
