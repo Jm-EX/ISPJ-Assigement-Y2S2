@@ -701,10 +701,15 @@ function refreshActiveUsers() {
 
 // Expand chat for specific user
 function expandChat(sessionId, username, email, room) {
-  // Check if reopening same user
+  // Check if reopening same user (more robust check)
   const isSameUser = currentChatUser && 
                     currentChatUser.sessionId === sessionId && 
+                    currentChatUser.username === username &&
+                    currentChatUser.email === email &&
                     currentChatUser.room === room;
+  
+  console.log('DEBUG: isSameUser:', isSameUser);
+  console.log('DEBUG: currentChatUser:', currentChatUser);
   
   currentChatUser = { sessionId, username, email, room };
   
@@ -715,12 +720,8 @@ function expandChat(sessionId, username, email, room) {
   // Show expanded chat view
   document.getElementById('expandedChatView').style.display = 'block';
   
-  // Only load messages if it's a different user or first time opening
-  if (!isSameUser) {
-    loadUserMessages(sessionId, room);
-  } else {
-    console.log('Reopening same user - messages already displayed');
-  }
+  // Always load messages to ensure persistence (but be smarter about duplicates)
+  loadUserMessages(sessionId, room, isSameUser);
   
   console.log('Expanded chat for user:', username);
 }
@@ -736,18 +737,19 @@ function closeExpandedChat() {
 function refreshChatMessages() {
   if (currentChatUser) {
     console.log('Refreshing messages for user:', currentChatUser.username);
-    loadUserMessages(currentChatUser.sessionId, currentChatUser.room);
+    // Always load fresh messages from database on refresh
+    loadUserMessages(currentChatUser.sessionId, currentChatUser.room, false);
   } else {
     console.log('No current user to refresh');
   }
 }
 
 // Load user messages
-function loadUserMessages(sessionId, room) {
+function loadUserMessages(sessionId, room, isSameUser = false) {
   const messagesContainer = document.getElementById('expandedChatMessages');
   
-  // Only show loading if container is empty or has error state
-  if (!messagesContainer.innerHTML || messagesContainer.innerHTML.includes('Error') || messagesContainer.innerHTML.includes('Loading')) {
+  // Only show loading if container is empty or has error state, or if it's first time opening
+  if (!isSameUser && (!messagesContainer.innerHTML || messagesContainer.innerHTML.includes('Error') || messagesContainer.innerHTML.includes('Loading'))) {
     messagesContainer.innerHTML = '<div class="empty-state"><p>Loading messages...</p></div>';
   }
   
