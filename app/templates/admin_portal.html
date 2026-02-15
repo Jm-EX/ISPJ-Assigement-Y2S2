@@ -714,8 +714,13 @@ socket.on('receive_encrypted_message', async function(data) {
                     timestamp: decryptedMessage.timestamp
                 });
             } else {
-                // Auto-expand chat if this is a new user message (same logic as unencrypted)
-                if (!currentChatUser) {
+                // Auto-expand chat if this is a new user message or from different user
+                const isNewUser = !currentChatUser;
+                const isDifferentUser = currentChatUser && 
+                    ((currentChatUser.email && currentChatUser.email !== userData.user_email) ||
+                     (!currentChatUser.email && currentChatUser.sessionId !== sessionId));
+                
+                if (isNewUser || isDifferentUser) {
                     console.log('DEBUG: Auto-expanding chat for new encrypted message user');
                     const displayName = decryptedMessage.sender || 'Guest';
                     expandChat(sessionId, displayName, userData.user_email, userData.user_room);
@@ -746,7 +751,7 @@ socket.on('receive_encrypted_message', async function(data) {
                         }
                     }, 200);
                 } else {
-                    console.log('DEBUG: Encrypted message not displayed - different user selected');
+                    console.log('DEBUG: Encrypted message not displayed - same user already selected');
                 }
             }
         } else {
@@ -1015,8 +1020,13 @@ socket.on('receive_message', function(data) {
       addCustomerMessageToChat(data);
     } else {
       console.log('DEBUG: Condition failed - message not displayed');
-      // Auto-expand chat if this is a new user message
-      if (!currentChatUser) {
+      // Auto-expand chat if this is a new user message or from different user
+      const isNewUser = !currentChatUser;
+      const isDifferentUser = currentChatUser && 
+          ((currentChatUser.email && currentChatUser.email !== data.user_email) ||
+           (!currentChatUser.email && currentChatUser.sessionId !== data.session_id));
+      
+      if (isNewUser || isDifferentUser) {
         console.log('DEBUG: Auto-expanding chat for new user');
         const displayName = data.sender || 'Guest';
         expandChat(data.session_id, displayName, data.user_email, data.user_room);
@@ -1038,6 +1048,8 @@ socket.on('receive_message', function(data) {
             }, 100);
           }
         }, 500);
+      } else {
+        console.log('DEBUG: Message not displayed - same user already selected');
       }
     }
     
