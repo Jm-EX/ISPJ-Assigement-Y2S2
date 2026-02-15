@@ -685,12 +685,12 @@ async function deriveKeyFromSharedSecret(sharedSecretHex) {
     
     // Use HKDF to derive encryption key
     const importedKey = await crypto.subtle.importKey(
+        'raw', // Use 'raw' format for HKDF input key material
+        secretBytes,
         {
             name: 'HKDF',
             hash: 'SHA-256',
         },
-        secretBytes,
-        { name: 'AES-GCM' },
         false,
         ['deriveKey']
     );
