@@ -617,10 +617,18 @@ async function encryptMessage(message, key) {
             encoded
         );
         
-        // Combine IV and encrypted data
-        const combined = new Uint8Array(iv.length + encrypted.byteLength);
+        // Get encrypted data and tag (Web Crypto API includes tag in encrypted data)
+        const encryptedArray = new Uint8Array(encrypted);
+        
+        // Extract tag (last 16 bytes) and encrypted data (everything before tag)
+        const tag = encryptedArray.slice(-16);
+        const encryptedData = encryptedArray.slice(0, encryptedArray.length - 16);
+        
+        // Combine IV + tag + encrypted data (matches server format)
+        const combined = new Uint8Array(iv.length + tag.length + encryptedData.length);
         combined.set(iv);
-        combined.set(new Uint8Array(encrypted), iv.length);
+        combined.set(tag, iv.length);
+        combined.set(encryptedData, iv.length + tag.length);
         
         // Convert to base64
         return btoa(String.fromCharCode(...combined));
@@ -636,9 +644,15 @@ async function decryptMessage(encryptedData, key) {
         // Convert from base64
         const combined = new Uint8Array(atob(encryptedData).split('').map(c => c.charCodeAt(0)));
         
-        // Extract IV and encrypted data
+        // Extract IV (first 12 bytes), tag (next 16 bytes), and encrypted data
         const iv = combined.slice(0, 12);
-        const encrypted = combined.slice(12);
+        const tag = combined.slice(12, 28);
+        const encrypted = combined.slice(28);
+        
+        // Combine encrypted data + tag (Web Crypto API expects tag at end)
+        const encryptedWithTag = new Uint8Array(encrypted.length + tag.length);
+        encryptedWithTag.set(encrypted);
+        encryptedWithTag.set(tag, encrypted.length);
         
         const decrypted = await crypto.subtle.decrypt(
             {
@@ -646,7 +660,7 @@ async function decryptMessage(encryptedData, key) {
                 iv: iv
             },
             key,
-            encrypted
+            encryptedWithTag
         );
         
         const decoded = new TextDecoder().decode(decrypted);

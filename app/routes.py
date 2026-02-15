@@ -32,6 +32,14 @@ logging.basicConfig(
 # Encryption Utilities
 # =========================
 
+import os
+import base64
+import json
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.backends import default_backend
+
 def generate_encryption_key(password: str, salt: bytes = None) -> bytes:
     """Generate encryption key from password using PBKDF2"""
     if salt is None:
@@ -42,24 +50,69 @@ def generate_encryption_key(password: str, salt: bytes = None) -> bytes:
         length=32,
         salt=salt,
         iterations=100000,
+        backend=default_backend()
     )
-    key = base64.urlsafe_b64encode(kdf.derive(password.encode()))
+    key = kdf.derive(password.encode())
     return key
 
 def encrypt_message(message: dict, key: bytes) -> str:
-    """Encrypt a message using Fernet symmetric encryption"""
-    f = Fernet(key)
-    json_message = json.dumps(message)
-    encrypted_message = f.encrypt(json_message.encode())
-    return base64.urlsafe_b64encode(encrypted_message).decode()
+    """Encrypt a message using AES-GCM (matches client-side)"""
+    try:
+        # Generate random IV (12 bytes for GCM)
+        iv = os.urandom(12)
+        
+        # Convert message to JSON then bytes
+        json_message = json.dumps(message)
+        message_bytes = json_message.encode('utf-8')
+        
+        # Create AES-GCM cipher
+        cipher = Cipher(
+            algorithms.AES(key),
+            modes.GCM(iv),
+            backend=default_backend()
+        )
+        encryptor = cipher.encryptor()
+        
+        # Encrypt the message
+        encrypted_message = encryptor.update(message_bytes) + encryptor.finalize()
+        
+        # Get authentication tag
+        tag = encryptor.tag
+        
+        # Combine IV + tag + encrypted message
+        combined = iv + tag + encrypted_message
+        
+        # Convert to base64
+        return base64.b64encode(combined).decode('utf-8')
+    except Exception as e:
+        print(f"DEBUG: Encryption error: {e}")
+        return None
 
 def decrypt_message(encrypted_message: str, key: bytes) -> dict:
-    """Decrypt a message using Fernet symmetric encryption"""
+    """Decrypt a message using AES-GCM (matches client-side)"""
     try:
-        f = Fernet(key)
-        decoded_message = base64.urlsafe_b64decode(encrypted_message.encode())
-        decrypted_message = f.decrypt(decoded_message)
-        return json.loads(decrypted_message.decode())
+        # Decode from base64
+        combined = base64.b64decode(encrypted_message.encode('utf-8'))
+        
+        # Extract IV (first 12 bytes), tag (next 16 bytes), and encrypted data
+        iv = combined[:12]
+        tag = combined[12:28]
+        encrypted_data = combined[28:]
+        
+        # Create AES-GCM cipher
+        cipher = Cipher(
+            algorithms.AES(key),
+            modes.GCM(iv, tag),
+            backend=default_backend()
+        )
+        decryptor = cipher.decryptor()
+        
+        # Decrypt the message
+        decrypted_bytes = decryptor.update(encrypted_data) + decryptor.finalize()
+        
+        # Convert back to JSON
+        decrypted_message = decrypted_bytes.decode('utf-8')
+        return json.loads(decrypted_message)
     except Exception as e:
         print(f"DEBUG: Decryption error: {e}")
         return None
