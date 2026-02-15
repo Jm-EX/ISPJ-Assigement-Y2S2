@@ -513,7 +513,7 @@ def on_message(data):
             ai_response = get_gemini_response(message)
             print(f"DEBUG: AI response received: {ai_response[:100]}...")
             
-            # Send AI response as "AI Support"
+            # Send AI response as "AI Support" to user's private room
             ai_message_data = {
                 'msg': ai_response,
                 'sender': 'AI Support',
@@ -525,8 +525,8 @@ def on_message(data):
             print(f"DEBUG: Waiting 1 second before sending AI response...")
             time.sleep(1)
             
-            print(f"DEBUG: Emitting AI response to room: {room}")
-            emit('receive_message', ai_message_data, room=room)
+            print(f"DEBUG: Emitting AI response to user's private room: {user_room_id}")
+            emit('receive_message', ai_message_data, room=user_room_id)
             print(f"DEBUG: AI response emitted successfully")
             print("="*80 + "\n")
             
@@ -544,7 +544,7 @@ def on_message(data):
                 'sender': 'AI Support',
                 'timestamp': datetime.now().strftime('%H:%M')
             }
-            emit('receive_message', error_message, room=room)
+            emit('receive_message', error_message, room=user_room_id)
     elif sender == 'customer' and user_modes.get(session_id) == 'human':
         # In human mode, forward message directly to admin (no database save)
         print(f"DEBUG: User is in Human mode - forwarding to admin")
