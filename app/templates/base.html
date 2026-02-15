@@ -340,6 +340,105 @@ let chatOpen = false;
 let chatHistory = []; // Store chat history
 let isHumanMode = false; // Track current support mode
 let aiConnected = true; // Track AI connection status
+
+// =========================
+// Encryption Utilities (User Side)
+// =========================
+
+let encryptionKeys = {}; // Store encryption keys per session
+
+// Generate encryption key from session ID (simple SHA-256 to match server)
+function generateClientKey(sessionId) {
+    if (!encryptionKeys[sessionId]) {
+        // Use simple SHA-256 to match server
+        const password = `session_${sessionId}_${new Date().toISOString().slice(0, 10).replace(/-/g, '')}`;
+        const encoder = new TextEncoder();
+        const data = encoder.encode(password);
+        return crypto.subtle.digest('SHA-256', data).then(hash => {
+            return crypto.subtle.importKey(
+                'raw',
+                hash,
+                { name: 'AES-GCM' },
+                false,
+                ['encrypt', 'decrypt']
+            ).then(key => {
+                encryptionKeys[sessionId] = key;
+                return key;
+            });
+        });
+    }
+    return Promise.resolve(encryptionKeys[sessionId]);
+}
+
+// Encrypt message for sending
+async function encryptMessage(message, key) {
+    try {
+        const iv = crypto.getRandomValues(new Uint8Array(12));
+        const encoded = new TextEncoder().encode(JSON.stringify(message));
+        
+        const encrypted = await crypto.subtle.encrypt(
+            {
+                name: 'AES-GCM',
+                iv: iv
+            },
+            key,
+            encoded
+        );
+        
+        // Get encrypted data and tag (Web Crypto API includes tag in encrypted data)
+        const encryptedArray = new Uint8Array(encrypted);
+        
+        // Extract tag (last 16 bytes) and encrypted data (everything before tag)
+        const tag = encryptedArray.slice(-16);
+        const encryptedData = encryptedArray.slice(0, encryptedArray.length - 16);
+        
+        // Combine IV + tag + encrypted data (matches server format)
+        const combined = new Uint8Array(iv.length + tag.length + encryptedData.length);
+        combined.set(iv);
+        combined.set(tag, iv.length);
+        combined.set(encryptedData, iv.length + tag.length);
+        
+        // Convert to base64
+        return btoa(String.fromCharCode(...combined));
+    } catch (error) {
+        console.error('Encryption error:', error);
+        return null;
+    }
+}
+
+// Decrypt received message
+async function decryptMessage(encryptedData, key) {
+    try {
+        // Convert from base64
+        const combined = new Uint8Array(atob(encryptedData).split('').map(c => c.charCodeAt(0)));
+        
+        // Extract IV (first 12 bytes), tag (next 16 bytes), and encrypted data
+        const iv = combined.slice(0, 12);
+        const tag = combined.slice(12, 28);
+        const encrypted = combined.slice(28);
+        
+        // Combine encrypted data + tag (Web Crypto API expects tag at end)
+        const encryptedWithTag = new Uint8Array(encrypted.length + tag.length);
+        encryptedWithTag.set(encrypted);
+        encryptedWithTag.set(tag, encrypted.length);
+        
+        const decrypted = await crypto.subtle.decrypt(
+            {
+                name: 'AES-GCM',
+                iv: iv
+            },
+            key,
+            encryptedWithTag
+        );
+        
+        const decoded = new TextDecoder().decode(decrypted);
+        return JSON.parse(decoded);
+    } catch (error) {
+        console.error('Decryption error:', error);
+        return null;
+    }
+}
+
 console.log('='.repeat(80));
 
 function toggleChat() {
@@ -472,14 +571,21 @@ function sendMessage() {
     console.log('CHATBOT DEBUG: Message:', msg);
     
     if (msg) {
-        console.log('CHATBOT DEBUG: Emitting send_message event');
-        const messageData = {
-            msg: msg,
-            sender: 'customer',
-            room: 'customer_service'
-        };
-        console.log('CHATBOT DEBUG: Message data:', messageData);
-        socket.emit('send_message', messageData);
+        if (isHumanMode) {
+            // ENCRYPTED: Send encrypted message for human mode
+            console.log('CHATBOT DEBUG: Sending ENCRYPTED message (human mode)');
+            sendEncryptedMessage(msg);
+        } else {
+            // UNENCRYPTED: Send normal message for AI mode
+            console.log('CHATBOT DEBUG: Sending UNENCRYPTED message (AI mode)');
+            const messageData = {
+                msg: msg,
+                sender: 'customer',
+                room: 'customer_service'
+            };
+            console.log('CHATBOT DEBUG: Message data:', messageData);
+            socket.emit('send_message', messageData);
+        }
         
         // Add to history immediately
         const messageObj = {
@@ -498,6 +604,59 @@ function sendMessage() {
     } else {
         console.log('CHATBOT DEBUG: Empty message, not sending');
         console.log('='.repeat(80));
+    }
+}
+
+// Send encrypted message (for human mode)
+async function sendEncryptedMessage(msg) {
+    try {
+        // Get session ID for encryption
+        const sessionId = socket.id || 'unknown';
+        
+        // Generate encryption key for this session
+        const key = await generateClientKey(sessionId);
+        
+        // Prepare message data
+        const messageData = {
+            msg: msg,
+            sender: 'customer',
+            timestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+            sender_type: 'customer',
+            encrypted: true
+        };
+        
+        // Encrypt the message
+        const encryptedMessage = await encryptMessage(messageData, key);
+        
+        if (encryptedMessage) {
+            console.log('CHATBOT DEBUG: Message encrypted successfully');
+            
+            // Send encrypted message via Socket.IO
+            socket.emit('send_encrypted_message', {
+                encrypted_data: encryptedMessage,
+                session_id: sessionId
+            });
+            
+            console.log('CHATBOT DEBUG: Encrypted message sent to server');
+        } else {
+            console.error('CHATBOT DEBUG: Failed to encrypt message');
+            // Fallback to unencrypted message
+            const fallbackData = {
+                msg: msg,
+                sender: 'customer',
+                room: 'customer_service'
+            };
+            socket.emit('send_message', fallbackData);
+        }
+    } catch (error) {
+        console.error('CHATBOT DEBUG: Encryption error:', error);
+        // Fallback to unencrypted message
+        const fallbackData = {
+            msg: msg,
+            sender: 'customer',
+            room: 'customer_service'
+        };
+        socket.emit('send_message', fallbackData);
     }
 }
 
@@ -577,6 +736,46 @@ socket.on('receive_message', function(data) {
     console.log('CHATBOT DEBUG: Message type:', type);
     addMessageToChat(data.sender, data.msg, type);
     console.log('CHATBOT DEBUG: Message added to chat');
+    console.log('='.repeat(80));
+});
+
+// Handle encrypted messages from admin
+socket.on('receive_encrypted_message', async function(data) {
+    console.log('\n' + '='.repeat(80));
+    console.log('CHATBOT DEBUG: receive_encrypted_message event received');
+    console.log('CHATBOT DEBUG: Data:', data);
+    
+    const sessionId = data.session_id;
+    const encryptedData = data.encrypted_data;
+    
+    try {
+        // Get or generate key for this session
+        const key = await generateClientKey(sessionId);
+        
+        // Decrypt the message
+        const decryptedMessage = await decryptMessage(encryptedData, key);
+        
+        if (decryptedMessage) {
+            console.log('CHATBOT DEBUG: Message decrypted successfully:', decryptedMessage);
+            
+            if (!chatOpen && decryptedMessage.sender !== 'customer') {
+                console.log('CHATBOT DEBUG: Chat closed, showing badge');
+                document.getElementById('chat-badge').style.display = 'block';
+            }
+            
+            // Using 'support' as the class for Admin replies
+            const type = decryptedMessage.sender === 'customer' ? 'customer' : 'support';
+            console.log('CHATBOT DEBUG: Message type:', type);
+            addMessageToChat(decryptedMessage.sender, decryptedMessage.msg, type);
+            console.log('CHATBOT DEBUG: Decrypted message added to chat');
+        } else {
+            console.error('CHATBOT DEBUG: Failed to decrypt admin message');
+        }
+    } catch (error) {
+        console.error('CHATBOT DEBUG: Error handling encrypted admin message:', error);
+        // Fallback: show encrypted indicator
+        addMessageToChat('Admin', '[Encrypted message - unable to decrypt]', 'support');
+    }
     console.log('='.repeat(80));
 });
 

@@ -570,6 +570,94 @@ def on_switch_to_ai():
     print("="*80 + "\n")
     logging.info(f"User {session_id} switched to AI mode")
 
+@socketio.on('send_encrypted_message')
+def on_send_encrypted_message(data):
+    """Handle encrypted messages from users"""
+    print("\n" + "="*80)
+    print("CHATBOT DEBUG: send_encrypted_message event received")
+    print(f"DEBUG: Raw data: {data}")
+    
+    session_id = data.get('session_id', '')
+    encrypted_data = data.get('encrypted_data', '')
+    
+    if not encrypted_data or not session_id:
+        print(f"DEBUG: Invalid encrypted message data: {data}")
+        return
+    
+    print(f"DEBUG: Session ID: {session_id}")
+    print(f"DEBUG: Encrypted data length: {len(encrypted_data)}")
+    
+    # Get encryption key for this session
+    encryption_key = get_session_key(session_id)
+    
+    try:
+        # Decrypt the user message
+        decrypted_message = decrypt_message(encrypted_data, encryption_key)
+        
+        if decrypted_message:
+            print(f"DEBUG: User message decrypted successfully: {decrypted_message.get('msg', '')[:50]}...")
+            
+            # Get user's private room for responses
+            user_email = session.get('email') if 'email' in session else None
+            if user_email:
+                user_room_id = f"user_{user_email}"
+            else:
+                user_room_id = f"guest_{session_id}"
+            
+            # Get user info for admin display
+            user_id = session.get('user_id') if 'user_id' in session else None
+            username = session.get('username', 'Guest') if 'username' in session else 'Guest'
+            user_email = session.get('email') if 'email' in session else None
+            
+            # Save user message to database first
+            print(f"DEBUG: Attempting to save user message to database...")
+            try:
+                save_chat_message(
+                    session_id=session_id,
+                    user_id=user_id,
+                    username=username,
+                    user_email=user_email,
+                    message=decrypted_message.get('msg', ''),
+                    sender_type='user',
+                    room='customer_service'
+                )
+                print(f"DEBUG: User message saved to database successfully")
+            except Exception as e:
+                print(f"DEBUG: Error saving user message: {e}")
+                import traceback
+                print(f"DEBUG: Database save traceback: {traceback.format_exc()}")
+            
+            # Create message data for admin (add user info)
+            customer_message_data = {
+                'msg': decrypted_message.get('msg', ''),
+                'sender': decrypted_message.get('sender', 'customer'),
+                'timestamp': decrypted_message.get('timestamp', datetime.now().strftime('%H:%M')),
+                'sender_type': 'customer',
+                'user_room': user_room_id,
+                'user_email': user_email,
+                'session_id': session_id,
+                'encrypted': True
+            }
+            
+            # Forward decrypted message to admin room (no need to re-encrypt)
+            emit('receive_encrypted_message', {
+                'encrypted_data': encrypted_data,  # Send original encrypted data
+                'session_id': session_id
+            }, room='customer_service')
+            
+            print(f"DEBUG: Encrypted user message forwarded to admin room: customer_service")
+        else:
+            print(f"DEBUG: Failed to decrypt user message")
+            
+    except Exception as e:
+        print(f"DEBUG: Error processing encrypted user message: {e}")
+        import traceback
+        print(f"DEBUG: Encrypted message traceback: {traceback.format_exc()}")
+    
+    print("="*80 + "\n")
+    logging.info(f"User {session_id} encrypted message processed")
+
+
 @socketio.on('send_message')
 def on_message(data):
     print("\n" + "="*80)
@@ -652,72 +740,11 @@ def on_message(data):
             }
             emit('receive_message', error_message, room=user_room_id)
     elif sender == 'customer' and user_modes.get(session_id) == 'human':
-        # In human mode, encrypt and forward message to admin
-        print(f"DEBUG: User is in Human mode - encrypting and forwarding to admin")
-        
-        # Get user info for admin display
-        user_id = session.get('user_id') if 'user_id' in session else None
-        username = session.get('username', 'Guest') if 'username' in session else 'Guest'
-        user_email = session.get('email') if 'email' in session else None
-        
-        # Create unique room identifier for this user
-        if user_email:
-            user_room_id = f"user_{user_email}"
-        else:
-            user_room_id = f"guest_{session_id}"
-        
-        # Get encryption key for this session
-        encryption_key = get_session_key(session_id)
-        
-        # Save user message to database first
-        print(f"DEBUG: Attempting to save user message to database...")
-        try:
-            save_chat_message(
-                session_id=session_id,
-                user_id=user_id,
-                username=username,
-                user_email=user_email,
-                message=message,
-                sender_type='user',
-                room='customer_service'
-            )
-            print(f"DEBUG: User message saved to database successfully")
-        except Exception as e:
-            print(f"DEBUG: Error saving user message: {e}")
-            import traceback
-            print(f"DEBUG: Database save traceback: {traceback.format_exc()}")
-        
-        # Create encrypted message data for admin
-        customer_message_data = {
-            'msg': message,
-            'sender': username,
-            'timestamp': datetime.now().strftime('%H:%M'),
-            'sender_type': 'customer',
-            'user_room': user_room_id,
-            'user_email': user_email,
-            'session_id': session_id,
-            'encrypted': True
-        }
-        
-        # Encrypt the message for end-to-end security
-        try:
-            encrypted_message = encrypt_message(customer_message_data, encryption_key)
-            print(f"DEBUG: Customer message encrypted successfully")
-            
-            # Forward encrypted message to admin room
-            emit('receive_encrypted_message', {
-                'encrypted_data': encrypted_message,
-                'session_id': session_id
-            }, room='customer_service')
-            
-            print(f"DEBUG: Encrypted message forwarded to admin room: customer_service")
-        except Exception as e:
-            print(f"DEBUG: Encryption error: {e}")
-            # Fallback to unencrypted message if encryption fails
-            emit('receive_message', customer_message_data, room='customer_service')
-        
+        # In human mode, user messages are now handled by on_send_encrypted_message
+        # This section is no longer needed - encrypted messages are handled separately
+        print(f"DEBUG: User is in Human mode - message should be handled by encrypted handler")
+        print(f"DEBUG: This section should not be reached in proper E2E encryption")
         print("="*80 + "\n")
-        logging.info(f"User {session_id} encrypted message forwarded to admin")
     else:
         # Handle admin/staff messages (forward to room)
         print(f"DEBUG: Message from non-customer sender or no mode set - no AI response")
