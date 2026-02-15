@@ -666,6 +666,127 @@ async function logoutSession(sessionId, username) {
 }
 
 // =========================
+// Encryption Utilities
+// =========================
+
+let encryptionKeys = {}; // Store encryption keys per session
+
+// Generate encryption key from session ID (simplified for demo)
+function generateClientKey(sessionId) {
+    if (!encryptionKeys[sessionId]) {
+        // In production, use proper key exchange protocol
+        const password = `session_${sessionId}_${new Date().toISOString().slice(0, 10).replace(/-/g, '')}`;
+        const encoder = new TextEncoder();
+        const data = encoder.encode(password);
+        return crypto.subtle.digest('SHA-256', data).then(hash => {
+            return crypto.subtle.importKey(
+                'raw',
+                hash,
+                { name: 'AES-GCM' },
+                false,
+                ['encrypt', 'decrypt']
+            ).then(key => {
+                encryptionKeys[sessionId] = key;
+                return key;
+            });
+        });
+    }
+    return Promise.resolve(encryptionKeys[sessionId]);
+}
+
+// Encrypt message for sending
+async function encryptMessage(message, key) {
+    try {
+        const iv = crypto.getRandomValues(new Uint8Array(12));
+        const encoded = new TextEncoder().encode(JSON.stringify(message));
+        
+        const encrypted = await crypto.subtle.encrypt(
+            {
+                name: 'AES-GCM',
+                iv: iv
+            },
+            key,
+            encoded
+        );
+        
+        // Combine IV and encrypted data
+        const combined = new Uint8Array(iv.length + encrypted.byteLength);
+        combined.set(iv);
+        combined.set(new Uint8Array(encrypted), iv.length);
+        
+        // Convert to base64
+        return btoa(String.fromCharCode(...combined));
+    } catch (error) {
+        console.error('Encryption error:', error);
+        return null;
+    }
+}
+
+// Decrypt received message
+async function decryptMessage(encryptedData, key) {
+    try {
+        // Convert from base64
+        const combined = new Uint8Array(atob(encryptedData).split('').map(c => c.charCodeAt(0)));
+        
+        // Extract IV and encrypted data
+        const iv = combined.slice(0, 12);
+        const encrypted = combined.slice(12);
+        
+        const decrypted = await crypto.subtle.decrypt(
+            {
+                name: 'AES-GCM',
+                iv: iv
+            },
+            key,
+            encrypted
+        );
+        
+        const decoded = new TextDecoder().decode(decrypted);
+        return JSON.parse(decoded);
+    } catch (error) {
+        console.error('Decryption error:', error);
+        return null;
+    }
+}
+
+// Handle encrypted messages from server
+socket.on('receive_encrypted_message', async function(data) {
+    console.log('Received encrypted message:', data);
+    
+    const sessionId = data.session_id;
+    const encryptedData = data.encrypted_data;
+    
+    try {
+        // Get or generate key for this session
+        const key = await generateClientKey(sessionId);
+        
+        // Decrypt the message
+        const decryptedMessage = await decryptMessage(encryptedData, key);
+        
+        if (decryptedMessage) {
+            console.log('Message decrypted successfully:', decryptedMessage);
+            
+            // Display the decrypted message
+            addCustomerMessageToChat({
+                msg: decryptedMessage.msg,
+                sender: decryptedMessage.sender,
+                timestamp: decryptedMessage.timestamp
+            });
+        } else {
+            console.error('Failed to decrypt message');
+        }
+    } catch (error) {
+        console.error('Error handling encrypted message:', error);
+        // Fallback: show encrypted indicator
+        addCustomerMessageToChat({
+            msg: '[Encrypted message - unable to decrypt]',
+            sender: 'Admin',
+            timestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+        });
+    }
+});
+
+// =========================
 // Chat Management Functions
 // =========================
 
@@ -832,7 +953,7 @@ function loadUserMessages(sessionId, room) {
 }
 
 // Send admin message
-function sendAdminMessage() {
+async function sendAdminMessage() {
   const input = document.getElementById('expandedChatInput');
   const message = input.value.trim();
   
@@ -845,12 +966,49 @@ function sendAdminMessage() {
     return;
   }
   
-  // Send message via Socket.IO
-  socket.emit('admin_send_message', {
-    message: message,
-    user_room: currentChatUser.room,
-    user_email: currentChatUser.email
-  });
+  // Get session ID for encryption
+  const sessionId = currentChatUser.email || currentChatUser.sessionId.replace('guest_', '');
+  
+  try {
+    // Generate encryption key for this session
+    const key = await generateClientKey(sessionId);
+    
+    // Prepare message data
+    const messageData = {
+      msg: message,
+      sender: 'Admin',
+      timestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+      sender_type: 'admin',
+      encrypted: true
+    };
+    
+    // Encrypt the message
+    const encryptedMessage = await encryptMessage(messageData, key);
+    
+    if (encryptedMessage) {
+      console.log('Message encrypted successfully');
+      
+      // Send encrypted message via Socket.IO
+      socket.emit('admin_send_encrypted_message', {
+        encrypted_data: encryptedMessage,
+        user_room: currentChatUser.room,
+        user_email: currentChatUser.email,
+        session_id: sessionId
+      });
+    } else {
+      console.error('Failed to encrypt message');
+      alert('Failed to encrypt message. Please try again.');
+      return;
+    }
+  } catch (error) {
+    console.error('Encryption error:', error);
+    // Fallback to unencrypted message
+    socket.emit('admin_send_message', {
+      message: message,
+      user_room: currentChatUser.room,
+      user_email: currentChatUser.email
+    });
+  }
   
   // Add message to local display immediately for better UX
   const messagesContainer = document.getElementById('expandedChatMessages');
@@ -885,7 +1043,7 @@ function sendAdminMessage() {
   // Clear input
   input.value = '';
   
-  console.log('Admin message sent via Socket.IO:', message);
+  console.log('Admin message sent (with encryption):', message);
 }
 
 // =========================

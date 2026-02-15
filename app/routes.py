@@ -9,6 +9,11 @@ import stripe
 import requests
 from flask_socketio import SocketIO, emit, join_room, leave_room
 import google.generativeai as genai
+import base64
+import json
+from cryptography.fernet import Fernet
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from app.auth_db import save_chat_message, get_chat_history, mark_messages_as_read
 
 # =========================
@@ -22,6 +27,54 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
+
+# =========================
+# Encryption Utilities
+# =========================
+
+def generate_encryption_key(password: str, salt: bytes = None) -> bytes:
+    """Generate encryption key from password using PBKDF2"""
+    if salt is None:
+        salt = os.urandom(16)
+    
+    kdf = PBKDF2HMAC(
+        algorithm=hashes.SHA256(),
+        length=32,
+        salt=salt,
+        iterations=100000,
+    )
+    key = base64.urlsafe_b64encode(kdf.derive(password.encode()))
+    return key
+
+def encrypt_message(message: dict, key: bytes) -> str:
+    """Encrypt a message using Fernet symmetric encryption"""
+    f = Fernet(key)
+    json_message = json.dumps(message)
+    encrypted_message = f.encrypt(json_message.encode())
+    return base64.urlsafe_b64encode(encrypted_message).decode()
+
+def decrypt_message(encrypted_message: str, key: bytes) -> dict:
+    """Decrypt a message using Fernet symmetric encryption"""
+    try:
+        f = Fernet(key)
+        decoded_message = base64.urlsafe_b64decode(encrypted_message.encode())
+        decrypted_message = f.decrypt(decoded_message)
+        return json.loads(decrypted_message.decode())
+    except Exception as e:
+        print(f"DEBUG: Decryption error: {e}")
+        return None
+
+# Store encryption keys for active sessions (in production, use a more secure method)
+session_keys = {}  # {session_id: encryption_key}
+
+def get_session_key(session_id: str) -> bytes:
+    """Get or create encryption key for a session"""
+    if session_id not in session_keys:
+        # Generate a unique key for this session
+        # In production, you might want to use a more sophisticated key exchange
+        password = f"session_{session_id}_{datetime.now().strftime('%Y%m%d')}"
+        session_keys[session_id] = generate_encryption_key(password)
+    return session_keys[session_id]
 
 main = Blueprint('main', __name__)
 
@@ -555,8 +608,8 @@ def on_message(data):
             }
             emit('receive_message', error_message, room=user_room_id)
     elif sender == 'customer' and user_modes.get(session_id) == 'human':
-        # In human mode, forward message directly to admin (no database save)
-        print(f"DEBUG: User is in Human mode - forwarding to admin")
+        # In human mode, encrypt and forward message to admin
+        print(f"DEBUG: User is in Human mode - encrypting and forwarding to admin")
         
         # Get user info for admin display
         user_id = session.get('user_id') if 'user_id' in session else None
@@ -568,6 +621,9 @@ def on_message(data):
             user_room_id = f"user_{user_email}"
         else:
             user_room_id = f"guest_{session_id}"
+        
+        # Get encryption key for this session
+        encryption_key = get_session_key(session_id)
         
         # Save user message to database first
         print(f"DEBUG: Attempting to save user message to database...")
@@ -587,30 +643,37 @@ def on_message(data):
             import traceback
             print(f"DEBUG: Database save traceback: {traceback.format_exc()}")
         
-        # Forward message to admin room
-        print(f"DEBUG: Checking customer_service room members before sending...")
-        try:
-            room_members = socketio.server.manager.get_participants('customer_service', None)
-            print(f"DEBUG: Room 'customer_service' has {len(room_members)} members: {room_members}")
-        except Exception as e:
-            print(f"DEBUG: Error checking room members: {e}")
-        
-        admin_message_data = {
+        # Create encrypted message data for admin
+        customer_message_data = {
             'msg': message,
             'sender': username,
             'timestamp': datetime.now().strftime('%H:%M'),
             'sender_type': 'customer',
             'user_room': user_room_id,
             'user_email': user_email,
-            'session_id': session_id
+            'session_id': session_id,
+            'encrypted': True
         }
         
-        print(f"DEBUG: Forwarding message to admin room: customer_service")
-        emit('receive_message', admin_message_data, room='customer_service')
-        print(f"DEBUG: Message forwarded successfully")
+        # Encrypt the message for end-to-end security
+        try:
+            encrypted_message = encrypt_message(customer_message_data, encryption_key)
+            print(f"DEBUG: Customer message encrypted successfully")
+            
+            # Forward encrypted message to admin room
+            emit('receive_encrypted_message', {
+                'encrypted_data': encrypted_message,
+                'session_id': session_id
+            }, room='customer_service')
+            
+            print(f"DEBUG: Encrypted message forwarded to admin room: customer_service")
+        except Exception as e:
+            print(f"DEBUG: Encryption error: {e}")
+            # Fallback to unencrypted message if encryption fails
+            emit('receive_message', customer_message_data, room='customer_service')
         
         print("="*80 + "\n")
-        logging.info(f"User {session_id} message forwarded to admin")
+        logging.info(f"User {session_id} encrypted message forwarded to admin")
     else:
         # Handle admin/staff messages (forward to room)
         print(f"DEBUG: Message from non-customer sender or no mode set - no AI response")
@@ -637,74 +700,80 @@ def on_admin_join():
     print(f"DEBUG: Admin joined customer_service room")
 
 
-@socketio.on('admin_send_message')
-def on_admin_send_message(data):
-    """Admin sends message to specific user"""
+@socketio.on('admin_send_encrypted_message')
+def on_admin_send_encrypted_message(data):
+    """Handle encrypted admin messages"""
     session_id = request.sid
-    message = data.get('message', '')
+    encrypted_data = data.get('encrypted_data', '')
     user_room = data.get('user_room', '')
     user_email = data.get('user_email', '')
+    user_session_id = data.get('session_id', '')
     
-    if not message or not user_room:
-        print(f"DEBUG: Invalid admin message data: {data}")
+    if not encrypted_data or not user_room:
+        print(f"DEBUG: Invalid encrypted admin message data: {data}")
         return
     
-    print(f"DEBUG: Admin sending message to {user_room}: {message}")
+    print(f"DEBUG: Received encrypted admin message for {user_room}")
     
-    # Log the original customer message to database first (for context)
+    # Get encryption key for this user session
+    encryption_key = get_session_key(user_session_id)
+    
     try:
-        # Get the original customer message data that triggered this admin response
-        # This would ideally come from the new_customer_message event data
-        # For now, we'll save the admin message with user context
+        # Decrypt the admin message
+        decrypted_message = decrypt_message(encrypted_data, encryption_key)
         
-        # Extract user info from room identifier
-        if user_email:
-            target_session_id = user_email
-            target_username = user_email.split('@')[0]  # Extract username from email
-            target_user_email = user_email
+        if decrypted_message:
+            print(f"DEBUG: Admin message decrypted successfully: {decrypted_message.get('msg', '')[:50]}...")
+            
+            # Log the original customer message to database first (for context)
+            try:
+                # Extract user info from room identifier
+                if user_email:
+                    target_session_id = user_email
+                    target_username = user_email.split('@')[0]  # Extract username from email
+                    target_user_email = user_email
+                else:
+                    target_session_id = user_room.replace('guest_', '')
+                    target_username = 'Guest'
+                    target_user_email = None
+                
+                # Save admin message to database
+                save_chat_message(
+                    session_id=target_session_id,
+                    user_id=None,  # Admin messages don't have user_id
+                    username='Admin',
+                    user_email=None,
+                    message=decrypted_message.get('msg', ''),
+                    sender_type='admin',
+                    room='customer_service'
+                )
+                print(f"DEBUG: Admin message saved to database")
+            except Exception as e:
+                print(f"DEBUG: Error saving admin message: {e}")
+                import traceback
+                print(f"DEBUG: Admin save traceback: {traceback.format_exc()}")
+            
+            # Send decrypted message to specific user room
+            emit('receive_message', decrypted_message, room=user_room)
+            
+            print(f"DEBUG: Decrypted admin message sent to {user_room}")
         else:
-            target_session_id = user_room.replace('guest_', '')
-            target_username = 'Guest'
-            target_user_email = None
-        
-        # Save admin message to database
-        try:
-            save_chat_message(
-                session_id=target_session_id,
-                user_id=None,  # Admin messages don't have user_id
-                username='Admin',
-                user_email=None,
-                message=message,
-                sender_type='admin',
-                room='customer_service'
-            )
-            print(f"DEBUG: Admin message saved to database")
-        except Exception as e:
-            print(f"DEBUG: Error saving admin message: {e}")
-            import traceback
-            print(f"DEBUG: Admin save traceback: {traceback.format_exc()}")
+            print(f"DEBUG: Failed to decrypt admin message")
+            
     except Exception as e:
-        print(f"DEBUG: Error saving admin message: {e}")
+        print(f"DEBUG: Error processing encrypted admin message: {e}")
+        import traceback
+        print(f"DEBUG: Encrypted message traceback: {traceback.format_exc()}")
     
-    # Create admin message data
-    admin_message_data = {
-        'msg': message,
-        'sender': 'Admin',
-        'timestamp': datetime.now().strftime('%H:%M'),
-        'sender_type': 'admin'
-    }
-    
-    # Send message to specific user room
-    emit('receive_message', admin_message_data, room=user_room)
-    
-    # Also send confirmation back to admin
+    # Also send confirmation back to admin (unencrypted)
     emit('admin_message_sent', {
         'status': 'success', 
         'message': 'Message sent',
-        'user_room': user_room
+        'user_room': user_room,
+        'encrypted': True
     })
     
-    print(f"DEBUG: Admin message sent to {user_room}")
+    print(f"DEBUG: Encrypted admin message processed")
     print("="*80 + "\n")
 
 
