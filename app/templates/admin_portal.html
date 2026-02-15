@@ -645,32 +645,37 @@ async function initializeDH(sessionId) {
 }
 
 // Perform key exchange with server
-async function performKeyExchange(sessionId) {
-    console.log('DH: Starting key exchange for session:', sessionId);
+async function performKeyExchange(userSessionId) {
+    console.log('DEBUG: DH Starting key exchange for user:', userSessionId);
     
-    const dh = initializeDH(sessionId);
+    // Use admin's own session ID for DH exchange, not user's session ID
+    const adminSessionId = socket.id;
+    console.log('DEBUG: Using admin session ID for DH:', adminSessionId);
+    
+    const dh = await initializeDH(userSessionId);  // Store under user session for lookup
     const publicKeyHex = dh.getPublicKeyHex();
     
-    // Send public key to server
+    // Send public key to server with admin session ID
     socket.emit('dh_exchange', {
-        session_id: sessionId,
+        session_id: adminSessionId,  // Use admin's session ID
+        target_user_id: userSessionId,  // Include target user for server routing
         public_key: publicKeyHex
     });
     
-    console.log('DH: Sent public key:', publicKeyHex);
+    console.log('DEBUG: DH Sent public key for admin session:', adminSessionId);
     
     // Wait for server's public key
     return new Promise((resolve) => {
         socket.once('dh_public_key', (data) => {
-            if (data.session_id === sessionId) {
+            if (data.session_id === adminSessionId) {
                 const serverPublicKey = BigInt('0x' + data.public_key);
                 const sharedSecretHex = dh.getSharedSecretHex(serverPublicKey);
                 
-                console.log('DH: Received server public key:', data.public_key);
-                console.log('DH: Computed shared secret:', sharedSecretHex.substring(0, 16) + '...');
+                console.log('DEBUG: DH Received server public key for admin session:', data.public_key);
+                console.log('DEBUG: DH Computed shared secret for user:', userSessionId, sharedSecretHex.substring(0, 16) + '...');
                 
                 // Generate encryption key from shared secret
-                const encryptionKey = await deriveKeyFromSharedSecret(sharedSecretHex);
+                const encryptionKey = deriveKeyFromSharedSecret(sharedSecretHex);
                 
                 resolve(encryptionKey);
             }

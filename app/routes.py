@@ -665,28 +665,47 @@ def on_dh_exchange(data):
     """Handle Diffie-Hellman key exchange from client"""
     session_id = data.get('session_id', '')
     client_public_key_hex = data.get('public_key', '')
+    target_user_id = data.get('target_user_id', '')  # Admin's target user
     
     if not session_id or not client_public_key_hex:
         print(f"DEBUG: Invalid DH exchange data: {data}")
         return
     
-    print(f"DH: Received client public key for session: {session_id}")
-    print(f"DH: Client public key: {client_public_key_hex}")
-    
-    # Initialize DH for this session
-    dh = initialize_dh(session_id)
-    
-    # Parse client public key
-    client_public_key = int(client_public_key_hex, 16)
-    
-    # Compute shared secret
-    shared_secret_hex = dh.get_shared_secret_hex(client_public_key)
-    
-    # Store client's public key for future use
-    dh.client_public_key = client_public_key
-    print(f"DH: Stored client public key for session {session_id}")
-    
-    print(f"DH: Computed shared secret: {shared_secret_hex[:16]}...")
+    # Check if this is from admin (has target_user_id) or user
+    if target_user_id:
+        print(f"DH: Admin {session_id} exchanging keys for user: {target_user_id}")
+        print(f"DH: Admin public key: {client_public_key_hex}")
+        
+        # Initialize DH for admin session
+        dh = initialize_dh(session_id)
+        admin_public_key = int(client_public_key_hex, 16)
+        
+        # Compute shared secret with admin
+        shared_secret_hex = dh.get_shared_secret_hex(admin_public_key)
+        
+        # Store admin's public key for future admin messages
+        dh.client_public_key = admin_public_key
+        dh.target_user_id = target_user_id  # Store which user this admin is talking to
+        print(f"DH: Stored admin public key for session {session_id} targeting user {target_user_id}")
+        
+        print(f"DH: Computed admin shared secret: {shared_secret_hex[:16]}...")
+        
+    else:
+        print(f"DH: User {session_id} exchanging keys")
+        print(f"DH: User public key: {client_public_key_hex}")
+        
+        # Initialize DH for user session
+        dh = initialize_dh(session_id)
+        client_public_key = int(client_public_key_hex, 16)
+        
+        # Compute shared secret with user
+        shared_secret_hex = dh.get_shared_secret_hex(client_public_key)
+        
+        # Store user's public key for future user messages
+        dh.client_public_key = client_public_key
+        print(f"DH: Stored user public key for session {session_id}")
+        
+        print(f"DH: Computed user shared secret: {shared_secret_hex[:16]}...")
     
     # Get server's public key
     server_public_key_hex = dh.get_public_key_hex()
