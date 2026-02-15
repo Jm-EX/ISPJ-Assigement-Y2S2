@@ -688,15 +688,102 @@ function refreshActiveUsers() {
   const usersList = document.getElementById('activeUsersList');
   usersList.innerHTML = '<div class="empty-state"><p>Loading active users...</p></div>';
   
-  // For now, show placeholder until we add API
-  setTimeout(() => {
+  // Fetch active conversations from API
+  fetch('/api/active-conversations', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log('Active conversations data:', data);
+    
+    // Clear loading state
+    usersList.innerHTML = '';
+    
+    if (data.conversations && data.conversations.length > 0) {
+      // Display active conversations
+      data.conversations.forEach(conv => {
+        displayActiveConversation(conv);
+      });
+      
+      // Update total unread count
+      updateUnreadCount(data.total_unread);
+    } else {
+      // Show empty state
+      usersList.innerHTML = `
+        <div style="padding: 20px; text-align: center; color: #666;">
+          <p>No active conversations in the last 24 hours.</p>
+          <p style="font-size: 12px; margin-top: 10px;">Active users will appear here when they send messages.</p>
+        </div>
+      `;
+      updateUnreadCount(0);
+    }
+  })
+  .catch(error => {
+    console.error('Error loading active users:', error);
     usersList.innerHTML = `
-      <div style="padding: 20px; text-align: center; color: #666;">
-        <p>Active users will appear here when they use concierge support.</p>
-        <p style="font-size: 12px; margin-top: 10px;">This will be connected to the database functions we created.</p>
+      <div style="padding: 20px; text-align: center; color: #f44336;">
+        <p>Error loading active users. Please try again.</p>
       </div>
     `;
-  }, 1000);
+  });
+}
+
+// Auto-load active users when page loads
+document.addEventListener('DOMContentLoaded', function() {
+  refreshActiveUsers();
+});
+
+// Display active conversation in the list
+function displayActiveConversation(conv) {
+  const usersList = document.getElementById('activeUsersList');
+  
+  const userElement = document.createElement('div');
+  userElement.id = `user_${conv.session_id}`;
+  userElement.style.cssText = `
+    padding: 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  `;
+  
+  const displayName = conv.username || 'Guest';
+  const displayInfo = conv.user_email || `Session: ${conv.session_id.substring(0, 8)}...`;
+  const lastMessageTime = conv.last_message_time ? 
+    new Date(conv.last_message_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Unknown';
+  
+  userElement.innerHTML = `
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <strong style="color: #333;">${displayName}</strong>
+        ${conv.unread_count > 0 ? `<span style="background: #f44336; color: white; padding: 2px 6px; border-radius: 10px; font-size: 11px; margin-left: 8px;">${conv.unread_count}</span>` : ''}
+        <br>
+        <small style="color: #666;">${displayInfo}</small>
+        <br>
+        <small style="color: #999;">Last message: ${lastMessageTime}</small>
+      </div>
+      <button onclick="expandChat('${conv.session_id}', '${displayName}', '${conv.user_email || ''}', '${conv.room}')" 
+              style="padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer;">
+        Chat
+      </button>
+    </div>
+  `;
+  
+  // Add hover effect
+  userElement.addEventListener('mouseenter', () => {
+    userElement.style.backgroundColor = '#f8f9fa';
+  });
+  
+  userElement.addEventListener('mouseleave', () => {
+    userElement.style.backgroundColor = 'white';
+  });
+  
+  usersList.appendChild(userElement);
 }
 
 // Expand chat for specific user
@@ -1083,10 +1170,40 @@ function addCustomerMessageToChat(messageData) {
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
-// Update unread count (placeholder for now)
-function updateUnreadCount() {
-  // This would be updated with real data from the database
-  console.log('Updating unread count...');
+// Update unread count
+function updateUnreadCount(count = null) {
+  // If count is provided, use it, otherwise fetch from API
+  if (count !== null) {
+    displayUnreadCount(count);
+  } else {
+    // Fetch fresh unread count from API
+    fetch('/api/active-conversations', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      displayUnreadCount(data.total_unread || 0);
+    })
+    .catch(error => {
+      console.error('Error updating unread count:', error);
+    });
+  }
+}
+
+// Display unread count in the UI
+function displayUnreadCount(count) {
+  // Update page title if there are unread messages
+  if (count > 0) {
+    document.title = `(${count}) Admin Dashboard - Hotel Management System`;
+  } else {
+    document.title = 'Admin Dashboard - Hotel Management System';
+  }
+  
+  // You can also update a badge or indicator in the UI if needed
+  console.log(`Total unread messages: ${count}`);
 }
 </script>
 {% endblock %}
