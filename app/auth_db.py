@@ -284,9 +284,9 @@ def get_chat_history(session_id=None, user_id=None, room=None, limit=50):
     db = get_db()
     cursor = db.cursor()
     
-    # Simple query without complex JOIN - use existing columns only
+    # Simple query without complex JOIN
     query = """
-        SELECT id, session_id, user_id, username, message, sender_type, room, timestamp, admin_read
+        SELECT id, session_id, user_id, username, user_email, message, sender_type, room, timestamp, admin_read
         FROM chat_messages 
         WHERE 1=1
     """
@@ -313,7 +313,7 @@ def get_chat_history(session_id=None, user_id=None, room=None, limit=50):
     try:
         cursor.execute(query, params)
         result = cursor.fetchall()
-        print(f"DEBUG: get_chat_history returned {len(result)} items")
+        print(f"DEBUG: get_chat_history result count: {len(result)}")
         return result
     except Exception as e:
         print(f"DEBUG: get_chat_history error: {e}")
