@@ -971,9 +971,6 @@ socket.on('receive_message', function(data) {
         }, 500);
       }
     }
-    
-    // Update unread count
-    updateUnreadCount();
   }
   // Admin messages are handled locally in sendAdminMessage function
 });
@@ -985,11 +982,6 @@ socket.on('admin_message_sent', (data) => {
   }
 });
 
-socket.on('messages_marked_read', (data) => {
-  console.log('Messages marked as read:', data);
-  if (data.status === 'success') {
-    updateUnreadCount();
-  }
 });
 
 // Add or update active user in the list
