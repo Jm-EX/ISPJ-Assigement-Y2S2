@@ -342,185 +342,7 @@ let isHumanMode = false; // Track current support mode
 let aiConnected = true; // Track AI connection status
 
 // =========================
-// Diffie-Hellman Key Exchange
-// =========================
-
-class DiffieHellman {
-    constructor() {
-        // Prime modulus and generator (can use standardized values)
-        this.prime = BigInt("0xFFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD129024E088A67CC74020BBEA63B139B22514A08798E3404DDEF9519B3CD3A431B302B0A6DF25F14374FE1356D6C51F245B543B839");
-        this.generator = BigInt("2");
-        
-        // Generate private key
-        this.privateKey = this.generateRandomKey();
-        
-        // Calculate public key
-        this.publicKey = this.modPow(this.generator, this.privateKey, this.prime);
-    }
-    
-    generateRandomKey() {
-        // Generate cryptographically secure random private key
-        const array = new Uint8Array(32);
-        crypto.getRandomValues(array);
-        let key = BigInt(0);
-        for (let i = 0; i < array.length; i++) {
-            key = (key << BigInt(8)) | BigInt(array[i]);
-        }
-        return key % (this.prime - BigInt(2)) + BigInt(2); // Ensure 2 <= key <= prime-2
-    }
-    
-    modPow(base, exponent, modulus) {
-        // Modular exponentiation
-        if (modulus === BigInt(1)) return BigInt(0);
-        let result = BigInt(1);
-        base = base % modulus;
-        
-        while (exponent > BigInt(0)) {
-            if (exponent % BigInt(2) === BigInt(1)) {
-                result = (result * base) % modulus;
-            }
-            exponent = exponent >> BigInt(1);
-            base = (base * base) % modulus;
-        }
-        return result;
-    }
-    
-    computeSharedSecret(otherPublicKey) {
-        // Compute shared secret: (otherPublicKey^privateKey) mod prime
-        return this.modPow(otherPublicKey, this.privateKey, this.prime);
-    }
-    
-    getPublicKeyHex() {
-        return this.publicKey.toString(16).padStart(64, '0');
-    }
-    
-    getSharedSecretHex(otherPublicKey) {
-        const sharedSecret = this.computeSharedSecret(otherPublicKey);
-        return sharedSecret.toString(16).padStart(64, '0');
-    }
-}
-
-// Store DH instances per session
-let dhInstances = {};
-
-// Initialize Diffie-Hellman for a session
-async function initializeDH(sessionId) {
-    if (!dhInstances[sessionId]) {
-        dhInstances[sessionId] = new DiffieHellman();
-        console.log('CHATBOT DEBUG: DH Initialized for session:', sessionId);
-    }
-    return dhInstances[sessionId];
-}
-
-// Perform key exchange with server
-async function performKeyExchange(sessionId) {
-    console.log('CHATBOT DEBUG: DH Starting key exchange for session:', sessionId);
-    
-    const dh = await initializeDH(sessionId);
-    const publicKeyHex = dh.getPublicKeyHex();
-    
-    // Send public key to server
-    socket.emit('dh_exchange', {
-        session_id: sessionId,
-        public_key: publicKeyHex
-    });
-    
-    console.log('CHATBOT DEBUG: DH Sent public key:', publicKeyHex);
-    
-    // Wait for server's public key
-    return new Promise((resolve) => {
-        socket.once('dh_public_key', (data) => {
-            if (data.session_id === sessionId) {
-                const serverPublicKey = BigInt('0x' + data.public_key);
-                const sharedSecretHex = dh.getSharedSecretHex(serverPublicKey);
-                
-                console.log('CHATBOT DEBUG: DH Received server public key:', data.public_key);
-                console.log('CHATBOT DEBUG: DH Computed shared secret:', sharedSecretHex.substring(0, 16) + '...');
-                
-                // Generate encryption key from shared secret
-                const encryptionKey = deriveKeyFromSharedSecret(sharedSecretHex);
-                
-                resolve(encryptionKey);
-            }
-        });
-    });
-}
-
-// Derive encryption key from shared secret
-async function deriveKeyFromSharedSecret(sharedSecretHex) {
-    // Convert hex string to bytes
-    const secretBytes = new Uint8Array(sharedSecretHex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
-    
-    // Use HKDF to derive encryption key
-    const importedKey = await crypto.subtle.importKey(
-        'raw', // Use 'raw' format for HKDF input key material
-        secretBytes,
-        {
-            name: 'HKDF',
-            hash: 'SHA-256',
-        },
-        false,
-        ['deriveKey']
-    );
-    
-    const derivedKey = await crypto.subtle.deriveKey(
-        {
-            name: 'HKDF',
-            hash: 'SHA-256',
-            salt: new TextEncoder().encode('chat-salt'), // Use consistent salt
-            info: new TextEncoder().encode('encryption'),
-        },
-        importedKey,
-        { name: 'AES-GCM', length: 256 },
-        true,
-        ['encrypt', 'decrypt']
-    );
-    
-    console.log('CHATBOT DEBUG: DH Derived encryption key from shared secret');
-    return derivedKey;
-}
-
-// Get or create DH encryption key for session
-async function getDHKey(sessionId) {
-    // Check if we already have a key
-    const existingKey = sessionStorage.getItem(`dh_key_${sessionId}`);
-    if (existingKey) {
-        console.log('CHATBOT DEBUG: Using existing DH key for session:', sessionId);
-        const keyData = JSON.parse(existingKey);
-        
-        // Convert base64 key string back to Uint8Array
-        const rawKeyBytes = new Uint8Array(atob(keyData.k).split('').map(char => char.charCodeAt(0)));
-        
-        const importedKey = await crypto.subtle.importKey(
-            'raw', // Use raw format with actual bytes
-            rawKeyBytes, // Use the raw key bytes, not JSON object
-            { name: 'AES-GCM' },
-            false,
-            ['encrypt', 'decrypt']
-        );
-        return importedKey;
-    }
-    
-    console.log('CHATBOT DEBUG: No existing DH key, performing key exchange for session:', sessionId);
-    
-    // Perform key exchange if no key exists
-    const key = await performKeyExchange(sessionId);
-    
-    // Store the key for future use
-    const exportedKey = await crypto.subtle.exportKey('raw', key);
-    const keyArray = Array.from(new Uint8Array(exportedKey));
-    sessionStorage.setItem(`dh_key_${sessionId}`, JSON.stringify({
-        kty: 'oct',
-        k: btoa(String.fromCharCode(...keyArray)),
-        alg: 'A256GCM'
-    }));
-    
-    console.log('CHATBOT DEBUG: DH key stored for session:', sessionId);
-    return key;
-}
-
-// =========================
-// Original Encryption Functions (Updated for DH)
+// Encryption Utilities (User Side)
 // =========================
 
 let encryptionKeys = {}; // Store encryption keys per session
@@ -673,15 +495,6 @@ function toggleSupportMode() {
         socket.emit('switch_to_human_mode');
         aiConnected = false;
         
-        // Initialize DH key exchange for human mode
-        const sessionId = socket.id || 'unknown';
-        console.log('CHATBOT DEBUG: Initializing DH key exchange for human mode session:', sessionId);
-        getDHKey(sessionId).then(key => {
-            console.log('CHATBOT DEBUG: DH key exchange completed for human mode');
-        }).catch(error => {
-            console.error('CHATBOT DEBUG: DH key exchange failed for human mode:', error);
-        });
-        
         // Add system message about switching to human mode
         switchMessage = "👋 You're now connected with Concierge Support. A human agent will assist you shortly. AI responses have been disabled.";
         addMessageToChat('System', switchMessage, 'system');
@@ -797,11 +610,11 @@ function sendMessage() {
 // Send encrypted message (for human mode)
 async function sendEncryptedMessage(msg) {
     try {
-        // Get session ID for DH key exchange
+        // Get session ID for encryption
         const sessionId = socket.id || 'unknown';
         
-        // Get or create DH encryption key for this session
-        const key = await getDHKey(sessionId);
+        // Generate encryption key for this session
+        const key = await generateClientKey(sessionId);
         
         // Prepare message data
         const messageData = {
@@ -812,11 +625,11 @@ async function sendEncryptedMessage(msg) {
             encrypted: true
         };
         
-        // Encrypt the message using DH-derived key
+        // Encrypt the message
         const encryptedMessage = await encryptMessage(messageData, key);
         
         if (encryptedMessage) {
-            console.log('CHATBOT DEBUG: Message encrypted successfully with DH key');
+            console.log('CHATBOT DEBUG: Message encrypted successfully');
             
             // Send encrypted message via Socket.IO
             socket.emit('send_encrypted_message', {
@@ -826,7 +639,7 @@ async function sendEncryptedMessage(msg) {
             
             console.log('CHATBOT DEBUG: Encrypted message sent to server');
         } else {
-            console.error('CHATBOT DEBUG: Failed to encrypt message with DH key');
+            console.error('CHATBOT DEBUG: Failed to encrypt message');
             // Fallback to unencrypted message
             const fallbackData = {
                 msg: msg,
@@ -834,7 +647,6 @@ async function sendEncryptedMessage(msg) {
                 room: 'customer_service'
             };
             socket.emit('send_message', fallbackData);
-            console.log('CHATBOT DEBUG: Fallback to unencrypted message');
         }
     } catch (error) {
         console.error('CHATBOT DEBUG: Encryption error:', error);
@@ -845,7 +657,6 @@ async function sendEncryptedMessage(msg) {
             room: 'customer_service'
         };
         socket.emit('send_message', fallbackData);
-        console.log('CHATBOT DEBUG: Fallback to unencrypted message');
     }
 }
 
@@ -938,25 +749,27 @@ socket.on('receive_encrypted_message', async function(data) {
     const encryptedData = data.encrypted_data;
     
     try {
-        // Get or create DH encryption key for this session
-        const key = await getDHKey(sessionId);
+        // Get or generate key for this session
+        const key = await generateClientKey(sessionId);
         
-        // Decrypt the message using DH-derived key
+        // Decrypt the message
         const decryptedMessage = await decryptMessage(encryptedData, key);
         
         if (decryptedMessage) {
-            console.log('CHATBOT DEBUG: Message decrypted successfully with DH key:', decryptedMessage);
+            console.log('CHATBOT DEBUG: Message decrypted successfully:', decryptedMessage);
             
             if (!chatOpen && decryptedMessage.sender !== 'customer') {
                 console.log('CHATBOT DEBUG: Chat closed, showing badge');
                 document.getElementById('chat-badge').style.display = 'block';
             }
+            
             // Using 'support' as the class for Admin replies
             const type = decryptedMessage.sender === 'customer' ? 'customer' : 'support';
             console.log('CHATBOT DEBUG: Message type:', type);
             addMessageToChat(decryptedMessage.sender, decryptedMessage.msg, type);
+            console.log('CHATBOT DEBUG: Decrypted message added to chat');
         } else {
-            console.error('CHATBOT DEBUG: Failed to decrypt message with DH key');
+            console.error('CHATBOT DEBUG: Failed to decrypt admin message');
         }
     } catch (error) {
         console.error('CHATBOT DEBUG: Error handling encrypted admin message:', error);

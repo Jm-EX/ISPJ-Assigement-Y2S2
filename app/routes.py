@@ -29,97 +29,7 @@ logging.basicConfig(
 )
 
 # =========================
-# Diffie-Hellman Key Exchange
-# =========================
-
-class DiffieHellman:
-    def __init__(self):
-        # Prime modulus and generator (using standardized values)
-        self.prime = int("FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD129024E088A67CC74020BBEA63B139B22514A08798E3404DDEF9519B3CD3A431B302B0A6DF25F14374FE1356D6C51F245B543B839", 16)
-        self.generator = 2
-        
-        # Generate private key
-        self.private_key = self.generate_random_key()
-        
-        # Calculate public key
-        self.public_key = self.mod_pow(self.generator, self.private_key, self.prime)
-    
-    def generate_random_key(self):
-        """Generate cryptographically secure random private key"""
-        import secrets
-        # Generate random 256-bit key
-        return secrets.randbelow(self.prime - 2) + 2
-    
-    def mod_pow(self, base, exponent, modulus):
-        """Modular exponentiation"""
-        if modulus == 1:
-            return 0
-        result = 1
-        base = base % modulus
-        
-        while exponent > 0:
-            if exponent % 2 == 1:
-                result = (result * base) % modulus
-            exponent = exponent >> 1
-            base = (base * base) % modulus
-        
-        return result
-    
-    def compute_shared_secret(self, other_public_key):
-        """Compute shared secret: (other_public_key^private_key) mod prime"""
-        return self.mod_pow(other_public_key, self.private_key, self.prime)
-    
-    def get_public_key_hex(self):
-        """Get public key as hex string"""
-        return format(self.public_key, '064x')
-    
-    def get_shared_secret_hex(self, other_public_key):
-        """Get shared secret as hex string"""
-        shared_secret = self.compute_shared_secret(other_public_key)
-        return format(shared_secret, '064x')
-
-# Store DH instances per session
-dh_instances = {}
-
-def initialize_dh(session_id):
-    """Initialize Diffie-Hellman for a session"""
-    if session_id not in dh_instances:
-        dh_instances[session_id] = DiffieHellman()
-        print(f"DH: Initialized for session: {session_id}")
-    return dh_instances[session_id]
-
-def derive_key_from_shared_secret(shared_secret_hex):
-    """Derive encryption key from shared secret using HKDF"""
-    import hashlib
-    from cryptography.hazmat.primitives import hashes
-    from cryptography.hazmat.primitives.kdf.hkdf import HKDF
-    from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-    from cryptography.hazmat.backends import default_backend
-    
-    # Convert hex string to bytes
-    shared_secret_bytes = bytes.fromhex(shared_secret_hex)
-    
-    # Use HKDF to derive encryption key
-    hkdf = HKDF(
-        algorithm=hashes.SHA256(),
-        length=32,
-        salt=b'chat-salt',  # Use consistent salt
-        info=b'encryption',
-        backend=default_backend()
-    )
-    
-    derived_key = hkdf.derive(shared_secret_bytes)
-    
-    # Create AES-GCM cipher
-    from cryptography.hazmat.primitives.ciphers import Cipher
-    from cryptography.hazmat.primitives.ciphers import algorithms
-    cipher = Cipher(algorithms.AES(derived_key), modes.GCM(), backend=default_backend())
-    
-    print(f"DH: Derived encryption key from shared secret")
-    return cipher
-
-# =========================
-# Original Encryption Functions
+# Encryption Utilities
 # =========================
 
 import os
@@ -646,14 +556,6 @@ def on_switch_to_human():
     print(f"DEBUG: Session ID: {session_id}")
     user_modes[session_id] = 'human'
     print(f"DEBUG: User mode switched to: human")
-    
-    # Notify admins that user is ready for human support
-    emit('user_ready_for_human_support', {
-        'session_id': session_id,
-        'message': f'User {session_id} is ready for human support'
-    }, room='customer_service')
-    
-    print(f"DEBUG: Notified admins that user {session_id} is ready for human support")
     print("="*80 + "\n")
     logging.info(f"User {session_id} switched to human mode")
 
@@ -667,67 +569,6 @@ def on_switch_to_ai():
     print(f"DEBUG: User mode switched to: ai")
     print("="*80 + "\n")
     logging.info(f"User {session_id} switched to AI mode")
-
-@socketio.on('dh_exchange')
-def on_dh_exchange(data):
-    """Handle Diffie-Hellman key exchange from client"""
-    session_id = data.get('session_id', '')
-    client_public_key_hex = data.get('public_key', '')
-    target_user_id = data.get('target_user_id', '')  # Admin's target user
-    
-    if not session_id or not client_public_key_hex:
-        print(f"DEBUG: Invalid DH exchange data: {data}")
-        return
-    
-    # Check if this is from admin (has target_user_id) or user
-    if target_user_id:
-        print(f"DH: Admin {session_id} exchanging keys for user: {target_user_id}")
-        print(f"DH: Admin public key: {client_public_key_hex}")
-        
-        # Initialize DH for admin session
-        dh = initialize_dh(session_id)
-        admin_public_key = int(client_public_key_hex, 16)
-        
-        # Compute shared secret with admin
-        shared_secret_hex = dh.get_shared_secret_hex(admin_public_key)
-        
-        # Store admin's public key for future admin messages
-        dh.client_public_key = admin_public_key
-        dh.target_user_id = target_user_id  # Store which user this admin is talking to
-        print(f"DH: Stored admin public key for session {session_id} targeting user {target_user_id}")
-        
-        print(f"DH: Computed admin shared secret: {shared_secret_hex[:16]}...")
-        
-    else:
-        print(f"DH: User {session_id} exchanging keys")
-        print(f"DH: User public key: {client_public_key_hex}")
-        
-        # Initialize DH for user session
-        dh = initialize_dh(session_id)
-        client_public_key = int(client_public_key_hex, 16)
-        
-        # Compute shared secret with user
-        shared_secret_hex = dh.get_shared_secret_hex(client_public_key)
-        
-        # Store user's public key for future user messages
-        dh.client_public_key = client_public_key
-        print(f"DH: Stored user public key for session {session_id}")
-        
-        print(f"DH: Computed user shared secret: {shared_secret_hex[:16]}...")
-    
-    # Get server's public key
-    server_public_key_hex = dh.get_public_key_hex()
-    
-    print(f"DH: Sending server public key to client: {server_public_key_hex}")
-    
-    # Send server's public key back to client
-    emit('dh_public_key', {
-        'session_id': session_id,
-        'public_key': server_public_key_hex
-    })
-    
-    print(f"DH: Key exchange completed for session {session_id}")
-
 
 @socketio.on('send_encrypted_message')
 def on_send_encrypted_message(data):
@@ -746,28 +587,12 @@ def on_send_encrypted_message(data):
     print(f"DEBUG: Session ID: {session_id}")
     print(f"DEBUG: Encrypted data length: {len(encrypted_data)}")
     
-    # Get DH instance for this session
-    dh = initialize_dh(session_id)
-    
-    # Check if we have the user's public key from DH exchange
-    if hasattr(dh, 'client_public_key'):
-        print(f"DEBUG: Using stored client public key for session {session_id}")
-        client_public_key = dh.client_public_key
-    else:
-        print(f"DEBUG: No stored client public key for session {session_id}, waiting for DH exchange")
-        # We can't decrypt without the user's public key
-        return
+    # Get encryption key for this session
+    encryption_key = get_session_key(session_id)
     
     try:
-        # Get the DH-derived encryption key for this session
-        # Use the stored client public key to compute shared secret
-        shared_secret_hex = dh.get_shared_secret_hex(client_public_key)
-        print(f"DEBUG: Computed shared secret with client public key: {shared_secret_hex[:16]}...")
-        
-        encryption_cipher = derive_key_from_shared_secret(shared_secret_hex)
-        
-        # Decrypt the user message using DH-derived key
-        decrypted_message = decrypt_message(encrypted_data, encryption_cipher)
+        # Decrypt the user message
+        decrypted_message = decrypt_message(encrypted_data, encryption_key)
         
         if decrypted_message:
             print(f"DEBUG: User message decrypted successfully: {decrypted_message.get('msg', '')[:50]}...")
@@ -815,23 +640,12 @@ def on_send_encrypted_message(data):
             }
             
             # Forward decrypted message to admin room (no need to re-encrypt)
-            print(f"DEBUG: Forwarding encrypted message to admin room 'customer_service'")
-            room_members = socketio.server.manager.get_participants('customer_service', None)
-            print(f"DEBUG: Room 'customer_service' members: {room_members}")
-            print(f"DEBUG: Room members count: {len(room_members) if room_members else 0}")
-            
-            if room_members and len(room_members) > 0:
-                print(f"DEBUG: Emitting to {len(room_members)} admin(s) in customer_service room")
-                socketio.emit('receive_encrypted_message', {
-                    'encrypted_data': encrypted_data,  # Send original encrypted data
-                    'session_id': session_id,
-                    'username': username,  # Add actual username here
-                    'user_email': user_email
-                }, room='customer_service')
-                print(f"DEBUG: Encrypted message forwarded to admin room for session {session_id}")
-            else:
-                print(f"DEBUG: WARNING: No admins in customer_service room to receive message!")
-                print(f"DEBUG: Message from user {session_id} will be lost!")
+            emit('receive_encrypted_message', {
+                'encrypted_data': encrypted_data,  # Send original encrypted data
+                'session_id': session_id,
+                'username': username,  # Add actual username here
+                'user_email': user_email
+            }, room='customer_service')
             
             print(f"DEBUG: Encrypted user message forwarded to admin room: customer_service")
         else:
@@ -976,25 +790,16 @@ def on_admin_send_encrypted_message(data):
     print(f"DEBUG: Admin using session ID: {user_session_id}")
     print(f"DEBUG: User room: {user_room}")
     
-    # Get DH instance for this session
-    dh = initialize_dh(user_session_id)
+    # Get encryption key for this user session
+    encryption_key = get_session_key(user_session_id)
+    print(f"DEBUG: Generated encryption key for session: {user_session_id}")
     
     try:
-        # For admin messages, we need to ensure DH key exchange has happened
-        # The admin should have already performed DH exchange when they selected the user
-        # So we can use the stored DH instance to derive the shared secret
-        
-        # Get the DH-derived encryption key for this session
-        # The admin encrypted using their DH-derived key, so we need the same key
-        encryption_cipher = derive_key_from_shared_secret(
-            dh.get_shared_secret_hex(int("0xFFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD129024E088A67CC74020BBEA63B139B22514A08798E3404DDEF9519B3CD3A431B302B0A6DF25F14374FE1356D6C51F245B543B839", 16))
-        )
-        
-        # Decrypt the admin message using DH-derived key
-        decrypted_message = decrypt_message(encrypted_data, encryption_cipher)
+        # Decrypt the admin message
+        decrypted_message = decrypt_message(encrypted_data, encryption_key)
         
         if decrypted_message:
-            print(f"DEBUG: Admin message decrypted successfully with DH key: {decrypted_message.get('msg', '')[:50]}...")
+            print(f"DEBUG: Admin message decrypted successfully: {decrypted_message.get('msg', '')[:50]}...")
             
             # Log the original customer message to database first (for context)
             try:
@@ -1033,7 +838,7 @@ def on_admin_send_encrypted_message(data):
             print(f"DEBUG: Encrypted admin message sent to {user_room}")
             print(f"DEBUG: Forwarded encrypted data with session_id: {user_session_id}")
         else:
-            print(f"DEBUG: Failed to decrypt admin message with DH key")
+            print(f"DEBUG: Failed to decrypt admin message")
             
     except Exception as e:
         print(f"DEBUG: Error processing encrypted admin message: {e}")
@@ -1045,7 +850,7 @@ def on_admin_send_encrypted_message(data):
         'status': 'success', 
         'message': 'Message sent',
         'user_room': user_room,
-        'message_data': decrypted_message,  # Send back decrypted message
+        'message_data': decrypted_message,  # Send back the decrypted message
         'encrypted': True
     })
     

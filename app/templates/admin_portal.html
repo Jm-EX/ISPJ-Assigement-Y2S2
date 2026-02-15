@@ -574,190 +574,7 @@
 const socket = io();
 
 // =========================
-// Diffie-Hellman Key Exchange
-// =========================
-
-class DiffieHellman {
-    constructor() {
-        // Prime modulus and generator (can use standardized values)
-        this.prime = BigInt("0xFFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD129024E088A67CC74020BBEA63B139B22514A08798E3404DDEF9519B3CD3A431B302B0A6DF25F14374FE1356D6C51F245B543B839");
-        this.generator = BigInt("2");
-        
-        // Generate private key
-        this.privateKey = this.generateRandomKey();
-        
-        // Calculate public key
-        this.publicKey = this.modPow(this.generator, this.privateKey, this.prime);
-    }
-    
-    generateRandomKey() {
-        // Generate cryptographically secure random private key
-        const array = new Uint8Array(32);
-        crypto.getRandomValues(array);
-        let key = BigInt(0);
-        for (let i = 0; i < array.length; i++) {
-            key = (key << BigInt(8)) | BigInt(array[i]);
-        }
-        return key % (this.prime - BigInt(2)) + BigInt(2); // Ensure 2 <= key <= prime-2
-    }
-    
-    modPow(base, exponent, modulus) {
-        // Modular exponentiation
-        if (modulus === BigInt(1)) return BigInt(0);
-        let result = BigInt(1);
-        base = base % modulus;
-        
-        while (exponent > BigInt(0)) {
-            if (exponent % BigInt(2) === BigInt(1)) {
-                result = (result * base) % modulus;
-            }
-            exponent = exponent >> BigInt(1);
-            base = (base * base) % modulus;
-        }
-        return result;
-    }
-    
-    computeSharedSecret(otherPublicKey) {
-        // Compute shared secret: (otherPublicKey^privateKey) mod prime
-        return this.modPow(otherPublicKey, this.privateKey, this.prime);
-    }
-    
-    getPublicKeyHex() {
-        return this.publicKey.toString(16).padStart(64, '0');
-    }
-    
-    getSharedSecretHex(otherPublicKey) {
-        const sharedSecret = this.computeSharedSecret(otherPublicKey);
-        return sharedSecret.toString(16).padStart(64, '0');
-    }
-}
-
-// Store DH instances per session
-let dhInstances = {};
-
-// Initialize Diffie-Hellman for a session
-async function initializeDH(sessionId) {
-    if (!dhInstances[sessionId]) {
-        dhInstances[sessionId] = new DiffieHellman();
-        console.log('DH: Initialized for session:', sessionId);
-    }
-    return dhInstances[sessionId];
-}
-
-// Perform key exchange with server
-async function performKeyExchange(userSessionId) {
-    console.log('DEBUG: DH Starting key exchange for user:', userSessionId);
-    
-    // Use admin's own session ID for DH exchange, not user's session ID
-    const adminSessionId = socket.id;
-    console.log('DEBUG: Using admin session ID for DH:', adminSessionId);
-    
-    const dh = await initializeDH(userSessionId);  // Store under user session for lookup
-    const publicKeyHex = dh.getPublicKeyHex();
-    
-    // Send public key to server with admin session ID
-    socket.emit('dh_exchange', {
-        session_id: adminSessionId,  // Use admin's session ID
-        target_user_id: userSessionId,  // Include target user for server routing
-        public_key: publicKeyHex
-    });
-    
-    console.log('DEBUG: DH Sent public key for admin session:', adminSessionId);
-    
-    // Wait for server's public key
-    return new Promise((resolve) => {
-        socket.once('dh_public_key', (data) => {
-            if (data.session_id === adminSessionId) {
-                const serverPublicKey = BigInt('0x' + data.public_key);
-                const sharedSecretHex = dh.getSharedSecretHex(serverPublicKey);
-                
-                console.log('DEBUG: DH Received server public key for admin session:', data.public_key);
-                console.log('DEBUG: DH Computed shared secret for user:', userSessionId, sharedSecretHex.substring(0, 16) + '...');
-                
-                // Generate encryption key from shared secret
-                const encryptionKey = deriveKeyFromSharedSecret(sharedSecretHex);
-                
-                resolve(encryptionKey);
-            }
-        });
-    });
-}
-
-// Derive encryption key from shared secret
-async function deriveKeyFromSharedSecret(sharedSecretHex) {
-    // Convert hex string to bytes
-    const secretBytes = new Uint8Array(sharedSecretHex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
-    
-    // Use HKDF to derive encryption key
-    const importedKey = await crypto.subtle.importKey(
-        'raw', // Use 'raw' format for HKDF input key material
-        secretBytes,
-        {
-            name: 'HKDF',
-            hash: 'SHA-256',
-        },
-        false,
-        ['deriveKey']
-    );
-    
-    const derivedKey = await crypto.subtle.deriveKey(
-        {
-            name: 'HKDF',
-            hash: 'SHA-256',
-            salt: new TextEncoder().encode('chat-salt'), // Use consistent salt
-            info: new TextEncoder().encode('encryption'),
-        },
-        importedKey,
-        { name: 'AES-GCM', length: 256 },
-        true,
-        ['encrypt', 'decrypt']
-    );
-    
-    console.log('DH: Derived encryption key from shared secret');
-    return derivedKey;
-}
-
-// Get or create DH encryption key for session
-async function getDHKey(sessionId) {
-    // Check if we already have a key
-    const existingKey = sessionStorage.getItem(`dh_key_${sessionId}`);
-    if (existingKey) {
-        console.log('DEBUG: Using existing DH key for session:', sessionId);
-        const keyData = JSON.parse(existingKey);
-        
-        // Convert base64 key string back to Uint8Array
-        const rawKeyBytes = new Uint8Array(atob(keyData.k).split('').map(char => char.charCodeAt(0)));
-        
-        const importedKey = await crypto.subtle.importKey(
-            'raw', // Use raw format with actual bytes
-            rawKeyBytes, // Use the raw key bytes, not JSON object
-            { name: 'AES-GCM' },
-            false,
-            ['encrypt', 'decrypt']
-        );
-        return importedKey;
-    }
-    
-    console.log('DEBUG: No existing DH key, performing key exchange for session:', sessionId);
-    
-    // Perform key exchange if no key exists
-    const key = await performKeyExchange(sessionId);
-    
-    // Store the key for future use
-    const exportedKey = await crypto.subtle.exportKey('raw', key);
-    const keyArray = Array.from(new Uint8Array(exportedKey));
-    sessionStorage.setItem(`dh_key_${sessionId}`, JSON.stringify({
-        kty: 'oct',
-        k: btoa(String.fromCharCode(...keyArray)),
-        alg: 'A256GCM'
-    }));
-    
-    console.log('DEBUG: DH key stored for session:', sessionId);
-    return key;
-}
-
-// =========================
-// Original Encryption Functions (Updated for DH)
+// Encryption Utilities
 // =========================
 
 let encryptionKeys = {}; // Store encryption keys per session
@@ -856,38 +673,22 @@ async function decryptMessage(encryptedData, key) {
 
 // Handle encrypted messages from server
 socket.on('receive_encrypted_message', async function(data) {
-    console.log('DEBUG: ===== ADMIN RECEIVED ENCRYPTED MESSAGE =====');
-    console.log('DEBUG: Received encrypted message:', data);
-    console.log('DEBUG: Socket ID:', socket.id);
-    console.log('DEBUG: Current time:', new Date().toISOString());
+    console.log('Received encrypted message:', data);
     
     const sessionId = data.session_id;
     const encryptedData = data.encrypted_data;
     const serverUsername = data.username; // Get username from server
     const serverEmail = data.user_email; // Get email from server
     
-    console.log('DEBUG: Session ID:', sessionId);
-    console.log('DEBUG: Encrypted data length:', encryptedData ? encryptedData.length : 'undefined');
-    console.log('DEBUG: Username:', serverUsername);
-    console.log('DEBUG: Email:', serverEmail);
-    
     try {
-        // Check if we need to do DH exchange for this user
-        const existingKey = sessionStorage.getItem(`dh_key_${sessionId}`);
-        if (!existingKey) {
-            console.log('DEBUG: No DH key for user, initiating DH exchange:', sessionId);
-            // Initialize DH key exchange for this user
-            await getDHKey(sessionId);
-        }
+        // Get or generate key for this session
+        const key = await generateClientKey(sessionId);
         
-        // Get or create DH encryption key for this session
-        const key = await getDHKey(sessionId);
-        
-        // Decrypt the message using DH-derived key
+        // Decrypt the message
         const decryptedMessage = await decryptMessage(encryptedData, key);
         
         if (decryptedMessage) {
-            console.log('Message decrypted successfully with DH key:', decryptedMessage);
+            console.log('Message decrypted successfully:', decryptedMessage);
             
             // Create user data object for active user management
             const userData = {
@@ -909,7 +710,7 @@ socket.on('receive_encrypted_message', async function(data) {
                 ((currentChatUser.email && currentChatUser.email === userData.user_email) ||
                  (!currentChatUser.email && currentChatUser.sessionId === sessionId))) {
                 
-                // Display decrypted message with actual username
+                // Display the decrypted message with actual username
                 addCustomerMessageToChat({
                     msg: decryptedMessage.msg,
                     sender: serverUsername || decryptedMessage.sender, // Use server username
@@ -957,7 +758,7 @@ socket.on('receive_encrypted_message', async function(data) {
                 }
             }
         } else {
-            console.error('Failed to decrypt message with DH key');
+            console.error('Failed to decrypt message');
         }
     } catch (error) {
         console.error('Error handling encrypted message:', error);
@@ -992,38 +793,36 @@ function refreshActiveUsers() {
   }, 1000);
 }
 
+// Expand chat for specific user
+function expandChat(sessionId, username, email, room) {
+  // Check if reopening same user
+  const isSameUser = currentChatUser && 
+                    currentChatUser.sessionId === sessionId && 
+                    currentChatUser.room === room;
   
-  // Expand chat for a specific user
-function expandChat(sessionId, displayName, userEmail, userRoom) {
-  currentChatUser = {
-    sessionId: sessionId,
-    displayName: displayName,
-    email: userEmail,
-    room: userRoom
-  };
+  currentChatUser = { sessionId, username, email, room };
   
-  // Update UI
-  const chatTitle = document.getElementById('expandedChatTitle');
-  const chatMessages = document.getElementById('expandedChatMessages');
-  const chatInput = document.getElementById('expandedChatInput');
+  // Update chat info
+  document.getElementById('chatUserInfo').textContent = username;
+  document.getElementById('chatUserDetails').textContent = `${email} • Session: ${sessionId}`;
   
-  chatTitle.textContent = `Chat with ${displayName}`;
-  chatMessages.innerHTML = '';
-  chatInput.disabled = false;
+  // Show expanded chat view
+  document.getElementById('expandedChatView').style.display = 'block';
   
-  // Show expanded chat
-  document.getElementById('expandedChat').style.display = 'flex';
+  // Only load messages if it's a different user or first time opening
+  if (!isSameUser) {
+    // Display current user's messages (will show empty if none exist)
+    displayCurrent_userMessages();
+    
+    // Load historical messages from database
+    loadUserMessages(sessionId, room);
+  } else {
+    console.log('Reopening same user - messages already displayed');
+    // Still refresh display in case new messages came in
+    displayCurrent_userMessages();
+  }
   
-  // Load user messages
-  loadUserMessages(sessionId);
-  
-  // Initialize DH key exchange for this user session
-  console.log('DEBUG: Initializing DH key exchange for user:', sessionId);
-  getDHKey(sessionId).then(key => {
-    console.log('DEBUG: DH key exchange completed for user:', sessionId);
-  }).catch(error => {
-    console.error('DEBUG: DH key exchange failed for user:', sessionId, error);
-  });
+  console.log('Expanded chat for user:', username);
 }
 
 // Close expanded chat
@@ -1131,13 +930,13 @@ async function sendAdminMessage() {
     return;
   }
   
-  // Get session ID for DH key exchange
-  const sessionId = currentChatUser.sessionId;
-  console.log('DEBUG: Admin using session ID for DH:', sessionId);
+  // Get session ID for encryption - use the same session ID as user
+  const sessionId = currentChatUser.sessionId; // Use the exact same session ID
+  console.log('DEBUG: Admin using session ID for encryption:', sessionId);
   
   try {
-    // Get or create DH encryption key for this session
-    const key = await getDHKey(sessionId);
+    // Generate encryption key for this session
+    const key = await generateClientKey(sessionId);
     
     // Prepare message data
     const messageData = {
@@ -1148,11 +947,11 @@ async function sendAdminMessage() {
       encrypted: true
     };
     
-    // Encrypt the message using DH-derived key
+    // Encrypt the message
     const encryptedMessage = await encryptMessage(messageData, key);
     
     if (encryptedMessage) {
-      console.log('Admin message encrypted successfully with DH key');
+      console.log('Message encrypted successfully');
       
       // Send encrypted message via Socket.IO
       socket.emit('admin_send_encrypted_message', {
@@ -1165,16 +964,23 @@ async function sendAdminMessage() {
       // Clear input immediately for better UX
       input.value = '';
       
-      console.log('Admin message sent (DH encrypted) - waiting for server confirmation...');
+      console.log('Admin message sent (encrypted) - waiting for server confirmation...');
     } else {
-      console.error('Failed to encrypt message with DH key');
+      console.error('Failed to encrypt message');
       alert('Failed to encrypt message. Please try again.');
       return;
     }
   } catch (error) {
-    console.error('DH encryption error:', error);
-    alert('Failed to establish secure connection. Please try again.');
-    return;
+    console.error('Encryption error:', error);
+    // Fallback to unencrypted message
+    socket.emit('admin_send_message', {
+      message: message,
+      user_room: currentChatUser.room,
+      user_email: currentChatUser.email
+    });
+    
+    // Clear input for better UX
+    input.value = '';
   }
 }
 
@@ -1193,37 +999,6 @@ socket.on('admin_joined', (data) => {
     console.log('Successfully connected to customer service');
   }
 });
-
-// Listen for users ready for human support
-socket.on('user_ready_for_human_support', async function(data) {
-  console.log('DEBUG: User ready for human support:', data);
-  
-  const userSessionId = data.session_id;
-  console.log(`DEBUG: User ${userSessionId} is ready, initiating DH exchange`);
-  
-  try {
-    // Auto-initiate DH exchange with this user
-    const key = await getDHKey(userSessionId);
-    console.log(`DEBUG: DH exchange completed for user ${userSessionId}`);
-    
-    // Update UI to show user is ready
-    if (typeof updateUserStatus === 'function') {
-      updateUserStatus(userSessionId, 'Ready for DH');
-    } else {
-      console.log(`DEBUG: User ${userSessionId} DH exchange ready`);
-    }
-  } catch (error) {
-    console.error(`DEBUG: DH exchange failed for user ${userSessionId}:`, error);
-  }
-});
-
-// Helper function to update user status (if not already defined)
-if (typeof updateUserStatus !== 'function') {
-  function updateUserStatus(sessionId, status) {
-    console.log(`DEBUG: User ${sessionId} status: ${status}`);
-    // You can add UI updates here if needed
-  }
-}
 
 socket.on('receive_message', function(data) {
   console.log('Admin received message:', data);
