@@ -930,8 +930,9 @@ async function sendAdminMessage() {
     return;
   }
   
-  // Get session ID for encryption
-  const sessionId = currentChatUser.email || currentChatUser.sessionId.replace('guest_', '');
+  // Get session ID for encryption - use the same session ID as user
+  const sessionId = currentChatUser.sessionId; // Use the exact same session ID
+  console.log('DEBUG: Admin using session ID for encryption:', sessionId);
   
   try {
     // Generate encryption key for this session

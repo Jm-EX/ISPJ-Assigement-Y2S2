@@ -787,9 +787,12 @@ def on_admin_send_encrypted_message(data):
         return
     
     print(f"DEBUG: Received encrypted admin message for {user_room}")
+    print(f"DEBUG: Admin using session ID: {user_session_id}")
+    print(f"DEBUG: User room: {user_room}")
     
     # Get encryption key for this user session
     encryption_key = get_session_key(user_session_id)
+    print(f"DEBUG: Generated encryption key for session: {user_session_id}")
     
     try:
         # Decrypt the admin message
@@ -826,10 +829,14 @@ def on_admin_send_encrypted_message(data):
                 import traceback
                 print(f"DEBUG: Admin save traceback: {traceback.format_exc()}")
             
-            # Send decrypted message to specific user room
-            emit('receive_message', decrypted_message, room=user_room)
+            # Send encrypted message to specific user room (for true E2E encryption)
+            emit('receive_encrypted_message', {
+                'encrypted_data': encrypted_data,  # Send original encrypted data
+                'session_id': user_session_id
+            }, room=user_room)
             
-            print(f"DEBUG: Decrypted admin message sent to {user_room}")
+            print(f"DEBUG: Encrypted admin message sent to {user_room}")
+            print(f"DEBUG: Forwarded encrypted data with session_id: {user_session_id}")
         else:
             print(f"DEBUG: Failed to decrypt admin message")
             
