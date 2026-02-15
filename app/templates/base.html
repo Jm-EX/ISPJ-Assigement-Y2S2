@@ -487,9 +487,13 @@ async function getDHKey(sessionId) {
     if (existingKey) {
         console.log('CHATBOT DEBUG: Using existing DH key for session:', sessionId);
         const keyData = JSON.parse(existingKey);
+        
+        // Convert base64 key string back to Uint8Array
+        const rawKeyBytes = new Uint8Array(atob(keyData.k).split('').map(char => char.charCodeAt(0)));
+        
         const importedKey = await crypto.subtle.importKey(
-            'raw', // Add missing format parameter
-            keyData,
+            'raw', // Use raw format with actual bytes
+            rawKeyBytes, // Use the raw key bytes, not JSON object
             { name: 'AES-GCM' },
             false,
             ['encrypt', 'decrypt']

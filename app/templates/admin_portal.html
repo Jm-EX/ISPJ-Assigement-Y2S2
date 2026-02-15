@@ -719,9 +719,13 @@ async function getDHKey(sessionId) {
     if (existingKey) {
         console.log('DEBUG: Using existing DH key for session:', sessionId);
         const keyData = JSON.parse(existingKey);
+        
+        // Convert base64 key string back to Uint8Array
+        const rawKeyBytes = new Uint8Array(atob(keyData.k).split('').map(char => char.charCodeAt(0)));
+        
         const importedKey = await crypto.subtle.importKey(
-            'raw', // Add missing format parameter
-            keyData,
+            'raw', // Use raw format with actual bytes
+            rawKeyBytes, // Use the raw key bytes, not JSON object
             { name: 'AES-GCM' },
             false,
             ['encrypt', 'decrypt']
@@ -847,7 +851,7 @@ async function decryptMessage(encryptedData, key) {
 
 // Handle encrypted messages from server
 socket.on('receive_encrypted_message', async function(data) {
-    console.log('Received encrypted message:', data);
+    console.log('DEBUG: Received encrypted message:', data);
     
     const sessionId = data.session_id;
     const encryptedData = data.encrypted_data;
@@ -855,6 +859,14 @@ socket.on('receive_encrypted_message', async function(data) {
     const serverEmail = data.user_email; // Get email from server
     
     try {
+        // Check if we need to do DH exchange for this user
+        const existingKey = sessionStorage.getItem(`dh_key_${sessionId}`);
+        if (!existingKey) {
+            console.log('DEBUG: No DH key for user, initiating DH exchange:', sessionId);
+            // Initialize DH key exchange for this user
+            await getDHKey(sessionId);
+        }
+        
         // Get or create DH encryption key for this session
         const key = await getDHKey(sessionId);
         

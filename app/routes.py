@@ -733,10 +733,11 @@ def on_send_encrypted_message(data):
     
     try:
         # Get the DH-derived encryption key for this session
-        # The user encrypted using DH-derived key, so we need the same key
-        encryption_cipher = derive_key_from_shared_secret(
-            dh.get_shared_secret_hex(int("0xFFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD129024E088A67CC74020BBEA63B139B22514A08798E3404DDEF9519B3CD3A431B302B0A6DF25F14374FE1356D6C51F245B543B839", 16))
-        )
+        # Use the stored client public key to compute shared secret
+        shared_secret_hex = dh.get_shared_secret_hex(client_public_key)
+        print(f"DEBUG: Computed shared secret with client public key: {shared_secret_hex[:16]}...")
+        
+        encryption_cipher = derive_key_from_shared_secret(shared_secret_hex)
         
         # Decrypt the user message using DH-derived key
         decrypted_message = decrypt_message(encrypted_data, encryption_cipher)
