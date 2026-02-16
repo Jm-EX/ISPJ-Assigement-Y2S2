@@ -233,6 +233,23 @@ def init_db(app):
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_chat_messages_room ON chat_messages(room)")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_chat_messages_admin_read ON chat_messages(admin_read)")
         
+        # Create dh_keys table for Diffie-Hellman key exchange
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS dh_keys (
+                id SERIAL PRIMARY KEY,
+                session_id VARCHAR(255) NOT NULL UNIQUE,
+                public_key TEXT NOT NULL,
+                created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+                expires_at TIMESTAMP NOT NULL DEFAULT NOW() + INTERVAL '24 hours'
+            )
+            """
+        )
+        
+        # Create index for dh_keys table
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_dh_keys_session_id ON dh_keys(session_id)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_dh_keys_expires_at ON dh_keys(expires_at)")
+        
         # Migration: Add totp_secret column if it doesn't exist
         try:
             cursor.execute("""
@@ -364,6 +381,66 @@ def mark_messages_as_read(session_id=None, room=None):
     
     cursor.execute(query, params)
     print(f"Messages marked as read for session: {session_id}, room: {room}")
+
+
+# =========================
+# Diffie-Hellman Key Exchange Functions
+# =========================
+
+def store_dh_public_key(session_id, public_key):
+    """Store a client's Diffie-Hellman public key"""
+    db = get_db()
+    cursor = db.cursor()
+    
+    try:
+        cursor.execute("""
+            INSERT INTO dh_keys (session_id, public_key)
+            VALUES (%s, %s)
+            ON CONFLICT (session_id) 
+            DO UPDATE SET public_key = EXCLUDED.public_key, 
+                         created_at = NOW(),
+                         expires_at = NOW() + INTERVAL '24 hours'
+        """, (session_id, public_key))
+        
+        print(f"DH public key stored for session: {session_id}")
+        return True
+    except Exception as e:
+        print(f"Error storing DH public key: {e}")
+        return False
+
+
+def get_dh_public_key(session_id):
+    """Get a client's Diffie-Hellman public key"""
+    db = get_db()
+    cursor = db.cursor()
+    
+    try:
+        cursor.execute("""
+            SELECT public_key FROM dh_keys 
+            WHERE session_id = %s AND expires_at > NOW()
+        """, (session_id,))
+        
+        result = cursor.fetchone()
+        if result:
+            return result['public_key']
+        return None
+    except Exception as e:
+        print(f"Error retrieving DH public key: {e}")
+        return None
+
+
+def cleanup_expired_dh_keys():
+    """Remove expired Diffie-Hellman keys"""
+    db = get_db()
+    cursor = db.cursor()
+    
+    try:
+        cursor.execute("DELETE FROM dh_keys WHERE expires_at < NOW()")
+        print("Expired DH keys cleaned up")
+        return True
+    except Exception as e:
+        print(f"Error cleaning up expired DH keys: {e}")
+        return False
 
 
 def seed_admin(app):

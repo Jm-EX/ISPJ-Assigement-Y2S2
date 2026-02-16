@@ -14,7 +14,7 @@ import json
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from app.auth_db import save_chat_message, get_chat_history, mark_messages_as_read
+from app.auth_db import save_chat_message, get_chat_history, mark_messages_as_read, store_dh_public_key, get_dh_public_key
 
 # =========================
 # Setup
@@ -887,6 +887,52 @@ def on_admin_mark_read(data):
 # =========================
 # API Routes
 # =========================
+
+@main.post('/api/dh-exchange')
+def api_dh_exchange():
+    """API endpoint for Diffie-Hellman key exchange"""
+    try:
+        data = request.get_json()
+        session_id = data.get('session_id')
+        client_public_key = data.get('public_key')
+        
+        if not session_id or not client_public_key:
+            return jsonify({'error': 'Missing session_id or public_key'}), 400
+        
+        print(f"DEBUG: DH key exchange for session: {session_id}")
+        
+        # Store the client's public key
+        if store_dh_public_key(session_id, client_public_key):
+            return jsonify({
+                'status': 'success',
+                'message': 'Public key stored successfully'
+            })
+        else:
+            return jsonify({'error': 'Failed to store public key'}), 500
+            
+    except Exception as e:
+        print(f"DEBUG: Error in DH key exchange: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+@main.get('/api/dh-public-key/<session_id>')
+def api_get_dh_public_key(session_id):
+    """API endpoint to retrieve a session's public key"""
+    try:
+        public_key = get_dh_public_key(session_id)
+        
+        if public_key:
+            return jsonify({
+                'status': 'success',
+                'public_key': public_key
+            })
+        else:
+            return jsonify({'error': 'Public key not found'}), 404
+            
+    except Exception as e:
+        print(f"DEBUG: Error retrieving DH public key: {e}")
+        return jsonify({'error': str(e)}), 500
+
 
 @main.post('/api/chat-history')
 def api_chat_history():
