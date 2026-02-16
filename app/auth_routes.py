@@ -348,15 +348,15 @@ def use_otp_instead():
     
     session["otp_token"] = otp_token
     
-    msg = Message(
-        subject="Your OTP Code",
-        sender=current_app.config["SMTP_FROM"],
-        recipients=[user["email"]],
-    )
-    msg.body = f"Your OTP code is: {otp_code}\n\nThis code will expire in 5 minutes."
-    mail.send(msg)
+    sent = _send_otp_email(user["email"], otp_code)
+    if sent:
+        flash("OTP sent to your email.", "success")
+    else:
+        flash(
+            "OTP email sending is not configured yet; check server logs for the OTP (dev mode).",
+            "error",
+        )
     
-    flash("OTP sent to your email.", "success")
     return redirect(url_for("auth.verify_otp_get"))
 
 
