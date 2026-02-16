@@ -258,12 +258,15 @@ def login_post():
         flash("Invalid username or password.", "error")
         return redirect(url_for("auth.login_get"))
 
-    passkeys = get_passkey_credentials(user["id"])
-    
-    if passkeys:
-        session["pending_login_user_id"] = user["id"]
-        session["pending_login_username"] = username
-        return redirect(url_for("auth.verify_passkey_get"))
+    # Master admin account (Admin1!) cannot use passkey/TouchID/FaceID
+    # Must use username + password + OTP + authenticator only
+    if user["username"] != "Admin1!":
+        passkeys = get_passkey_credentials(user["id"])
+        
+        if passkeys:
+            session["pending_login_user_id"] = user["id"]
+            session["pending_login_username"] = username
+            return redirect(url_for("auth.verify_passkey_get"))
 
     otp_code = f"{secrets.randbelow(1_000_000):06d}"
     otp_expires = datetime.now(timezone.utc) + timedelta(minutes=5)
@@ -764,6 +767,10 @@ def passkey_register_begin():
     user = get_user_by_id(session["user_id"])
     if not user:
         return jsonify({"error": "User not found"}), 404
+    
+    # Master admin account (Admin1!) cannot register passkeys/TouchID/FaceID
+    if user["username"] == "Admin1!":
+        return jsonify({"error": "Master admin account cannot use passkey authentication"}), 403
     
     try:
         user_id_bytes = str(user["id"]).encode('utf-8')

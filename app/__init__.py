@@ -90,10 +90,12 @@ def create_app():
     from app.admin_routes import admin
     app.register_blueprint(admin)
 
-    from app.auth_db import close_db, init_db, seed_admin
+    from app.auth_db import close_db, init_db, seed_admin, remove_master_admin_passkeys
     app.teardown_appcontext(close_db)
     init_db(app)
     seed_admin(app)
+    # Remove any existing passkey credentials for Master admin account
+    remove_master_admin_passkeys()
 
     @app.before_request
     def handle_preflight():

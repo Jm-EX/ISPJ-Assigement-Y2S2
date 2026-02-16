@@ -647,6 +647,32 @@ def delete_passkey_credential(credential_id: str):
     )
 
 
+def remove_master_admin_passkeys():
+    """Remove all passkey credentials for Master admin account (Admin1!)"""
+    db = get_db()
+    cursor = db.cursor()
+    
+    try:
+        # Get Admin1! user ID
+        cursor.execute("SELECT id FROM users WHERE username = %s", ("Admin1!",))
+        admin_user = cursor.fetchone()
+        
+        if admin_user:
+            admin_id = admin_user['id']
+            # Delete all passkey credentials for Admin1!
+            cursor.execute(
+                "DELETE FROM passkey_credentials WHERE user_id = %s", (admin_id,)
+            )
+            print(f"Removed all passkey credentials for Master admin account (Admin1!)")
+            return True
+        else:
+            print("Master admin account (Admin1!) not found")
+            return False
+    except Exception as e:
+        print(f"Error removing master admin passkeys: {e}")
+        return False
+
+
 def log_security_event(user_id, username, event_type, details=None, risk_score=None):
     db = get_db()
     cursor = db.cursor()
