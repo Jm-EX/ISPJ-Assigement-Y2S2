@@ -347,9 +347,9 @@
                     class="chat-input" 
                     id="messageInput" 
                     placeholder="Type a message..."
-                    onkeypress="if(event.key === 'Enter') sendMessage()"
+                    onkeypress="if(event.key === 'Enter') sendAdminMessage()"
                 />
-                <button class="send-button" id="sendButton" onclick="sendMessage()">
+                <button class="send-button" id="sendButton" onclick="sendAdminMessage()">
                     ➤
                 </button>
             </div>
@@ -600,7 +600,7 @@ function displayMessages(sessionId) {
 }
 
 // Send message to customer
-async function sendMessage() {
+async function sendAdminMessage() {
     if (!currentCustomer) {
         alert('Please select a customer first');
         return;
