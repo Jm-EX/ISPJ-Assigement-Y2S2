@@ -95,7 +95,8 @@ def create_app():
     init_db(app)
     seed_admin(app)
     # Remove any existing passkey credentials for Master admin account
-    remove_master_admin_passkeys()
+    with app.app_context():
+        remove_master_admin_passkeys()
 
     @app.before_request
     def handle_preflight():
