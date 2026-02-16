@@ -570,8 +570,24 @@
 // Socket.IO Connection  
 // =========================
 
-// Connect to Socket.IO FIRST - before any event handlers
-const socket = io();
+// Socket is already declared in base.html, no need to redeclare
+
+// =========================
+// Chat Widget Functions (for base.html chat widget)
+// =========================
+
+function toggleChat() {
+    console.log('Admin: toggleChat called');
+    const popup = document.getElementById('chat-popup');
+    const chatOpen = popup.style.display === 'flex';
+    
+    if (chatOpen) {
+        popup.style.display = 'none';
+    } else {
+        popup.style.display = 'flex';
+        socket.emit('join_chat', {room: 'customer_service'});
+    }
+}
 
 // =========================
 // Encryption Utilities - Diffie-Hellman E2EE
