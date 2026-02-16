@@ -574,7 +574,7 @@ def on_switch_to_ai():
 
 @socketio.on('send_encrypted_message')
 def on_send_encrypted_message(data):
-    """Handle encrypted messages from users"""
+    """Handle encrypted messages from users - forward to admin without decryption"""
     print("\n" + "="*80)
     print("CHATBOT DEBUG: send_encrypted_message event received")
     print(f"DEBUG: Raw data: {data}")
@@ -589,76 +589,33 @@ def on_send_encrypted_message(data):
     print(f"DEBUG: Session ID: {session_id}")
     print(f"DEBUG: Encrypted data length: {len(encrypted_data)}")
     
-    # Get encryption key for this session
-    encryption_key = get_session_key(session_id)
+    # Get user's private room for responses
+    user_email = session.get('email') if 'email' in session else None
+    if user_email:
+        user_room_id = f"user_{user_email}"
+    else:
+        user_room_id = f"guest_{session_id}"
     
-    try:
-        # Decrypt the user message
-        decrypted_message = decrypt_message(encrypted_data, encryption_key)
-        
-        if decrypted_message:
-            print(f"DEBUG: User message decrypted successfully: {decrypted_message.get('msg', '')[:50]}...")
-            
-            # Get user's private room for responses
-            user_email = session.get('email') if 'email' in session else None
-            if user_email:
-                user_room_id = f"user_{user_email}"
-            else:
-                user_room_id = f"guest_{session_id}"
-            
-            # Get user info for admin display
-            user_id = session.get('user_id') if 'user_id' in session else None
-            username = session.get('username', 'Guest') if 'username' in session else 'Guest'
-            user_email = session.get('email') if 'email' in session else None
-            
-            # Save user message to database first
-            print(f"DEBUG: Attempting to save user message to database...")
-            try:
-                save_chat_message(
-                    session_id=session_id,
-                    user_id=user_id,
-                    username=username,
-                    user_email=user_email,
-                    message=decrypted_message.get('msg', ''),
-                    sender_type='user',
-                    room='customer_service'
-                )
-                print(f"DEBUG: User message saved to database successfully")
-            except Exception as e:
-                print(f"DEBUG: Error saving user message: {e}")
-                import traceback
-                print(f"DEBUG: Database save traceback: {traceback.format_exc()}")
-            
-            # Create message data for admin (add user info)
-            customer_message_data = {
-                'msg': decrypted_message.get('msg', ''),
-                'sender': decrypted_message.get('sender', 'customer'),
-                'timestamp': decrypted_message.get('timestamp', datetime.now().strftime('%H:%M')),
-                'sender_type': 'customer',
-                'user_room': user_room_id,
-                'user_email': user_email,
-                'session_id': session_id,
-                'encrypted': True
-            }
-            
-            # Forward decrypted message to admin room (no need to re-encrypt)
-            emit('receive_encrypted_message', {
-                'encrypted_data': encrypted_data,  # Send original encrypted data
-                'session_id': session_id,
-                'username': username,  # Add actual username here
-                'user_email': user_email
-            }, room='customer_service')
-            
-            print(f"DEBUG: Encrypted user message forwarded to admin room: customer_service")
-        else:
-            print(f"DEBUG: Failed to decrypt user message")
-            
-    except Exception as e:
-        print(f"DEBUG: Error processing encrypted user message: {e}")
-        import traceback
-        print(f"DEBUG: Encrypted message traceback: {traceback.format_exc()}")
+    # Get user info for admin display
+    user_id = session.get('user_id') if 'user_id' in session else None
+    username = session.get('username', 'Guest') if 'username' in session else 'Guest'
+    user_email = session.get('email') if 'email' in session else None
     
+    print(f"DEBUG: User info - username: {username}, email: {user_email}, room: {user_room_id}")
+    
+    # Forward encrypted message directly to admin room
+    # Admin will decrypt it using the DH shared secret
+    emit('receive_encrypted_message', {
+        'encrypted_data': encrypted_data,  # Send original encrypted data
+        'session_id': session_id,
+        'username': username,  # Add actual username here
+        'user_email': user_email,
+        'user_room': user_room_id
+    }, room='customer_service')
+    
+    print(f"DEBUG: Encrypted user message forwarded to admin room: customer_service")
     print("="*80 + "\n")
+    
     logging.info(f"User {session_id} encrypted message processed")
 
 
