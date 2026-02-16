@@ -1,0 +1,675 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Chat - Customer Support{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        background: #f0f2f5;
+    }
+
+    .chat-container {
+        display: flex;
+        height: 100vh;
+        max-width: 1600px;
+        margin: 0 auto;
+        background: white;
+    }
+
+    /* Sidebar - Customer List */
+    .customers-sidebar {
+        width: 350px;
+        background: white;
+        border-right: 1px solid #e0e0e0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .sidebar-header {
+        padding: 20px;
+        background: #075e54;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .sidebar-header h2 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 600;
+    }
+
+    .back-button {
+        background: rgba(255,255,255,0.2);
+        border: none;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background 0.2s;
+    }
+
+    .back-button:hover {
+        background: rgba(255,255,255,0.3);
+    }
+
+    .customers-list {
+        flex: 1;
+        overflow-y: auto;
+    }
+
+    .customer-item {
+        padding: 16px 20px;
+        border-bottom: 1px solid #f0f0f0;
+        cursor: pointer;
+        transition: background 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .customer-item:hover {
+        background: #f5f5f5;
+    }
+
+    .customer-item.active {
+        background: #e8f5e9;
+        border-left: 4px solid #075e54;
+    }
+
+    .customer-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 18px;
+        flex-shrink: 0;
+    }
+
+    .customer-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .customer-name {
+        font-weight: 600;
+        font-size: 15px;
+        color: #111;
+        margin-bottom: 4px;
+    }
+
+    .customer-last-message {
+        font-size: 13px;
+        color: #667781;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .customer-time {
+        font-size: 12px;
+        color: #999;
+    }
+
+    /* Chat Area */
+    .chat-area {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: #e5ddd5;
+    }
+
+    .chat-header {
+        padding: 16px 20px;
+        background: #075e54;
+        color: white;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .chat-header-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: white;
+        color: #075e54;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+    }
+
+    .chat-header-info h3 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+    .chat-header-info p {
+        margin: 2px 0 0 0;
+        font-size: 13px;
+        opacity: 0.8;
+    }
+
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect fill="%23e5ddd5" width="100" height="100"/><path fill="%23d1d7db" opacity="0.08" d="M0 0h100v100H0z"/></svg>');
+    }
+
+    .message-wrapper {
+        display: flex;
+        margin-bottom: 12px;
+        animation: fadeIn 0.3s ease-in;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message-wrapper.customer {
+        justify-content: flex-start;
+    }
+
+    .message-wrapper.admin {
+        justify-content: flex-end;
+    }
+
+    .message-bubble {
+        max-width: 65%;
+        padding: 8px 12px;
+        border-radius: 8px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        position: relative;
+    }
+
+    .message-wrapper.customer .message-bubble {
+        background: white;
+        border-radius: 0 8px 8px 8px;
+    }
+
+    .message-wrapper.admin .message-bubble {
+        background: #dcf8c6;
+        border-radius: 8px 0 8px 8px;
+    }
+
+    .message-sender {
+        font-weight: 600;
+        font-size: 13px;
+        margin-bottom: 4px;
+    }
+
+    .message-wrapper.customer .message-sender {
+        color: #667eea;
+    }
+
+    .message-wrapper.admin .message-sender {
+        color: #075e54;
+    }
+
+    .message-text {
+        color: #111;
+        line-height: 1.4;
+        word-wrap: break-word;
+        font-size: 14px;
+    }
+
+    .message-time {
+        font-size: 11px;
+        color: #667781;
+        text-align: right;
+        margin-top: 4px;
+    }
+
+    .chat-input-area {
+        padding: 12px 20px;
+        background: #f0f2f5;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .chat-input {
+        flex: 1;
+        padding: 12px 16px;
+        border: none;
+        border-radius: 24px;
+        background: white;
+        font-size: 15px;
+        outline: none;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .send-button {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: #075e54;
+        border: none;
+        color: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s;
+        font-size: 20px;
+    }
+
+    .send-button:hover {
+        background: #064e47;
+    }
+
+    .send-button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+    }
+
+    .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: #667781;
+        text-align: center;
+        padding: 40px;
+    }
+
+    .empty-state-icon {
+        font-size: 80px;
+        margin-bottom: 20px;
+        opacity: 0.3;
+    }
+
+    .empty-state h3 {
+        margin: 0 0 10px 0;
+        font-size: 24px;
+        color: #111;
+    }
+
+    .empty-state p {
+        margin: 0;
+        font-size: 14px;
+    }
+</style>
+
+<div class="chat-container">
+    <!-- Customers Sidebar -->
+    <div class="customers-sidebar">
+        <div class="sidebar-header">
+            <h2>Customer Chats</h2>
+            <button class="back-button" onclick="window.location.href='/admin'">← Back</button>
+        </div>
+        <div class="customers-list" id="customersList">
+            <div class="empty-state">
+                <div class="empty-state-icon">💬</div>
+                <p>No active conversations yet</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Area -->
+    <div class="chat-area">
+        <div id="noChatSelected" class="empty-state">
+            <div class="empty-state-icon">💬</div>
+            <h3>Welcome to Customer Support</h3>
+            <p>Select a customer from the list to start chatting</p>
+        </div>
+        
+        <div id="chatContent" style="display: none; flex: 1; display: flex; flex-direction: column;">
+            <div class="chat-header">
+                <div class="chat-header-avatar" id="chatHeaderAvatar">?</div>
+                <div class="chat-header-info">
+                    <h3 id="chatHeaderName">Customer</h3>
+                    <p id="chatHeaderEmail">customer@example.com</p>
+                </div>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages"></div>
+            
+            <div class="chat-input-area">
+                <input 
+                    type="text" 
+                    class="chat-input" 
+                    id="messageInput" 
+                    placeholder="Type a message..."
+                    onkeypress="if(event.key === 'Enter') sendMessage()"
+                />
+                <button class="send-button" id="sendButton" onclick="sendMessage()">
+                    ➤
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Global variables
+let currentCustomer = null;
+let customerChats = {}; // Store chats per customer: { sessionId: { info: {}, messages: [] } }
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Admin Chat page loaded');
+    initializeSocketHandlers();
+    loadCustomers();
+});
+
+// Initialize Socket.IO handlers
+function initializeSocketHandlers() {
+    if (typeof socket === 'undefined') {
+        console.log('Socket not yet available, retrying...');
+        setTimeout(initializeSocketHandlers, 50);
+        return;
+    }
+
+    console.log('Initializing admin chat socket handlers');
+
+    // Join admin room
+    socket.emit('admin_join');
+
+    socket.on('admin_joined', (data) => {
+        console.log('Admin joined customer service:', data);
+    });
+
+    // Handle regular messages
+    socket.on('receive_message', function(data) {
+        console.log('Received message:', data);
+        
+        if (data.sender_type === 'customer') {
+            const sessionId = data.session_id;
+            const username = data.username || data.sender || 'Guest';
+            
+            // Add or update customer
+            if (!customerChats[sessionId]) {
+                customerChats[sessionId] = {
+                    info: {
+                        sessionId: sessionId,
+                        username: username,
+                        email: data.user_email || '',
+                        lastMessage: data.msg,
+                        lastMessageTime: data.timestamp || new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+                    },
+                    messages: []
+                };
+            } else {
+                customerChats[sessionId].info.lastMessage = data.msg;
+                customerChats[sessionId].info.lastMessageTime = data.timestamp || new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            }
+            
+            // Add message
+            customerChats[sessionId].messages.push({
+                sender: username,
+                msg: data.msg,
+                timestamp: data.timestamp || new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                type: 'customer'
+            });
+            
+            // Update UI
+            updateCustomersList();
+            
+            // If this customer is currently selected, update chat
+            if (currentCustomer && currentCustomer.sessionId === sessionId) {
+                displayMessages(sessionId);
+            }
+        }
+    });
+
+    // Handle encrypted messages
+    socket.on('receive_encrypted_message', async function(data) {
+        console.log('Received encrypted message:', data);
+        
+        const sessionId = data.session_id;
+        const encryptedData = data.encrypted_data;
+        const username = data.username || 'Guest';
+        const email = data.user_email || '';
+        
+        try {
+            const key = await generateClientKey(sessionId);
+            const decryptedMessage = await decryptMessage(encryptedData, key);
+            
+            if (decryptedMessage) {
+                console.log('Message decrypted successfully');
+                
+                // Add or update customer
+                if (!customerChats[sessionId]) {
+                    customerChats[sessionId] = {
+                        info: {
+                            sessionId: sessionId,
+                            username: username,
+                            email: email,
+                            lastMessage: decryptedMessage.msg,
+                            lastMessageTime: decryptedMessage.timestamp || new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+                        },
+                        messages: []
+                    };
+                } else {
+                    customerChats[sessionId].info.lastMessage = decryptedMessage.msg;
+                    customerChats[sessionId].info.lastMessageTime = decryptedMessage.timestamp || new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                }
+                
+                // Add message
+                customerChats[sessionId].messages.push({
+                    sender: username,
+                    msg: decryptedMessage.msg,
+                    timestamp: decryptedMessage.timestamp || new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                    type: 'customer'
+                });
+                
+                // Update UI
+                updateCustomersList();
+                
+                // If this customer is currently selected, update chat
+                if (currentCustomer && currentCustomer.sessionId === sessionId) {
+                    displayMessages(sessionId);
+                }
+            }
+        } catch (error) {
+            console.error('Error handling encrypted message:', error);
+        }
+    });
+
+    socket.on('admin_message_sent', (data) => {
+        console.log('Admin message sent confirmation:', data);
+    });
+}
+
+// Load customers list
+function loadCustomers() {
+    // This will be populated as messages come in
+    updateCustomersList();
+}
+
+// Update customers list in sidebar
+function updateCustomersList() {
+    const customersList = document.getElementById('customersList');
+    
+    if (Object.keys(customerChats).length === 0) {
+        customersList.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">💬</div>
+                <p>No active conversations yet</p>
+            </div>
+        `;
+        return;
+    }
+    
+    customersList.innerHTML = '';
+    
+    // Sort by last message time (most recent first)
+    const sortedCustomers = Object.values(customerChats).sort((a, b) => {
+        return b.info.lastMessageTime.localeCompare(a.info.lastMessageTime);
+    });
+    
+    sortedCustomers.forEach(customer => {
+        const item = document.createElement('div');
+        item.className = 'customer-item';
+        if (currentCustomer && currentCustomer.sessionId === customer.info.sessionId) {
+            item.classList.add('active');
+        }
+        
+        const initial = customer.info.username.charAt(0).toUpperCase();
+        
+        item.innerHTML = `
+            <div class="customer-avatar">${initial}</div>
+            <div class="customer-info">
+                <div class="customer-name">${customer.info.username}</div>
+                <div class="customer-last-message">${customer.info.lastMessage || 'No messages yet'}</div>
+            </div>
+            <div class="customer-time">${customer.info.lastMessageTime}</div>
+        `;
+        
+        item.onclick = () => selectCustomer(customer.info.sessionId);
+        customersList.appendChild(item);
+    });
+}
+
+// Select a customer to chat with
+function selectCustomer(sessionId) {
+    if (!customerChats[sessionId]) return;
+    
+    currentCustomer = customerChats[sessionId].info;
+    
+    // Update UI
+    document.getElementById('noChatSelected').style.display = 'none';
+    document.getElementById('chatContent').style.display = 'flex';
+    
+    // Update header
+    const initial = currentCustomer.username.charAt(0).toUpperCase();
+    document.getElementById('chatHeaderAvatar').textContent = initial;
+    document.getElementById('chatHeaderName').textContent = currentCustomer.username;
+    document.getElementById('chatHeaderEmail').textContent = currentCustomer.email || 'Guest User';
+    
+    // Display messages
+    displayMessages(sessionId);
+    
+    // Update sidebar
+    updateCustomersList();
+    
+    // Focus input
+    document.getElementById('messageInput').focus();
+}
+
+// Display messages for selected customer
+function displayMessages(sessionId) {
+    const messagesContainer = document.getElementById('chatMessages');
+    messagesContainer.innerHTML = '';
+    
+    if (!customerChats[sessionId] || !customerChats[sessionId].messages.length) {
+        messagesContainer.innerHTML = `
+            <div class="empty-state">
+                <p>No messages yet. Start the conversation!</p>
+            </div>
+        `;
+        return;
+    }
+    
+    customerChats[sessionId].messages.forEach(message => {
+        const wrapper = document.createElement('div');
+        wrapper.className = `message-wrapper ${message.type}`;
+        
+        const bubble = document.createElement('div');
+        bubble.className = 'message-bubble';
+        
+        bubble.innerHTML = `
+            <div class="message-sender">${message.sender}</div>
+            <div class="message-text">${message.msg}</div>
+            <div class="message-time">${message.timestamp}</div>
+        `;
+        
+        wrapper.appendChild(bubble);
+        messagesContainer.appendChild(wrapper);
+    });
+    
+    // Scroll to bottom
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+// Send message to customer
+async function sendMessage() {
+    if (!currentCustomer) {
+        alert('Please select a customer first');
+        return;
+    }
+    
+    const input = document.getElementById('messageInput');
+    const message = input.value.trim();
+    
+    if (!message) return;
+    
+    const timestamp = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    
+    // Add to local storage
+    if (!customerChats[currentCustomer.sessionId]) {
+        customerChats[currentCustomer.sessionId] = {
+            info: currentCustomer,
+            messages: []
+        };
+    }
+    
+    customerChats[currentCustomer.sessionId].messages.push({
+        sender: 'Admin',
+        msg: message,
+        timestamp: timestamp,
+        type: 'admin'
+    });
+    
+    // Update last message
+    customerChats[currentCustomer.sessionId].info.lastMessage = message;
+    customerChats[currentCustomer.sessionId].info.lastMessageTime = timestamp;
+    
+    // Display immediately
+    displayMessages(currentCustomer.sessionId);
+    updateCustomersList();
+    
+    // Clear input
+    input.value = '';
+    
+    // Send via socket
+    try {
+        const key = await generateClientKey(currentCustomer.sessionId);
+        
+        const messageData = {
+            msg: message,
+            sender: 'Admin',
+            timestamp: timestamp,
+            sender_type: 'admin'
+        };
+        
+        const encryptedMessage = await encryptMessage(messageData, key);
+        
+        if (encryptedMessage) {
+            socket.emit('send_encrypted_message', {
+                encrypted_data: encryptedMessage,
+                session_id: currentCustomer.sessionId,
+                target_room: `user_${currentCustomer.email || currentCustomer.sessionId}`
+            });
+        } else {
+            // Fallback to unencrypted
+            socket.emit('admin_send_message', {
+                msg: message,
+                session_id: currentCustomer.sessionId,
+                target_room: `user_${currentCustomer.email || currentCustomer.sessionId}`
+            });
+        }
+    } catch (error) {
+        console.error('Error sending message:', error);
+    }
+}
+</script>
+
+{% endblock %}
