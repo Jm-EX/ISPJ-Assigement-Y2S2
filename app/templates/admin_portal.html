@@ -593,13 +593,7 @@ function toggleChat() {
 // Encryption Utilities - Diffie-Hellman E2EE
 // =========================
 
-let encryptionKeys = {}; // Store encryption keys per session
-let dhKeyPairs = {}; // Store DH key pairs per session
-let sharedSecrets = {}; // Store shared secrets per session
-
-// Diffie-Hellman parameters (using a standard 2048-bit prime)
-const DH_PRIME = BigInt('0xFFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD129024E088A67CC74020BBEA63B139B22514A08798E3404DDEF9519B3CD3A431B302B0A6DF25F14374FE1356D6D51C245E485B576625E7EC6F44C42E9A637ED6B0BFF5CB6F406B7EDEE386BFB5A899FA5AE9F24117C4B1FE649286651ECE45B3DC2007CB8A163BF0598DA48361C55D39A69163FA8FD24CF5F83655D23DCA3AD961C62F356208552BB9ED529077096966D670C354E4ABC9804F1746C08CA18217C32905E462E36CE3BE39E772C180E86039B2783A2EC07A28FB5C55DF06F4C52C9DE2BCBF6955817183995497CEA956AE515D2261898FA051015728E5A8AACAA68FFFFFFFFFFFFFFFF');
-const DH_GENERATOR = BigInt(2);
+// encryptionKeys, dhKeyPairs, sharedSecrets, DH_PRIME, and DH_GENERATOR are already declared in base.html
 
 // Generate Diffie-Hellman key pair
 async function generateDHKeyPair(sessionId) {
@@ -1131,6 +1125,16 @@ async function sendAdminMessage() {
 
 // =========================
 // Socket.IO event handlers
+// =========================
+
+// Function to initialize socket event handlers once socket is available
+function initializeAdminSocketHandlers() {
+  if (typeof socket === 'undefined') {
+    console.log('Socket not yet available, retrying...');
+    setTimeout(initializeAdminSocketHandlers, 50);
+    return;
+  }
+
 socket.on('connect', () => {
   console.log('Admin connected to Socket.IO');
   
@@ -1261,6 +1265,11 @@ socket.on('messages_marked_read', (data) => {
     updateUnreadCount();
   }
 });
+
+} // End of initializeAdminSocketHandlers function
+
+// Call the initialization function
+initializeAdminSocketHandlers();
 
 // Add or update active user in the list
 function addOrUpdateActiveUser(messageData) {
