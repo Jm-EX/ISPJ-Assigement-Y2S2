@@ -431,7 +431,7 @@ async function sendPublicKeyToServer(sessionId) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                session_id: sessionId,
+                session_id: `user_${sessionId}`,  // Prefix with 'user_' to distinguish from admin
                 public_key: keyPair.publicKey
             })
         });
@@ -448,7 +448,8 @@ async function sendPublicKeyToServer(sessionId) {
 // Get other party's public key from server
 async function getPublicKeyFromServer(sessionId) {
     try {
-        const response = await fetch(`/api/dh-public-key/${sessionId}`);
+        // User tries to get admin's public key
+        const response = await fetch(`/api/dh-public-key/admin_${sessionId}`);
         const data = await response.json();
         
         if (data.status === 'success') {
