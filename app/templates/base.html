@@ -213,6 +213,7 @@
             {% if session.get('user_id') %}
                 {% if session.get('is_admin') %}
                     <a href="{{ url_for('admin.portal') }}" class="btn">Admin portal</a>
+                    <a href="{{ url_for('admin.admin_chat') }}" class="btn">💬 Chat</a>
                 {% endif %}
                 <a href="{{ url_for('auth.profile_get') }}" class="btn">Profile</a>
                 <a href="{{ url_for('auth.logout') }}" class="btn">Logout</a>
