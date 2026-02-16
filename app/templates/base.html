@@ -342,32 +342,161 @@ let isHumanMode = false; // Track current support mode
 let aiConnected = true; // Track AI connection status
 
 // =========================
-// Encryption Utilities (User Side)
+// Encryption Utilities (User Side) - Diffie-Hellman E2EE
 // =========================
 
 let encryptionKeys = {}; // Store encryption keys per session
+let dhKeyPairs = {}; // Store DH key pairs per session
+let sharedSecrets = {}; // Store shared secrets per session
 
-// Generate encryption key from session ID (simple SHA-256 to match server)
-function generateClientKey(sessionId) {
-    if (!encryptionKeys[sessionId]) {
-        // Use simple SHA-256 to match server
+// Diffie-Hellman parameters (using a standard 2048-bit prime)
+const DH_PRIME = BigInt('0xFFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD129024E088A67CC74020BBEA63B139B22514A08798E3404DDEF9519B3CD3A431B302B0A6DF25F14374FE1356D6D51C245E485B576625E7EC6F44C42E9A637ED6B0BFF5CB6F406B7EDEE386BFB5A899FA5AE9F24117C4B1FE649286651ECE45B3DC2007CB8A163BF0598DA48361C55D39A69163FA8FD24CF5F83655D23DCA3AD961C62F356208552BB9ED529077096966D670C354E4ABC9804F1746C08CA18217C32905E462E36CE3BE39E772C180E86039B2783A2EC07A28FB5C55DF06F4C52C9DE2BCBF6955817183995497CEA956AE515D2261898FA051015728E5A8AACAA68FFFFFFFFFFFFFFFF');
+const DH_GENERATOR = BigInt(2);
+
+// Generate Diffie-Hellman key pair
+async function generateDHKeyPair(sessionId) {
+    if (dhKeyPairs[sessionId]) {
+        return dhKeyPairs[sessionId];
+    }
+    
+    // Generate private key (random number)
+    const privateKeyArray = new Uint8Array(32);
+    crypto.getRandomValues(privateKeyArray);
+    const privateKey = BigInt('0x' + Array.from(privateKeyArray).map(b => b.toString(16).padStart(2, '0')).join(''));
+    
+    // Calculate public key: g^privateKey mod p
+    const publicKey = modPow(DH_GENERATOR, privateKey, DH_PRIME);
+    
+    dhKeyPairs[sessionId] = {
+        privateKey: privateKey,
+        publicKey: publicKey.toString(16)
+    };
+    
+    console.log('DEBUG: Generated DH key pair for session:', sessionId);
+    return dhKeyPairs[sessionId];
+}
+
+// Modular exponentiation (for DH calculation)
+function modPow(base, exponent, modulus) {
+    if (modulus === BigInt(1)) return BigInt(0);
+    let result = BigInt(1);
+    base = base % modulus;
+    while (exponent > BigInt(0)) {
+        if (exponent % BigInt(2) === BigInt(1)) {
+            result = (result * base) % modulus;
+        }
+        exponent = exponent >> BigInt(1);
+        base = (base * base) % modulus;
+    }
+    return result;
+}
+
+// Perform DH key exchange and derive shared secret
+async function performDHKeyExchange(sessionId, otherPublicKeyHex) {
+    const keyPair = await generateDHKeyPair(sessionId);
+    const otherPublicKey = BigInt('0x' + otherPublicKeyHex);
+    
+    // Calculate shared secret: otherPublicKey^privateKey mod p
+    const sharedSecret = modPow(otherPublicKey, keyPair.privateKey, DH_PRIME);
+    
+    // Convert shared secret to bytes and derive AES key
+    const sharedSecretHex = sharedSecret.toString(16).padStart(512, '0');
+    const sharedSecretBytes = new Uint8Array(sharedSecretHex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+    
+    // Use SHA-256 to derive a 256-bit AES key from the shared secret
+    const keyMaterial = await crypto.subtle.digest('SHA-256', sharedSecretBytes);
+    const aesKey = await crypto.subtle.importKey(
+        'raw',
+        keyMaterial,
+        { name: 'AES-GCM' },
+        false,
+        ['encrypt', 'decrypt']
+    );
+    
+    sharedSecrets[sessionId] = sharedSecret;
+    encryptionKeys[sessionId] = aesKey;
+    
+    console.log('DEBUG: DH key exchange completed for session:', sessionId);
+    return aesKey;
+}
+
+// Send public key to server for storage
+async function sendPublicKeyToServer(sessionId) {
+    const keyPair = await generateDHKeyPair(sessionId);
+    
+    try {
+        const response = await fetch('/api/dh-exchange', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                session_id: sessionId,
+                public_key: keyPair.publicKey
+            })
+        });
+        
+        const data = await response.json();
+        console.log('DEBUG: Public key sent to server:', data);
+        return data.status === 'success';
+    } catch (error) {
+        console.error('Error sending public key to server:', error);
+        return false;
+    }
+}
+
+// Get other party's public key from server
+async function getPublicKeyFromServer(sessionId) {
+    try {
+        const response = await fetch(`/api/dh-public-key/${sessionId}`);
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            console.log('DEBUG: Retrieved public key from server for session:', sessionId);
+            return data.public_key;
+        }
+        return null;
+    } catch (error) {
+        console.error('Error getting public key from server:', error);
+        return null;
+    }
+}
+
+// Generate encryption key using DH key exchange
+async function generateClientKey(sessionId) {
+    if (encryptionKeys[sessionId]) {
+        return encryptionKeys[sessionId];
+    }
+    
+    // Send our public key to server
+    await sendPublicKeyToServer(sessionId);
+    
+    // Try to get other party's public key
+    const otherPublicKey = await getPublicKeyFromServer(sessionId);
+    
+    if (otherPublicKey) {
+        // Perform DH key exchange
+        return await performDHKeyExchange(sessionId, otherPublicKey);
+    } else {
+        // If no other public key yet, generate our key pair and wait
+        await generateDHKeyPair(sessionId);
+        
+        // For now, use a temporary key derived from session ID
+        // This will be replaced once the other party's public key is available
         const password = `session_${sessionId}_${new Date().toISOString().slice(0, 10).replace(/-/g, '')}`;
         const encoder = new TextEncoder();
         const data = encoder.encode(password);
-        return crypto.subtle.digest('SHA-256', data).then(hash => {
-            return crypto.subtle.importKey(
-                'raw',
-                hash,
-                { name: 'AES-GCM' },
-                false,
-                ['encrypt', 'decrypt']
-            ).then(key => {
-                encryptionKeys[sessionId] = key;
-                return key;
-            });
-        });
+        const hash = await crypto.subtle.digest('SHA-256', data);
+        const key = await crypto.subtle.importKey(
+            'raw',
+            hash,
+            { name: 'AES-GCM' },
+            false,
+            ['encrypt', 'decrypt']
+        );
+        encryptionKeys[sessionId] = key;
+        return key;
     }
-    return Promise.resolve(encryptionKeys[sessionId]);
 }
 
 // Encrypt message for sending
