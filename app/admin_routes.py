@@ -74,6 +74,16 @@ def portal():
     return render_template("admin_portal.html", stats=stats, users=users, security_logs=security_logs, active_sessions=active_sessions, chat_stats=chat_stats_data)
 
 
+@admin.get("/admin/chat")
+def admin_chat():
+    if not session.get("user_id"):
+        return redirect(url_for("auth.login_get"))
+    if not session.get("is_admin"):
+        return redirect(url_for("main.index"))
+    
+    return render_template("admin_chat.html")
+
+
 @admin.post("/admin/delete-user/<int:user_id>")
 def delete_user_route(user_id):
     print(f"\n{'='*80}")
