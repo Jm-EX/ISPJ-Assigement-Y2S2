@@ -504,6 +504,7 @@ function initializeSocketHandlers() {
         const encryptedData = data.encrypted_data;
         const username = data.username || 'Guest';
         const email = data.user_email || '';
+        const userRoom = data.user_room || `guest_${sessionId}`;  // Store user's room for replies
         
         try {
             const key = await generateAdminClientKey(sessionId);
@@ -525,6 +526,7 @@ function initializeSocketHandlers() {
                             sessionId: sessionId,
                             username: username,
                             email: email,
+                            userRoom: userRoom,  // Store user's room for replies
                             lastMessage: decryptedMessage.msg,
                             lastMessageTime: decryptedMessage.timestamp || new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
                         },
@@ -533,6 +535,8 @@ function initializeSocketHandlers() {
                 } else {
                     customerChats[sessionId].info.lastMessage = decryptedMessage.msg;
                     customerChats[sessionId].info.lastMessageTime = decryptedMessage.timestamp || new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    // Update userRoom in case it changed
+                    customerChats[sessionId].info.userRoom = userRoom;
                 }
                 
                 // Add message
@@ -788,7 +792,9 @@ async function sendAdminMessage() {
     
     // Send via socket
     try {
+        console.log('DEBUG ADMIN SEND: Starting to send message to', currentCustomer.sessionId);
         const key = await generateAdminClientKey(currentCustomer.sessionId);
+        console.log('DEBUG ADMIN SEND: Got encryption key');
         
         const messageData = {
             msg: message,
@@ -797,24 +803,30 @@ async function sendAdminMessage() {
             sender_type: 'admin'
         };
         
+        console.log('DEBUG ADMIN SEND: Encrypting message:', messageData);
         const encryptedMessage = await encryptMessage(messageData, key);
+        console.log('DEBUG ADMIN SEND: Encrypted result:', encryptedMessage ? 'success' : 'failed');
         
         if (encryptedMessage) {
+            const targetRoom = currentCustomer.userRoom || `guest_${currentCustomer.sessionId}`;
+            console.log('DEBUG ADMIN SEND: Emitting to target_room:', targetRoom);
             socket.emit('send_encrypted_message', {
                 encrypted_data: encryptedMessage,
                 session_id: currentCustomer.sessionId,
-                target_room: `user_${currentCustomer.email || currentCustomer.sessionId}`
+                target_room: targetRoom
             });
+            console.log('DEBUG ADMIN SEND: Message emitted successfully');
         } else {
+            console.log('DEBUG ADMIN SEND: Encryption failed, using fallback');
             // Fallback to unencrypted
             socket.emit('admin_send_message', {
                 msg: message,
                 session_id: currentCustomer.sessionId,
-                target_room: `user_${currentCustomer.email || currentCustomer.sessionId}`
+                target_room: currentCustomer.userRoom || `guest_${currentCustomer.sessionId}`
             });
         }
     } catch (error) {
-        console.error('Error sending message:', error);
+        console.error('DEBUG ADMIN SEND: Error sending message:', error);
     }
 }
 
