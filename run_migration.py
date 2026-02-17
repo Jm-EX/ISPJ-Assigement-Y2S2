@@ -86,11 +86,27 @@ def run_migration():
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_dh_keys_expires_at ON dh_keys(expires_at)")
         print("dh_keys index created!")
         
+        # Create casino_balances table for persistent user balances
+        print("Creating casino_balances table...")
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS casino_balances (
+                id SERIAL PRIMARY KEY,
+                user_id INTEGER NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+                balance INTEGER NOT NULL DEFAULT 1000,
+                created_at TIMESTAMP DEFAULT NOW(),
+                updated_at TIMESTAMP DEFAULT NOW()
+            )
+        """)
+        print("casino_balances table created/verified!")
+        
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_casino_balances_user_id ON casino_balances(user_id)")
+        print("casino_balances index created!")
+        
         # Verify tables exist
         print("\nVerifying tables...")
         cursor.execute("""
             SELECT table_name FROM information_schema.tables 
-            WHERE table_schema = 'public' AND table_name IN ('chat_messages', 'dh_keys')
+            WHERE table_schema = 'public' AND table_name IN ('chat_messages', 'dh_keys', 'casino_balances')
         """)
         tables = cursor.fetchall()
         print(f"Found tables: {[t[0] for t in tables]}")
