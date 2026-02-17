@@ -541,8 +541,34 @@ async function encryptMessage(message, key) {
 // Decrypt received message
 async function decryptMessage(encryptedData, key) {
     try {
+        // Validate input
+        if (!encryptedData || typeof encryptedData !== 'string') {
+            console.warn('Decryption skipped: invalid input data');
+            return null;
+        }
+        
+        // Check if it's valid base64 (must only contain valid base64 chars)
+        const base64Regex = /^[A-Za-z0-9+/=]+$/;
+        if (!base64Regex.test(encryptedData)) {
+            console.warn('Decryption skipped: not valid base64 format');
+            return null;
+        }
+        
+        // Check minimum length (IV 12 + tag 16 + at least 1 byte data = 29 bytes minimum)
+        // Base64 encoded 29 bytes = ~40 chars minimum
+        if (encryptedData.length < 40) {
+            console.warn('Decryption skipped: data too short');
+            return null;
+        }
+        
         // Convert from base64
         const combined = new Uint8Array(atob(encryptedData).split('').map(c => c.charCodeAt(0)));
+        
+        // Validate decoded length
+        if (combined.length < 29) {
+            console.warn('Decryption skipped: decoded data too short');
+            return null;
+        }
         
         // Extract IV (first 12 bytes), tag (next 16 bytes), and encrypted data
         const iv = combined.slice(0, 12);
@@ -566,7 +592,8 @@ async function decryptMessage(encryptedData, key) {
         const decoded = new TextDecoder().decode(decrypted);
         return JSON.parse(decoded);
     } catch (error) {
-        console.error('Decryption error:', error);
+        // Silently skip invalid messages - they may be old/corrupted
+        console.warn('Decryption skipped: unable to decrypt message');
         return null;
     }
 }
