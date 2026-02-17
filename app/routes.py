@@ -531,15 +531,31 @@ def on_join(data):
         
         print(f"DEBUG: Loaded {len(chat_history)} chat history messages")
         
-        # Send chat history to user
+        # Send chat history to user - use receive_encrypted_message for encrypted messages
         for msg in chat_history:
-            history_data = {
-                'msg': msg['message'],
-                'sender': msg['username'] if msg['sender_type'] == 'user' else 'Admin',
-                'timestamp': msg['timestamp'].strftime('%H:%M') if msg['timestamp'] else datetime.now().strftime('%H:%M'),
-                'sender_type': msg['sender_type']
-            }
-            emit('receive_message', history_data, room=user_room_id)
+            # Check if message looks encrypted (long base64 string)
+            message_content = msg['message']
+            is_encrypted = message_content and len(message_content) > 40 and '/' in message_content
+            
+            if is_encrypted:
+                # Send as encrypted message for client-side decryption
+                history_data = {
+                    'encrypted_data': message_content,
+                    'session_id': user_email if user_email else session_id,
+                    'username': msg['username'] if msg['sender_type'] == 'user' else 'Admin',
+                    'sender_type': msg['sender_type'],
+                    'timestamp': msg['timestamp'].strftime('%H:%M') if msg['timestamp'] else datetime.now().strftime('%H:%M')
+                }
+                emit('receive_encrypted_message', history_data, room=user_room_id)
+            else:
+                # Send as plain text message (AI responses, old messages)
+                history_data = {
+                    'msg': message_content,
+                    'sender': msg['username'] if msg['sender_type'] == 'user' else 'Admin',
+                    'timestamp': msg['timestamp'].strftime('%H:%M') if msg['timestamp'] else datetime.now().strftime('%H:%M'),
+                    'sender_type': msg['sender_type']
+                }
+                emit('receive_message', history_data, room=user_room_id)
             
         print(f"DEBUG: Chat history sent to user")
     except Exception as e:
