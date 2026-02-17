@@ -442,7 +442,7 @@ function initializeSocketHandlers() {
         const email = data.user_email || '';
         
         try {
-            const key = await generateClientKey(sessionId);
+            const key = await generateAdminClientKey(sessionId);
             const decryptedMessage = await decryptMessage(encryptedData, key);
             
             if (decryptedMessage) {
@@ -608,6 +608,85 @@ function displayMessages(sessionId) {
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
+// Admin-specific: Send admin's public key to server
+async function sendAdminPublicKeyToServer(sessionId) {
+    const keyPair = await generateDHKeyPair(sessionId);
+    
+    try {
+        const response = await fetch('/api/dh-exchange', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                session_id: `admin_${sessionId}`,  // Prefix with 'admin_'
+                public_key: keyPair.publicKey
+            })
+        });
+        
+        const data = await response.json();
+        console.log('DEBUG: Admin public key sent to server:', data);
+        return data.status === 'success';
+    } catch (error) {
+        console.error('Error sending admin public key to server:', error);
+        return false;
+    }
+}
+
+// Admin-specific: Get user's public key from server
+async function getAdminPublicKeyFromServer(sessionId) {
+    try {
+        // Admin tries to get user's public key
+        const response = await fetch(`/api/dh-public-key/user_${sessionId}`);
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            console.log('DEBUG: Admin retrieved user public key for session:', sessionId);
+            return data.public_key;
+        }
+        return null;
+    } catch (error) {
+        console.error('Error getting user public key from server:', error);
+        return null;
+    }
+}
+
+// Admin-specific: Generate encryption key using DH key exchange
+async function generateAdminClientKey(sessionId) {
+    if (encryptionKeys[sessionId]) {
+        return encryptionKeys[sessionId];
+    }
+    
+    // Send admin's public key to server
+    await sendAdminPublicKeyToServer(sessionId);
+    
+    // Try to get user's public key
+    const userPublicKey = await getAdminPublicKeyFromServer(sessionId);
+    
+    if (userPublicKey) {
+        // Perform DH key exchange
+        return await performDHKeyExchange(sessionId, userPublicKey);
+    } else {
+        // If no user public key yet, generate our key pair and wait
+        await generateDHKeyPair(sessionId);
+        
+        // For now, use a temporary key derived from session ID
+        const password = `session_${sessionId}_${new Date().toISOString().slice(0, 10).replace(/-/g, '')}`;
+        const encoder = new TextEncoder();
+        const data = encoder.encode(password);
+        const hash = await crypto.subtle.digest('SHA-256', data);
+        const key = await crypto.subtle.importKey(
+            'raw',
+            hash,
+            { name: 'AES-GCM' },
+            false,
+            ['encrypt', 'decrypt']
+        );
+        encryptionKeys[sessionId] = key;
+        return key;
+    }
+}
+
 // Send message to customer
 async function sendAdminMessage() {
     if (!currentCustomer) {
@@ -650,7 +729,7 @@ async function sendAdminMessage() {
     
     // Send via socket
     try {
-        const key = await generateClientKey(currentCustomer.sessionId);
+        const key = await generateAdminClientKey(currentCustomer.sessionId);
         
         const messageData = {
             msg: message,
