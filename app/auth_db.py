@@ -383,6 +383,52 @@ def mark_messages_as_read(session_id=None, room=None):
     print(f"Messages marked as read for session: {session_id}, room: {room}")
 
 
+def get_all_chat_sessions():
+    """Get all unique chat sessions for admin dashboard"""
+    db = get_db()
+    cursor = db.cursor()
+    
+    try:
+        # Get unique session IDs
+        cursor.execute("""
+            SELECT DISTINCT session_id FROM chat_messages 
+            WHERE room = 'customer_service'
+        """)
+        
+        session_ids = cursor.fetchall()
+        
+        result = []
+        for row in session_ids:
+            sid = row['session_id']
+            
+            # Get latest message for this session
+            cursor.execute("""
+                SELECT session_id, username, user_email, message, sender_type, timestamp
+                FROM chat_messages 
+                WHERE session_id = %s AND room = 'customer_service'
+                ORDER BY timestamp DESC
+                LIMIT 1
+            """, (sid,))
+            
+            latest = cursor.fetchone()
+            if latest:
+                result.append({
+                    'session_id': latest['session_id'],
+                    'username': latest['username'],
+                    'user_email': latest['user_email'],
+                    'last_message': latest['message'],
+                    'sender_type': latest['sender_type'],
+                    'timestamp': latest['timestamp']
+                })
+        
+        return result
+    except Exception as e:
+        print(f"Error getting chat sessions: {e}")
+        import traceback
+        print(f"Traceback: {traceback.format_exc()}")
+        return []
+
+
 # =========================
 # Diffie-Hellman Key Exchange Functions
 # =========================
