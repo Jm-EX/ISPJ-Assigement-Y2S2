@@ -337,6 +337,9 @@
                     <h3 id="chatHeaderName">Customer</h3>
                     <p id="chatHeaderEmail">customer@example.com</p>
                 </div>
+                <button onclick="closeCustomerChat()" style="background: #f44336; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; margin-left: auto;">
+                    ✓ Close Chat
+                </button>
             </div>
             
             <div class="chat-messages" id="chatMessages"></div>
@@ -444,6 +447,12 @@ function initializeSocketHandlers() {
             
             if (decryptedMessage) {
                 console.log('Message decrypted successfully');
+                
+                // Skip if this is an admin message (already added locally)
+                if (decryptedMessage.sender_type === 'admin' || decryptedMessage.sender === 'Admin') {
+                    console.log('Skipping admin message echo');
+                    return;
+                }
                 
                 // Add or update customer
                 if (!customerChats[sessionId]) {
@@ -669,6 +678,32 @@ async function sendAdminMessage() {
     } catch (error) {
         console.error('Error sending message:', error);
     }
+}
+
+// Close customer chat
+function closeCustomerChat() {
+    if (!currentCustomer) {
+        alert('No customer selected');
+        return;
+    }
+    
+    if (!confirm(`Are you sure you want to close the chat with ${currentCustomer.username}? This will clear their chat history.`)) {
+        return;
+    }
+    
+    console.log('Closing chat for customer:', currentCustomer.sessionId);
+    
+    // Emit close chat event to user
+    socket.emit('admin_close_chat', {
+        session_id: currentCustomer.sessionId,
+        user_email: currentCustomer.email,
+        user_room: `user_${currentCustomer.email || currentCustomer.sessionId}`
+    });
+    
+    // Show confirmation
+    alert(`Chat with ${currentCustomer.username} has been closed. The user has been notified.`);
+    
+    console.log('Chat closed successfully');
 }
 </script>
 
