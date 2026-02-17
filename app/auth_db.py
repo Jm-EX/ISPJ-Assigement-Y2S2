@@ -415,9 +415,20 @@ def get_all_chat_sessions():
         for row in session_ids:
             sid = row['session_id']
             
-            # Get latest message for this session
+            # Get the FIRST user message to identify who opened the chat
             cursor.execute("""
-                SELECT session_id, username, user_email, message, sender_type, timestamp
+                SELECT session_id, username, user_email
+                FROM chat_messages 
+                WHERE session_id = %s AND room = 'customer_service' AND sender_type = 'user'
+                ORDER BY timestamp ASC
+                LIMIT 1
+            """, (sid,))
+            
+            first_user = cursor.fetchone()
+            
+            # Get the LATEST message for timestamp and preview
+            cursor.execute("""
+                SELECT message, sender_type, timestamp
                 FROM chat_messages 
                 WHERE session_id = %s AND room = 'customer_service'
                 ORDER BY timestamp DESC
@@ -425,11 +436,22 @@ def get_all_chat_sessions():
             """, (sid,))
             
             latest = cursor.fetchone()
-            if latest:
+            
+            if first_user and latest:
                 result.append({
-                    'session_id': latest['session_id'],
-                    'username': latest['username'],
-                    'user_email': latest['user_email'],
+                    'session_id': sid,
+                    'username': first_user['username'],  # User who opened the chat
+                    'user_email': first_user['user_email'],
+                    'last_message': latest['message'],
+                    'sender_type': latest['sender_type'],
+                    'timestamp': latest['timestamp']
+                })
+            elif latest:
+                # Fallback if no user message found (shouldn't happen)
+                result.append({
+                    'session_id': sid,
+                    'username': 'Unknown',
+                    'user_email': None,
                     'last_message': latest['message'],
                     'sender_type': latest['sender_type'],
                     'timestamp': latest['timestamp']
