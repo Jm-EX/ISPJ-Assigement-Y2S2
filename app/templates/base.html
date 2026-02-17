@@ -960,8 +960,10 @@ socket.on('connect', function() {
     console.log('CHATBOT DEBUG: Socket ID:', socket.id);
     console.log('='.repeat(80));
     
-    // Load chat history when connected
-    setTimeout(() => loadChatHistory(), 500);
+    // Load chat history when connected (skip on admin chat page)
+    if (!window.location.pathname.includes('/admin/chat')) {
+        setTimeout(() => loadChatHistory(), 500);
+    }
 });
 
 // Handle chat closed by admin
