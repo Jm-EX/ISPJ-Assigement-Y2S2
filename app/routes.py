@@ -231,6 +231,10 @@ resorts = [
 def index():
     return render_template("home.html", resorts=resorts)
 
+@main.route("/casino/blackjack")
+def blackjack():
+    return render_template("blackjack.html")
+
 @main.route("/book")
 def book_room():
     return render_template("book_room.html")
