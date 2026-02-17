@@ -925,32 +925,50 @@ socket.on('status', function(data) {
     console.log('='.repeat(80));
 });
 
-// Load chat history on page load
-function loadChatHistory() {
+// Load encrypted chat history on page load
+async function loadChatHistory() {
     const sessionId = socket.id;
     if (!sessionId) return;
     
-    fetch('/api/chat-history', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            session_id: sessionId
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.messages && data.messages.length > 0) {
+    console.log('CHATBOT DEBUG: Loading chat history for session:', sessionId);
+    
+    try {
+        const response = await fetch('/api/user-chat-history', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                session_id: sessionId
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'success' && data.messages && data.messages.length > 0) {
             console.log('CHATBOT DEBUG: Loaded chat history:', data.messages.length, 'messages');
-            data.messages.forEach(msg => {
-                addMessage(msg.sender_type === 'user' ? 'You' : 'Admin', msg.message);
-            });
+            
+            // Get encryption key for decryption
+            const key = await generateClientKey(sessionId);
+            
+            for (const msg of data.messages) {
+                try {
+                    // Decrypt the message
+                    const decryptedMessage = await decryptMessage(msg.encrypted_data, key);
+                    
+                    if (decryptedMessage) {
+                        const sender = msg.sender_type === 'user' ? 'You' : 'Admin';
+                        const type = msg.sender_type === 'user' ? 'customer' : 'support';
+                        addMessageToChat(sender, decryptedMessage.msg, type);
+                    }
+                } catch (decryptError) {
+                    console.error('CHATBOT DEBUG: Error decrypting history message:', decryptError);
+                }
+            }
         }
-    })
-    .catch(error => {
-        console.error('Error loading chat history:', error);
-    });
+    } catch (error) {
+        console.error('CHATBOT DEBUG: Error loading chat history:', error);
+    }
 }
 
 // Add connection event listeners for debugging

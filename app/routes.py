@@ -595,6 +595,22 @@ def on_send_encrypted_message(data):
     if target_room:
         # Admin sending to user
         print(f"DEBUG: Admin message - forwarding to user room: {target_room}")
+        
+        # Save encrypted admin message to database
+        try:
+            save_chat_message(
+                session_id=session_id,
+                user_id=None,
+                username='Admin',
+                user_email=None,
+                message=encrypted_data,  # Store encrypted message
+                sender_type='admin',
+                room='customer_service'
+            )
+            print(f"DEBUG: Admin encrypted message saved to database")
+        except Exception as e:
+            print(f"DEBUG: Error saving admin message: {e}")
+        
         emit('receive_encrypted_message', {
             'encrypted_data': encrypted_data,
             'session_id': session_id,
@@ -618,6 +634,21 @@ def on_send_encrypted_message(data):
         user_email = session.get('email') if 'email' in session else None
         
         print(f"DEBUG: User info - username: {username}, email: {user_email}, room: {user_room_id}")
+        
+        # Save encrypted user message to database
+        try:
+            save_chat_message(
+                session_id=session_id,
+                user_id=user_id,
+                username=username,
+                user_email=user_email,
+                message=encrypted_data,  # Store encrypted message
+                sender_type='user',
+                room='customer_service'
+            )
+            print(f"DEBUG: User encrypted message saved to database")
+        except Exception as e:
+            print(f"DEBUG: Error saving user message: {e}")
         
         # Forward encrypted message directly to admin room
         # Admin will decrypt it using the DH shared secret
@@ -936,6 +967,88 @@ def api_get_dh_public_key(session_id):
             
     except Exception as e:
         print(f"DEBUG: Error retrieving DH public key: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+@main.post('/api/admin-chat-sessions')
+def api_admin_chat_sessions():
+    """API endpoint to get all customer chat sessions for admin"""
+    if not session.get("user_id") or not session.get("is_admin"):
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    try:
+        # Get all unique sessions with their latest messages
+        db = get_db()
+        cursor = db.cursor()
+        
+        cursor.execute("""
+            SELECT DISTINCT ON (session_id) 
+                session_id, username, user_email, message, sender_type, timestamp
+            FROM chat_messages 
+            WHERE room = 'customer_service'
+            ORDER BY session_id, timestamp DESC
+        """)
+        
+        sessions = cursor.fetchall()
+        
+        result = []
+        for sess in sessions:
+            result.append({
+                'session_id': sess['session_id'],
+                'username': sess['username'],
+                'user_email': sess['user_email'],
+                'last_message': sess['message'],
+                'sender_type': sess['sender_type'],
+                'timestamp': sess['timestamp'].isoformat() if sess['timestamp'] else None
+            })
+        
+        return jsonify({
+            'status': 'success',
+            'sessions': result
+        })
+        
+    except Exception as e:
+        print(f"DEBUG: Error getting admin chat sessions: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+@main.post('/api/user-chat-history')
+def api_user_chat_history():
+    """API endpoint to get encrypted chat history for user"""
+    try:
+        data = request.get_json()
+        session_id = data.get('session_id')
+        
+        if not session_id:
+            return jsonify({'error': 'Missing session_id'}), 400
+        
+        print(f"DEBUG: Getting user chat history for session_id={session_id}")
+        
+        chat_history = get_chat_history(
+            session_id=session_id,
+            room='customer_service',
+            limit=50
+        )
+        
+        # Return encrypted messages for client-side decryption
+        messages = []
+        for msg in chat_history:
+            messages.append({
+                'id': msg['id'],
+                'session_id': msg['session_id'],
+                'username': msg['username'],
+                'encrypted_data': msg['message'],  # This is the encrypted message
+                'sender_type': msg['sender_type'],
+                'timestamp': msg['timestamp'].isoformat() if msg['timestamp'] else None
+            })
+        
+        return jsonify({
+            'status': 'success',
+            'messages': messages
+        })
+        
+    except Exception as e:
+        print(f"DEBUG: Error getting user chat history: {e}")
         return jsonify({'error': str(e)}), 500
 
 

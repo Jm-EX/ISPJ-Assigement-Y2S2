@@ -565,10 +565,118 @@ function initializeSocketHandlers() {
     });
 }
 
-// Load customers list
-function loadCustomers() {
-    // This will be populated as messages come in
-    updateCustomersList();
+// Load customers list from database
+async function loadCustomers() {
+    console.log('DEBUG: Loading customer chat sessions from database');
+    
+    try {
+        const response = await fetch('/api/admin-chat-sessions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'success' && data.sessions && data.sessions.length > 0) {
+            console.log('DEBUG: Loaded', data.sessions.length, 'chat sessions');
+            
+            for (const sess of data.sessions) {
+                const sessionId = sess.session_id;
+                
+                // Initialize customer chat if not exists
+                if (!customerChats[sessionId]) {
+                    customerChats[sessionId] = {
+                        info: {
+                            sessionId: sessionId,
+                            username: sess.username || 'Guest',
+                            email: sess.user_email || '',
+                            userRoom: sess.user_email ? `user_${sess.user_email}` : `guest_${sessionId}`,
+                            lastMessage: '[Encrypted]',
+                            lastMessageTime: sess.timestamp ? new Date(sess.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ''
+                        },
+                        messages: []
+                    };
+                }
+                
+                // Load message history for this session
+                await loadSessionMessages(sessionId);
+            }
+            
+            updateCustomersList();
+        } else {
+            console.log('DEBUG: No chat sessions found');
+            updateCustomersList();
+        }
+    } catch (error) {
+        console.error('DEBUG: Error loading customer sessions:', error);
+        updateCustomersList();
+    }
+}
+
+// Load messages for a specific session
+async function loadSessionMessages(sessionId) {
+    try {
+        const response = await fetch('/api/chat-history', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                session_id: sessionId,
+                room: 'customer_service'
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.messages && data.messages.length > 0) {
+            console.log('DEBUG: Loaded', data.messages.length, 'messages for session', sessionId);
+            
+            // Get encryption key for decryption
+            const key = await generateAdminClientKey(sessionId);
+            
+            for (const msg of data.messages) {
+                try {
+                    // Decrypt the message
+                    const decryptedMessage = await decryptMessage(msg.message, key);
+                    
+                    if (decryptedMessage) {
+                        // Add to customer chat messages
+                        if (!customerChats[sessionId]) {
+                            customerChats[sessionId] = {
+                                info: {
+                                    sessionId: sessionId,
+                                    username: msg.username || 'Guest',
+                                    email: msg.user_email || '',
+                                    userRoom: msg.user_email ? `user_${msg.user_email}` : `guest_${sessionId}`,
+                                    lastMessage: decryptedMessage.msg,
+                                    lastMessageTime: msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ''
+                                },
+                                messages: []
+                            };
+                        }
+                        
+                        customerChats[sessionId].messages.push({
+                            sender: msg.sender_type === 'admin' ? 'Admin' : (msg.username || 'Guest'),
+                            msg: decryptedMessage.msg,
+                            timestamp: msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '',
+                            type: msg.sender_type === 'admin' ? 'admin' : 'customer'
+                        });
+                        
+                        // Update last message
+                        customerChats[sessionId].info.lastMessage = decryptedMessage.msg;
+                        customerChats[sessionId].info.lastMessageTime = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '';
+                    }
+                } catch (decryptError) {
+                    console.error('DEBUG: Error decrypting message:', decryptError);
+                }
+            }
+        }
+    } catch (error) {
+        console.error('DEBUG: Error loading session messages:', error);
+    }
 }
 
 // Update customers list in sidebar
