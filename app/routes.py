@@ -841,6 +841,37 @@ def on_admin_mark_read(data):
         emit('messages_marked_read', {'status': 'error', 'message': str(e)})
 
 
+@socketio.on('admin_close_chat')
+def on_admin_close_chat(data):
+    """Admin closes chat with a customer - clears user's chat but keeps admin history"""
+    session_id = data.get('session_id', '')
+    user_room = data.get('user_room', '')
+    
+    print(f"DEBUG: Admin closing chat for session: {session_id}, room: {user_room}")
+    
+    try:
+        # Emit chat_closed event to the specific user's room
+        emit('chat_closed', {
+            'status': 'closed',
+            'message': 'The admin has closed this chat. Your issue has been resolved. Thank you!'
+        }, room=user_room)
+        
+        print(f"DEBUG: Chat closed event sent to {user_room}")
+        
+        # Confirm to admin
+        emit('chat_close_confirmed', {
+            'status': 'success',
+            'session_id': session_id
+        })
+        
+    except Exception as e:
+        print(f"DEBUG: Error closing chat: {e}")
+        emit('chat_close_confirmed', {
+            'status': 'error',
+            'message': str(e)
+        })
+
+
 # =========================
 # API Routes
 # =========================
