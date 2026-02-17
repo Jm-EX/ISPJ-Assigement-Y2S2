@@ -316,6 +316,7 @@ def passkey_login_complete():
     
     session["user_id"] = int(user["id"])
     session["username"] = user["username"]
+    session["email"] = user["email"]
     session["is_admin"] = bool(user["is_admin"])
     
     if session.get("is_admin"):
@@ -419,6 +420,7 @@ def setup_totp_post():
     session.permanent = True
     session["user_id"] = int(user["id"])
     session["username"] = user["username"]
+    session["email"] = user["email"]
     session["is_admin"] = bool(user["is_admin"])
     
     # Now pop the pending flag
@@ -481,6 +483,7 @@ def verify_totp_post():
     session.permanent = True
     session["user_id"] = int(user["id"])
     session["username"] = user["username"]
+    session["email"] = user["email"]
     session["is_admin"] = bool(user["is_admin"])
     
     # Now pop the pending flag
@@ -583,6 +586,7 @@ def verify_otp_post():
     session.permanent = True
     session["user_id"] = int(user["id"])
     session["username"] = user["username"]
+    session["email"] = user["email"]
     session["is_admin"] = bool(user["is_admin"])
     
     from app.auth_db import update_last_login, create_or_update_session, send_high_risk_alert
