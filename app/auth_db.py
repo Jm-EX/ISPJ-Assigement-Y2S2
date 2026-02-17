@@ -1241,3 +1241,48 @@ def delete_session(session_id: int):
     
     cursor.execute("DELETE FROM active_sessions WHERE id = %s", (session_id,))
     db.commit()
+
+
+# =========================
+# Casino Balance Functions
+# =========================
+
+def get_user_casino_balance(user_id: int) -> int:
+    """Get user's casino balance, create with default 1000 if not exists"""
+    db = get_db()
+    cursor = db.cursor()
+    
+    cursor.execute("SELECT balance FROM casino_balances WHERE user_id = %s", (user_id,))
+    result = cursor.fetchone()
+    
+    if result:
+        return result['balance']
+    else:
+        # Create new balance record with default 1000 chips
+        cursor.execute(
+            "INSERT INTO casino_balances (user_id, balance) VALUES (%s, %s)",
+            (user_id, 1000)
+        )
+        return 1000
+
+
+def update_user_casino_balance(user_id: int, new_balance: int) -> bool:
+    """Update user's casino balance"""
+    db = get_db()
+    cursor = db.cursor()
+    
+    try:
+        # Ensure balance doesn't go negative
+        if new_balance < 0:
+            new_balance = 0
+        
+        cursor.execute(
+            """INSERT INTO casino_balances (user_id, balance) 
+               VALUES (%s, %s) 
+               ON CONFLICT (user_id) DO UPDATE SET balance = %s""",
+            (user_id, new_balance, new_balance)
+        )
+        return True
+    except Exception as e:
+        print(f"Error updating casino balance: {e}")
+        return False
