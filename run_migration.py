@@ -49,6 +49,19 @@ def run_migration():
         """)
         print("chat_messages table created/verified!")
         
+        # Add user_email column if it doesn't exist (for existing tables)
+        print("Checking for missing columns...")
+        cursor.execute("""
+            SELECT column_name FROM information_schema.columns 
+            WHERE table_name = 'chat_messages' AND column_name = 'user_email'
+        """)
+        if not cursor.fetchone():
+            print("Adding missing user_email column...")
+            cursor.execute("ALTER TABLE chat_messages ADD COLUMN user_email VARCHAR(255)")
+            print("user_email column added!")
+        else:
+            print("user_email column already exists.")
+        
         # Create indexes
         print("Creating indexes...")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_chat_messages_session_id ON chat_messages(session_id)")
