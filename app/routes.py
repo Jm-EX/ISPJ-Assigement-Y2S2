@@ -973,11 +973,17 @@ def api_get_dh_public_key(session_id):
 @main.post('/api/admin-chat-sessions')
 def api_admin_chat_sessions():
     """API endpoint to get all customer chat sessions for admin"""
+    print("DEBUG api_admin_chat_sessions: Endpoint called")
+    print(f"DEBUG api_admin_chat_sessions: user_id={session.get('user_id')}, is_admin={session.get('is_admin')}")
+    
     if not session.get("user_id") or not session.get("is_admin"):
+        print("DEBUG api_admin_chat_sessions: Unauthorized - returning 401")
         return jsonify({'error': 'Unauthorized'}), 401
     
     try:
+        print("DEBUG api_admin_chat_sessions: Calling get_all_chat_sessions()")
         sessions = get_all_chat_sessions()
+        print(f"DEBUG api_admin_chat_sessions: Got {len(sessions)} sessions")
         
         # Convert timestamps to ISO format
         result = []
@@ -1065,6 +1071,9 @@ def api_chat_history():
                 limit=50
             )
             print(f"DEBUG: get_chat_history returned {len(chat_history)} items")
+            for i, msg in enumerate(chat_history):
+                msg_preview = msg['message'][:50] if msg['message'] else 'None'
+                print(f"DEBUG: Message {i}: length={len(msg['message']) if msg['message'] else 0}, preview={msg_preview}")
             
         except Exception as db_error:
             print(f"DEBUG: Database error in get_chat_history: {db_error}")

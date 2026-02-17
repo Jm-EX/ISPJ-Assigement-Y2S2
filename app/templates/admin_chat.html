@@ -639,6 +639,13 @@ async function loadSessionMessages(sessionId) {
             
             for (const msg of data.messages) {
                 try {
+                    // Debug: log the raw message data
+                    console.log('DEBUG: Raw message from DB:', {
+                        length: msg.message ? msg.message.length : 0,
+                        preview: msg.message ? msg.message.substring(0, 50) : 'null',
+                        sender_type: msg.sender_type
+                    });
+                    
                     // Decrypt the message
                     const decryptedMessage = await decryptMessage(msg.message, key);
                     
