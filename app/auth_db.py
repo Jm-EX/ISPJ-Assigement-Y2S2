@@ -347,23 +347,28 @@ def get_active_conversations(hours=24):
     db = get_db()
     cursor = db.cursor()
     
-    # Use simpler SQL syntax to avoid compatibility issues
-    cursor.execute("""
-        SELECT 
-            session_id,
-            user_id,
-            username,
-            user_email,
-            room,
-            MAX(timestamp) as last_message_time,
-            SUM(CASE WHEN admin_read = FALSE AND sender_type != 'admin' THEN 1 ELSE 0 END) as unread_count
-        FROM chat_messages
-        WHERE timestamp >= NOW() - INTERVAL %s hours
-        GROUP BY session_id, user_id, username, user_email, room
-        ORDER BY last_message_time DESC
-    """, (hours,))
-    
-    return cursor.fetchall()
+    try:
+        # PostgreSQL requires INTERVAL as a string literal, not a parameter
+        # Use make_interval function instead
+        cursor.execute("""
+            SELECT 
+                session_id,
+                user_id,
+                username,
+                user_email,
+                room,
+                MAX(timestamp) as last_message_time,
+                SUM(CASE WHEN admin_read = FALSE AND sender_type != 'admin' THEN 1 ELSE 0 END) as unread_count
+            FROM chat_messages
+            WHERE timestamp >= NOW() - make_interval(hours => %s)
+            GROUP BY session_id, user_id, username, user_email, room
+            ORDER BY last_message_time DESC
+        """, (hours,))
+        
+        return cursor.fetchall()
+    except Exception as e:
+        print(f"Error getting chat stats: {e}")
+        return []
 
 
 def mark_messages_as_read(session_id=None, room=None):
