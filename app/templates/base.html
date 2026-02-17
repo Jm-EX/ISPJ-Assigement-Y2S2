@@ -538,7 +538,7 @@ async function encryptMessage(message, key) {
     }
 }
 
-// Decrypt received message
+// Decrypt received message - handles both encrypted and plain text messages
 async function decryptMessage(encryptedData, key) {
     try {
         // Validate input
@@ -550,26 +550,28 @@ async function decryptMessage(encryptedData, key) {
         // Trim whitespace that might have been added
         encryptedData = encryptedData.trim();
         
-        // Check minimum length (IV 12 + tag 16 + at least 1 byte data = 29 bytes minimum)
+        // Check minimum length for encrypted data (IV 12 + tag 16 + at least 1 byte data = 29 bytes minimum)
         // Base64 encoded 29 bytes = ~40 chars minimum
+        // If shorter, treat as plain text message
         if (encryptedData.length < 40) {
-            console.warn('Decryption skipped: data too short, length=' + encryptedData.length);
-            return null;
+            console.log('Message is plain text (too short for encrypted):', encryptedData);
+            return { msg: encryptedData, sender: 'unknown', timestamp: '', encrypted: false };
         }
         
-        // Try to decode - let atob handle validation
+        // Try to decode base64 - if it fails, treat as plain text
         let combined;
         try {
             combined = new Uint8Array(atob(encryptedData).split('').map(c => c.charCodeAt(0)));
         } catch (atobError) {
-            console.warn('Decryption skipped: invalid base64 encoding');
-            return null;
+            // Not valid base64 - treat as plain text message
+            console.log('Message is plain text (not base64):', encryptedData.substring(0, 50));
+            return { msg: encryptedData, sender: 'unknown', timestamp: '', encrypted: false };
         }
         
-        // Validate decoded length
+        // Validate decoded length - if too short, treat as plain text
         if (combined.length < 29) {
-            console.warn('Decryption skipped: decoded data too short');
-            return null;
+            console.log('Message is plain text (decoded too short):', encryptedData);
+            return { msg: encryptedData, sender: 'unknown', timestamp: '', encrypted: false };
         }
         
         // Extract IV (first 12 bytes), tag (next 16 bytes), and encrypted data
@@ -594,9 +596,10 @@ async function decryptMessage(encryptedData, key) {
         const decoded = new TextDecoder().decode(decrypted);
         return JSON.parse(decoded);
     } catch (error) {
-        // Silently skip invalid messages - they may be old/corrupted
-        console.warn('Decryption skipped: unable to decrypt message');
-        return null;
+        // Decryption failed - might be plain text that looked like base64
+        // Return as plain text
+        console.log('Decryption failed, treating as plain text:', encryptedData.substring(0, 50));
+        return { msg: encryptedData, sender: 'unknown', timestamp: '', encrypted: false };
     }
 }
 
