@@ -596,10 +596,21 @@ def on_send_encrypted_message(data):
         # Admin sending to user
         print(f"DEBUG: Admin message - forwarding to user room: {target_room}")
         
+        # Extract persistent session ID from target_room
+        # target_room is either "user_<email>" or "guest_<socket_id>"
+        if target_room.startswith('user_'):
+            persistent_session_id = target_room[5:]  # Remove "user_" prefix to get email
+        elif target_room.startswith('guest_'):
+            persistent_session_id = target_room[6:]  # Remove "guest_" prefix to get socket ID
+        else:
+            persistent_session_id = session_id
+        
+        print(f"DEBUG: Admin message persistent_session_id: {persistent_session_id}")
+        
         # Save encrypted admin message to database
         try:
             save_chat_message(
-                session_id=session_id,
+                session_id=persistent_session_id,  # Use user's persistent ID
                 user_id=None,
                 username='Admin',
                 user_email=None,
@@ -607,7 +618,7 @@ def on_send_encrypted_message(data):
                 sender_type='admin',
                 room='customer_service'
             )
-            print(f"DEBUG: Admin encrypted message saved to database")
+            print(f"DEBUG: Admin encrypted message saved to database with session_id={persistent_session_id}")
         except Exception as e:
             print(f"DEBUG: Error saving admin message: {e}")
         
@@ -625,20 +636,24 @@ def on_send_encrypted_message(data):
         user_email = session.get('email') if 'email' in session else None
         if user_email:
             user_room_id = f"user_{user_email}"
+            # Use email as persistent session ID for logged-in users
+            persistent_session_id = user_email
         else:
             user_room_id = f"guest_{session_id}"
+            # For guests, use socket session ID (will change on refresh)
+            persistent_session_id = session_id
         
         # Get user info for admin display
         user_id = session.get('user_id') if 'user_id' in session else None
         username = session.get('username', 'Guest') if 'username' in session else 'Guest'
         user_email = session.get('email') if 'email' in session else None
         
-        print(f"DEBUG: User info - username: {username}, email: {user_email}, room: {user_room_id}")
+        print(f"DEBUG: User info - username: {username}, email: {user_email}, room: {user_room_id}, persistent_session_id: {persistent_session_id}")
         
-        # Save encrypted user message to database
+        # Save encrypted user message to database using persistent session ID
         try:
             save_chat_message(
-                session_id=session_id,
+                session_id=persistent_session_id,  # Use email for logged-in users
                 user_id=user_id,
                 username=username,
                 user_email=user_email,
@@ -646,7 +661,7 @@ def on_send_encrypted_message(data):
                 sender_type='user',
                 room='customer_service'
             )
-            print(f"DEBUG: User encrypted message saved to database")
+            print(f"DEBUG: User encrypted message saved to database with session_id={persistent_session_id}")
         except Exception as e:
             print(f"DEBUG: Error saving user message: {e}")
         
@@ -654,7 +669,8 @@ def on_send_encrypted_message(data):
         # Admin will decrypt it using the DH shared secret
         emit('receive_encrypted_message', {
             'encrypted_data': encrypted_data,  # Send original encrypted data
-            'session_id': session_id,
+            'session_id': persistent_session_id,  # Use persistent ID for grouping
+            'socket_id': session_id,  # Keep socket ID for real-time routing
             'username': username,  # Add actual username here
             'user_email': user_email,
             'user_room': user_room_id
