@@ -489,29 +489,17 @@ async function generateDeterministicKey(sessionId) {
     return key;
 }
 
-// Generate encryption key using DH key exchange
+// Generate encryption key - use deterministic shared key for reliability
 async function generateClientKey(sessionId) {
     if (encryptionKeys[sessionId]) {
         return encryptionKeys[sessionId];
     }
     
-    // Send our public key to server
-    await sendPublicKeyToServer(sessionId);
-    
-    // Try to get other party's public key
-    const otherPublicKey = await getPublicKeyFromServer(sessionId);
-    
-    if (otherPublicKey) {
-        // Perform DH key exchange
-        return await performDHKeyExchange(sessionId, otherPublicKey);
-    } else {
-        // If no other public key yet, use deterministic shared key
-        // This ensures both sides derive the same key even without DH exchange
-        console.log('DEBUG: Using deterministic key for session:', sessionId);
-        const key = await generateDeterministicKey(sessionId);
-        encryptionKeys[sessionId] = key;
-        return key;
-    }
+    // Use deterministic shared key - ensures both user and admin derive the same key
+    console.log('DEBUG: Using deterministic key for session:', sessionId);
+    const key = await generateDeterministicKey(sessionId);
+    encryptionKeys[sessionId] = key;
+    return key;
 }
 
 // Encrypt message for sending
@@ -883,8 +871,13 @@ socket.on('receive_message', function(data) {
     console.log('='.repeat(80));
 });
 
-// Handle encrypted messages from admin
+// Handle encrypted messages from admin (only for user chat widget, not admin page)
 socket.on('receive_encrypted_message', async function(data) {
+    // Skip this handler on admin chat page - it has its own handler
+    if (window.location.pathname.includes('/admin/chat')) {
+        return;
+    }
+    
     console.log('\n' + '='.repeat(80));
     console.log('CHATBOT DEBUG: receive_encrypted_message event received');
     console.log('CHATBOT DEBUG: Data:', data);
@@ -967,8 +960,10 @@ socket.on('connect', function() {
     console.log('CHATBOT DEBUG: Socket ID:', socket.id);
     console.log('='.repeat(80));
     
-    // Load chat history when connected
-    setTimeout(() => loadChatHistory(), 500);
+    // Load chat history when connected (skip on admin chat page)
+    if (!window.location.pathname.includes('/admin/chat')) {
+        setTimeout(() => loadChatHistory(), 500);
+    }
 });
 
 // Handle chat closed by admin

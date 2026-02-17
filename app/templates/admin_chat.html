@@ -733,29 +733,17 @@ async function generateDeterministicKey(sessionId) {
     return key;
 }
 
-// Admin-specific: Generate encryption key using DH key exchange
+// Admin-specific: Generate encryption key - use deterministic shared key for reliability
 async function generateAdminClientKey(sessionId) {
     if (adminEncryptionKeys[sessionId]) {
         return adminEncryptionKeys[sessionId];
     }
     
-    // Send admin's public key to server
-    await sendAdminPublicKeyToServer(sessionId);
-    
-    // Try to get user's public key
-    const userPublicKey = await getAdminPublicKeyFromServer(sessionId);
-    
-    if (userPublicKey) {
-        // Perform DH key exchange
-        return await performDHKeyExchange(sessionId, userPublicKey);
-    } else {
-        // If no user public key yet, use deterministic shared key
-        // This ensures both sides derive the same key even without DH exchange
-        console.log('DEBUG: Admin using deterministic key for session:', sessionId);
-        const key = await generateDeterministicKey(sessionId);
-        adminEncryptionKeys[sessionId] = key;
-        return key;
-    }
+    // Use deterministic shared key - ensures both user and admin derive the same key
+    console.log('DEBUG: Admin using deterministic key for session:', sessionId);
+    const key = await generateDeterministicKey(sessionId);
+    adminEncryptionKeys[sessionId] = key;
+    return key;
 }
 
 // Send message to customer
