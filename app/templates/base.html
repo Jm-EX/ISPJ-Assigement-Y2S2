@@ -871,8 +871,13 @@ socket.on('receive_message', function(data) {
     console.log('='.repeat(80));
 });
 
-// Handle encrypted messages from admin
+// Handle encrypted messages from admin (only for user chat widget, not admin page)
 socket.on('receive_encrypted_message', async function(data) {
+    // Skip this handler on admin chat page - it has its own handler
+    if (window.location.pathname.includes('/admin/chat')) {
+        return;
+    }
+    
     console.log('\n' + '='.repeat(80));
     console.log('CHATBOT DEBUG: receive_encrypted_message event received');
     console.log('CHATBOT DEBUG: Data:', data);
