@@ -14,7 +14,7 @@ import json
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from app.auth_db import save_chat_message, get_chat_history, mark_messages_as_read, store_dh_public_key, get_dh_public_key
+from app.auth_db import save_chat_message, get_chat_history, mark_messages_as_read, store_dh_public_key, get_dh_public_key, get_db
 
 # =========================
 # Setup
