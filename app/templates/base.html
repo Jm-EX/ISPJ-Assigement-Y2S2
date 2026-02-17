@@ -774,8 +774,11 @@ function sendMessage() {
 // Send encrypted message (for human mode)
 async function sendEncryptedMessage(msg) {
     try {
-        // Get session ID for encryption
-        const sessionId = socket.id || 'unknown';
+        // Get persistent session ID for encryption - use email for logged-in users
+        // This ensures messages are grouped by user across page refreshes
+        const userEmail = '{{ session.get("email", "") }}';
+        const sessionId = userEmail || socket.id || 'unknown';
+        console.log('DEBUG: Using persistent session ID for encryption:', sessionId);
         
         // Generate encryption key for this session
         const key = await generateClientKey(sessionId);
@@ -959,10 +962,12 @@ socket.on('status', function(data) {
 
 // Load encrypted chat history on page load
 async function loadChatHistory() {
-    const sessionId = socket.id;
+    // Use persistent session ID - email for logged-in users
+    const userEmail = '{{ session.get("email", "") }}';
+    const sessionId = userEmail || socket.id;
     if (!sessionId) return;
     
-    console.log('CHATBOT DEBUG: Loading chat history for session:', sessionId);
+    console.log('CHATBOT DEBUG: Loading chat history for persistent session:', sessionId);
     
     try {
         const response = await fetch('/api/user-chat-history', {
@@ -980,7 +985,7 @@ async function loadChatHistory() {
         if (data.status === 'success' && data.messages && data.messages.length > 0) {
             console.log('CHATBOT DEBUG: Loaded chat history:', data.messages.length, 'messages');
             
-            // Get encryption key for decryption
+            // Get encryption key for decryption using persistent session ID
             const key = await generateClientKey(sessionId);
             
             for (const msg of data.messages) {
