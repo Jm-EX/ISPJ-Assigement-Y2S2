@@ -547,22 +547,24 @@ async function decryptMessage(encryptedData, key) {
             return null;
         }
         
-        // Check if it's valid base64 (must only contain valid base64 chars)
-        const base64Regex = /^[A-Za-z0-9+/=]+$/;
-        if (!base64Regex.test(encryptedData)) {
-            console.warn('Decryption skipped: not valid base64 format');
-            return null;
-        }
+        // Trim whitespace that might have been added
+        encryptedData = encryptedData.trim();
         
         // Check minimum length (IV 12 + tag 16 + at least 1 byte data = 29 bytes minimum)
         // Base64 encoded 29 bytes = ~40 chars minimum
         if (encryptedData.length < 40) {
-            console.warn('Decryption skipped: data too short');
+            console.warn('Decryption skipped: data too short, length=' + encryptedData.length);
             return null;
         }
         
-        // Convert from base64
-        const combined = new Uint8Array(atob(encryptedData).split('').map(c => c.charCodeAt(0)));
+        // Try to decode - let atob handle validation
+        let combined;
+        try {
+            combined = new Uint8Array(atob(encryptedData).split('').map(c => c.charCodeAt(0)));
+        } catch (atobError) {
+            console.warn('Decryption skipped: invalid base64 encoding');
+            return null;
+        }
         
         // Validate decoded length
         if (combined.length < 29) {
