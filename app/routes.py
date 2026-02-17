@@ -981,26 +981,37 @@ def api_admin_chat_sessions():
         db = get_db()
         cursor = db.cursor()
         
+        # Get unique session IDs first
         cursor.execute("""
-            SELECT DISTINCT ON (session_id) 
-                session_id, username, user_email, message, sender_type, timestamp
-            FROM chat_messages 
+            SELECT DISTINCT session_id FROM chat_messages 
             WHERE room = 'customer_service'
-            ORDER BY session_id, timestamp DESC
         """)
         
-        sessions = cursor.fetchall()
+        session_ids = cursor.fetchall()
         
         result = []
-        for sess in sessions:
-            result.append({
-                'session_id': sess['session_id'],
-                'username': sess['username'],
-                'user_email': sess['user_email'],
-                'last_message': sess['message'],
-                'sender_type': sess['sender_type'],
-                'timestamp': sess['timestamp'].isoformat() if sess['timestamp'] else None
-            })
+        for row in session_ids:
+            sid = row['session_id']
+            
+            # Get latest message for this session
+            cursor.execute("""
+                SELECT session_id, username, user_email, message, sender_type, timestamp
+                FROM chat_messages 
+                WHERE session_id = %s AND room = 'customer_service'
+                ORDER BY timestamp DESC
+                LIMIT 1
+            """, (sid,))
+            
+            latest = cursor.fetchone()
+            if latest:
+                result.append({
+                    'session_id': latest['session_id'],
+                    'username': latest['username'],
+                    'user_email': latest['user_email'],
+                    'last_message': latest['message'],
+                    'sender_type': latest['sender_type'],
+                    'timestamp': latest['timestamp'].isoformat() if latest['timestamp'] else None
+                })
         
         return jsonify({
             'status': 'success',
@@ -1009,6 +1020,8 @@ def api_admin_chat_sessions():
         
     except Exception as e:
         print(f"DEBUG: Error getting admin chat sessions: {e}")
+        import traceback
+        print(f"DEBUG: Traceback: {traceback.format_exc()}")
         return jsonify({'error': str(e)}), 500
 
 
