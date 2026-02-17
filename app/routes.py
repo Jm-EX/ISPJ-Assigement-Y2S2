@@ -233,7 +233,14 @@ def index():
 
 @main.route("/casino/blackjack")
 def blackjack():
-    return render_template("blackjack.html")
+    if not session.get('user_id'):
+        flash('Please log in to play Blackjack.', 'error')
+        return redirect(url_for('auth.login_get'))
+    
+    from app.auth_db import get_user_casino_balance
+    user_id = session.get('user_id')
+    balance = get_user_casino_balance(user_id)
+    return render_template("blackjack.html", balance=balance, user_id=user_id)
 
 @main.route("/book")
 def book_room():
@@ -1145,3 +1152,32 @@ def api_chat_history():
     except Exception as e:
         print(f"DEBUG: Error in chat history API: {e}")
         return jsonify({'error': str(e)}), 500
+
+
+@main.route('/api/casino/balance', methods=['GET'])
+def get_casino_balance():
+    """Get user's casino balance"""
+    if not session.get('user_id'):
+        return jsonify({'error': 'Not logged in'}), 401
+    
+    from app.auth_db import get_user_casino_balance
+    user_id = session.get('user_id')
+    balance = get_user_casino_balance(user_id)
+    return jsonify({'balance': balance})
+
+
+@main.route('/api/casino/balance', methods=['POST'])
+def update_casino_balance():
+    """Update user's casino balance"""
+    if not session.get('user_id'):
+        return jsonify({'error': 'Not logged in'}), 401
+    
+    from app.auth_db import update_user_casino_balance
+    user_id = session.get('user_id')
+    data = request.get_json()
+    new_balance = data.get('balance', 0)
+    
+    if update_user_casino_balance(user_id, new_balance):
+        return jsonify({'success': True, 'balance': new_balance})
+    else:
+        return jsonify({'error': 'Failed to update balance'}), 500
