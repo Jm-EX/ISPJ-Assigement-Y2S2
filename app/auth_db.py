@@ -279,6 +279,9 @@ def save_chat_message(session_id, user_id, username, user_email, message, sender
     db = get_db()
     cursor = db.cursor()
     
+    print(f"DEBUG save_chat_message: session_id={session_id}, username={username}, sender_type={sender_type}, room={room}")
+    print(f"DEBUG save_chat_message: message length={len(message) if message else 0}")
+    
     try:
         cursor.execute("""
             INSERT INTO chat_messages 
@@ -286,13 +289,13 @@ def save_chat_message(session_id, user_id, username, user_email, message, sender
             VALUES (%s, %s, %s, %s, %s, %s, %s)
         """, (session_id, user_id, username, user_email, message, sender_type, room))
         
-        db.commit()  # Commit the transaction to save the message
-        
-        print(f"Chat message saved: {username} ({sender_type}) in {room}")
+        # autocommit is enabled, so no need to call commit()
+        print(f"DEBUG save_chat_message: SUCCESS - Chat message saved: {username} ({sender_type}) in {room}")
         return True
     except Exception as e:
-        print(f"Error saving chat message: {e}")
-        db.rollback()  # Rollback on error
+        print(f"DEBUG save_chat_message: ERROR - {e}")
+        import traceback
+        print(f"DEBUG save_chat_message: Traceback: {traceback.format_exc()}")
         return False
 
 
@@ -389,6 +392,12 @@ def get_all_chat_sessions():
     cursor = db.cursor()
     
     try:
+        # First check if table has any data
+        cursor.execute("SELECT COUNT(*) as count FROM chat_messages")
+        count_result = cursor.fetchone()
+        total_count = count_result['count'] if count_result else 0
+        print(f"DEBUG get_all_chat_sessions: Total messages in chat_messages table: {total_count}")
+        
         # Get unique session IDs
         cursor.execute("""
             SELECT DISTINCT session_id FROM chat_messages 
