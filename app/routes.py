@@ -14,7 +14,7 @@ import json
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from app.auth_db import save_chat_message, get_chat_history, mark_messages_as_read, store_dh_public_key, get_dh_public_key, get_db
+from app.auth_db import save_chat_message, get_chat_history, mark_messages_as_read, store_dh_public_key, get_dh_public_key, get_db, get_all_chat_sessions
 
 # =========================
 # Setup
@@ -977,41 +977,19 @@ def api_admin_chat_sessions():
         return jsonify({'error': 'Unauthorized'}), 401
     
     try:
-        # Get all unique sessions with their latest messages
-        db = get_db()
-        cursor = db.cursor()
+        sessions = get_all_chat_sessions()
         
-        # Get unique session IDs first
-        cursor.execute("""
-            SELECT DISTINCT session_id FROM chat_messages 
-            WHERE room = 'customer_service'
-        """)
-        
-        session_ids = cursor.fetchall()
-        
+        # Convert timestamps to ISO format
         result = []
-        for row in session_ids:
-            sid = row['session_id']
-            
-            # Get latest message for this session
-            cursor.execute("""
-                SELECT session_id, username, user_email, message, sender_type, timestamp
-                FROM chat_messages 
-                WHERE session_id = %s AND room = 'customer_service'
-                ORDER BY timestamp DESC
-                LIMIT 1
-            """, (sid,))
-            
-            latest = cursor.fetchone()
-            if latest:
-                result.append({
-                    'session_id': latest['session_id'],
-                    'username': latest['username'],
-                    'user_email': latest['user_email'],
-                    'last_message': latest['message'],
-                    'sender_type': latest['sender_type'],
-                    'timestamp': latest['timestamp'].isoformat() if latest['timestamp'] else None
-                })
+        for sess in sessions:
+            result.append({
+                'session_id': sess['session_id'],
+                'username': sess['username'],
+                'user_email': sess['user_email'],
+                'last_message': sess['last_message'],
+                'sender_type': sess['sender_type'],
+                'timestamp': sess['timestamp'].isoformat() if sess['timestamp'] else None
+            })
         
         return jsonify({
             'status': 'success',
