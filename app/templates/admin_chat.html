@@ -365,6 +365,63 @@
 let currentCustomer = null;
 let customerChats = {}; // Store chats per customer: { sessionId: { info: {}, messages: [] } }
 
+// Admin-specific DH key storage (separate from user keys in base.html)
+const adminDHKeyPairs = {};
+const adminEncryptionKeys = {};
+const adminSharedSecrets = {};
+
+// Override generateDHKeyPair for admin to use separate cache
+async function generateDHKeyPair(sessionId) {
+    if (adminDHKeyPairs[sessionId]) {
+        return adminDHKeyPairs[sessionId];
+    }
+    
+    // Generate private key (random number)
+    const privateKeyArray = new Uint8Array(32);
+    crypto.getRandomValues(privateKeyArray);
+    const privateKey = BigInt('0x' + Array.from(privateKeyArray).map(b => b.toString(16).padStart(2, '0')).join(''));
+    
+    // Calculate public key: g^privateKey mod p
+    const publicKey = modPow(DH_GENERATOR, privateKey, DH_PRIME);
+    
+    adminDHKeyPairs[sessionId] = {
+        privateKey: privateKey,
+        publicKey: publicKey.toString(16)
+    };
+    
+    console.log('DEBUG: Admin generated DH key pair for session:', sessionId);
+    return adminDHKeyPairs[sessionId];
+}
+
+// Override performDHKeyExchange for admin to use admin cache
+async function performDHKeyExchange(sessionId, otherPublicKeyHex) {
+    const keyPair = await generateDHKeyPair(sessionId);
+    const otherPublicKey = BigInt('0x' + otherPublicKeyHex);
+    
+    // Calculate shared secret: otherPublicKey^privateKey mod p
+    const sharedSecret = modPow(otherPublicKey, keyPair.privateKey, DH_PRIME);
+    
+    // Convert shared secret to bytes and derive AES key
+    const sharedSecretHex = sharedSecret.toString(16).padStart(512, '0');
+    const sharedSecretBytes = new Uint8Array(sharedSecretHex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+    
+    // Use SHA-256 to derive a 256-bit AES key from the shared secret
+    const keyMaterial = await crypto.subtle.digest('SHA-256', sharedSecretBytes);
+    const aesKey = await crypto.subtle.importKey(
+        'raw',
+        keyMaterial,
+        { name: 'AES-GCM' },
+        false,
+        ['encrypt', 'decrypt']
+    );
+    
+    adminSharedSecrets[sessionId] = sharedSecret;
+    adminEncryptionKeys[sessionId] = aesKey;
+    
+    console.log('DEBUG: Admin DH key exchange completed for session:', sessionId);
+    return aesKey;
+}
+
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Admin Chat page loaded');
@@ -653,8 +710,8 @@ async function getAdminPublicKeyFromServer(sessionId) {
 
 // Admin-specific: Generate encryption key using DH key exchange
 async function generateAdminClientKey(sessionId) {
-    if (encryptionKeys[sessionId]) {
-        return encryptionKeys[sessionId];
+    if (adminEncryptionKeys[sessionId]) {
+        return adminEncryptionKeys[sessionId];
     }
     
     // Send admin's public key to server
@@ -682,7 +739,7 @@ async function generateAdminClientKey(sessionId) {
             false,
             ['encrypt', 'decrypt']
         );
-        encryptionKeys[sessionId] = key;
+        adminEncryptionKeys[sessionId] = key;
         return key;
     }
 }
