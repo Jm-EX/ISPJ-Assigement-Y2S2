@@ -358,7 +358,7 @@ def get_active_conversations(hours=24):
                 user_email,
                 room,
                 MAX(timestamp) as last_message_time,
-                SUM(CASE WHEN admin_read = FALSE AND sender_type != 'admin' THEN 1 ELSE 0 END) as unread_count
+                SUM(CASE WHEN admin_read = 0 AND sender_type != 'admin' THEN 1 ELSE 0 END) as unread_count
             FROM chat_messages
             WHERE timestamp >= NOW() - make_interval(hours => %s)
             GROUP BY session_id, user_id, username, user_email, room
@@ -376,7 +376,7 @@ def mark_messages_as_read(session_id=None, room=None):
     db = get_db()
     cursor = db.cursor()
     
-    query = "UPDATE chat_messages SET admin_read = TRUE WHERE admin_read = FALSE"
+    query = "UPDATE chat_messages SET admin_read = 1 WHERE admin_read = 0"
     params = []
     
     if session_id:
