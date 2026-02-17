@@ -285,8 +285,8 @@ def save_chat_message(session_id, user_id, username, user_email, message, sender
     try:
         cursor.execute("""
             INSERT INTO chat_messages 
-            (session_id, user_id, username, user_email, message, sender_type, room)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            (session_id, user_id, username, user_email, message, sender_type, room, timestamp)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, NOW())
         """, (session_id, user_id, username, user_email, message, sender_type, room))
         
         # autocommit is enabled, so no need to call commit()
