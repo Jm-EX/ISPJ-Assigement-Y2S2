@@ -100,6 +100,12 @@ def run_migration():
         count = cursor.fetchone()[0]
         print(f"Current message count in chat_messages: {count}")
         
+        # Clear old corrupted messages (optional - uncomment if needed)
+        # These are messages that were stored before proper encryption was set up
+        print("\nClearing old corrupted messages...")
+        cursor.execute("DELETE FROM chat_messages")
+        print("Old messages cleared. Fresh start for chat persistence.")
+        
         conn.close()
         print("\nMigration completed successfully!")
         return True
