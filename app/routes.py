@@ -444,17 +444,19 @@ def booking_confirmation():
         return redirect(url_for("main.book_room"))
     
     # Save booking to database
-    try:
-        from app.auth_db import create_booking
-        user_id = session.get('user_id')
-        booking_id = create_booking(user_id, booking_data)
-        booking_data['booking_id'] = booking_id
-        booking_data['user_id'] = user_id
-        print(f"DEBUG: Saved booking {booking_id} for user {user_id}")
-    except Exception as e:
-        print(f"ERROR: Failed to save booking: {e}")
+    from app.auth_db import create_booking
+    user_id = session.get('user_id')
+    booking_id = create_booking(user_id, booking_data)
+    
+    if booking_id == -1:
+        # Booking failed to save
         flash("Failed to save booking. Please contact support.", "error")
         return redirect(url_for("main.book_room"))
+        
+    # Booking saved successfully
+    booking_data['booking_id'] = booking_id
+    booking_data['user_id'] = user_id
+    print(f"DEBUG: Saved booking {booking_id} for user {user_id}")
     
     return render_template("booking_confirmation.html", booking=booking_data)
 

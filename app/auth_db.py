@@ -1420,31 +1420,90 @@ def get_room_availability():
 
 def create_booking(user_id: int, booking_data: dict) -> int:
     """Create a new booking and return booking ID"""
+    print("\n" + "="*80)
+    print(f"DEBUG: Creating booking for user_id: {user_id}")
+    print(f"DEBUG: Booking data: {booking_data}")
+    
     db = get_db()
     cursor = db.cursor()
+    
+    # First check if the bookings table exists
     try:
-        # Create bookings table if it doesn't exist
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS bookings (
-                id SERIAL PRIMARY KEY,
-                user_id INTEGER REFERENCES users(id),
-                guest_name VARCHAR(255) NOT NULL,
-                guest_email VARCHAR(255) NOT NULL,
-                guest_phone VARCHAR(50),
-                room_type VARCHAR(100) NOT NULL,
-                check_in_date DATE NOT NULL,
-                check_out_date DATE NOT NULL,
-                num_guests INTEGER DEFAULT 1,
-                total_price DECIMAL(10, 2) NOT NULL,
-                status VARCHAR(50) DEFAULT 'pending',
-                special_requests TEXT,
-                notes TEXT,
-                passport_file VARCHAR(255),
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        """)
+        cursor.execute("""SELECT EXISTS (
+            SELECT FROM information_schema.tables 
+            WHERE table_schema = 'public' AND table_name = 'bookings'
+        )""")
+        table_exists = cursor.fetchone().get('exists', False)
+        print(f"DEBUG: Bookings table exists: {table_exists}")
         
+        if not table_exists:
+            print("DEBUG: Creating bookings table...")
+            cursor.execute("""
+                CREATE TABLE bookings (
+                    id SERIAL PRIMARY KEY,
+                    user_id INTEGER,
+                    guest_name VARCHAR(255) NOT NULL,
+                    guest_email VARCHAR(255) NOT NULL,
+                    guest_phone VARCHAR(50),
+                    room_type VARCHAR(100) NOT NULL,
+                    check_in_date DATE NOT NULL,
+                    check_out_date DATE NOT NULL,
+                    num_guests INTEGER DEFAULT 1,
+                    total_price DECIMAL(10, 2) NOT NULL,
+                    status VARCHAR(50) DEFAULT 'pending',
+                    special_requests TEXT,
+                    notes TEXT,
+                    passport_file VARCHAR(255),
+                    created_at TIMESTAMP DEFAULT NOW(),
+                    updated_at TIMESTAMP DEFAULT NOW()
+                )
+            """)
+            db.commit()
+            print("DEBUG: Bookings table created successfully")
+            
+        # Prepare booking data
+        from datetime import datetime
+        
+        # Get and validate data fields
+        guest_name = booking_data.get('guest_name', '')
+        guest_email = booking_data.get('email', '')
+        guest_phone = booking_data.get('phone', '')
+        room_type = booking_data.get('room_type', 'Standard Room')
+        total_price = booking_data.get('total_price', 0.0)
+        special_requests = booking_data.get('special_requests', '')
+        passport_file = booking_data.get('passport_file', '')
+        
+        # Convert date strings to proper date objects
+        check_in = datetime.now().date()  # Default
+        check_out = datetime.now().date() + timedelta(days=1)  # Default
+        
+        try:
+            if booking_data.get('check_in'):
+                check_in = datetime.strptime(booking_data['check_in'], '%Y-%m-%d').date()
+        except Exception as e:
+            print(f"DEBUG: Error parsing check_in date: {e}, using default")
+            
+        try:
+            if booking_data.get('check_out'):
+                check_out = datetime.strptime(booking_data['check_out'], '%Y-%m-%d').date()
+        except Exception as e:
+            print(f"DEBUG: Error parsing check_out date: {e}, using default")
+        
+        # Use nights as num_guests if num_guests not provided
+        num_guests = int(booking_data.get('nights', 1))
+        
+        # Print prepared values
+        print(f"DEBUG: Prepared data for insertion:")
+        print(f"  user_id: {user_id}")
+        print(f"  guest_name: {guest_name}")
+        print(f"  guest_email: {guest_email}")
+        print(f"  room_type: {room_type}")
+        print(f"  check_in: {check_in}")
+        print(f"  check_out: {check_out}")
+        print(f"  num_guests: {num_guests}")
+        print(f"  total_price: {total_price}")
+        
+        # Insert booking
         cursor.execute("""
             INSERT INTO bookings 
             (user_id, guest_name, guest_email, guest_phone, room_type, 
@@ -1454,28 +1513,34 @@ def create_booking(user_id: int, booking_data: dict) -> int:
             RETURNING id
         """, (
             user_id,
-            booking_data.get('guest_name'),
-            booking_data.get('email'),
-            booking_data.get('phone'),
-            booking_data.get('room_type'),
-            booking_data.get('check_in'),
-            booking_data.get('check_out'),
-            booking_data.get('nights', 1),  # Use nights as num_guests if num_guests not provided
-            booking_data.get('total_price'),
+            guest_name,
+            guest_email,
+            guest_phone,
+            room_type,
+            check_in,
+            check_out,
+            num_guests,
+            total_price,
             'confirmed',  # Payment confirmed via Stripe
-            booking_data.get('special_requests', ''),
+            special_requests,
             '',
-            booking_data.get('passport_file', '')
+            passport_file
         ))
         
         result = cursor.fetchone()
         db.commit()
-        print(f"Created booking {result['id']} for user {user_id}")
-        return result['id']
+        booking_id = result['id']
+        print(f"DEBUG: Created booking {booking_id} for user {user_id}")
+        print("="*80 + "\n")
+        return booking_id
+        
     except Exception as e:
-        print(f"Error creating booking: {e}")
+        import traceback
+        print(f"ERROR: Exception in create_booking: {type(e).__name__}: {str(e)}")
+        print(f"ERROR: Traceback:\n{traceback.format_exc()}")
+        print("="*80 + "\n")
         db.rollback()
-        raise
+        return -1  # Return -1 instead of raising to prevent crashing the app
 
 
 def update_booking(booking_id: int, data: dict) -> bool:
