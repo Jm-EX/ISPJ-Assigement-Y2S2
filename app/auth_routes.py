@@ -57,6 +57,9 @@ from app.auth_db import (
     check_ip_lockout,
     record_failed_login,
     clear_failed_login_attempts,
+    check_username_lockout,
+    record_failed_login_by_username,
+    clear_username_login_attempts,
     get_totp_secret,
     set_totp_secret,
     update_last_login,
@@ -242,49 +245,13 @@ def login_post():
     username = (request.form.get("username") or "").strip()
     password = request.form.get("password") or ""
     
-    # Check IP-based lockout FIRST (before any authentication)
-    ip_address = request.remote_addr
-    is_locked, remaining_seconds, failed_attempts = check_ip_lockout(ip_address)
-    
-    if is_locked:
-        minutes = remaining_seconds // 60
-        seconds = remaining_seconds % 60
-        if minutes > 0:
-            time_msg = f"{minutes} minute{'s' if minutes > 1 else ''} and {seconds} second{'s' if seconds != 1 else ''}"
-        else:
-            time_msg = f"{seconds} second{'s' if seconds != 1 else ''}"
-        
-        flash(f"Too many failed login attempts. Your IP address is temporarily locked. Please try again in {time_msg}.", "error")
-        log_security_event(None, ip_address, 'login_blocked', f'IP lockout - {failed_attempts} failed attempts')
-        return redirect(url_for("auth.login_get"))
-
+    # Get user first to check if username exists
     user = get_user_by_username(username)
     
-    # Check for account lockout if user exists
+    # Check username-based lockout ONLY if username exists in database
     if user:
-        user_agent = request.headers.get('User-Agent', '')
-        user_role = user.get('role')
-        is_locked, remaining_time = check_account_lockout(user["id"], ip_address, user_agent, user_role)
+        is_locked, remaining_seconds, failed_attempts = check_username_lockout(username)
         
-        if is_locked:
-            flash(f"Account temporarily locked due to multiple failed attempts. Please try again in {remaining_time}.", "error")
-            return redirect(url_for("auth.login_get"))
-    
-    if user is None or not check_password_hash(user["password_hash"], password):
-        # Record failed login for IP-based lockout
-        record_failed_login(ip_address)
-        
-        # Check if IP is now locked out after recording this attempt
-        is_locked, remaining_seconds, failed_attempts = check_ip_lockout(ip_address)
-        
-        # Increment failed attempts if user exists (user-based lockout)
-        if user:
-            user_agent = request.headers.get('User-Agent', '')
-            increment_failed_attempts_by_user(user["id"], ip_address, user_agent)
-        
-        log_security_event(None, username, 'login_failed', 'Invalid credentials')
-        
-        # Show lockout message if IP is now locked
         if is_locked:
             minutes = remaining_seconds // 60
             seconds = remaining_seconds % 60
@@ -292,8 +259,36 @@ def login_post():
                 time_msg = f"{minutes} minute{'s' if minutes > 1 else ''} and {seconds} second{'s' if seconds != 1 else ''}"
             else:
                 time_msg = f"{seconds} second{'s' if seconds != 1 else ''}"
-            flash(f"Too many failed login attempts. Your IP address is locked for {time_msg}.", "error")
+            
+            flash(f"Account '{username}' is temporarily locked due to multiple failed login attempts. Please try again in {time_msg}.", "error")
+            log_security_event(user["id"], username, 'login_blocked', f'Username lockout - {failed_attempts} failed attempts')
+            return redirect(url_for("auth.login_get"))
+    
+    # Try to authenticate
+    if user is None or not check_password_hash(user["password_hash"], password):
+        # Record failed login by username ONLY if username exists
+        if user:
+            record_failed_login_by_username(username)
+            
+            # Check if username is now locked out after recording this attempt
+            is_locked, remaining_seconds, failed_attempts = check_username_lockout(username)
+            
+            log_security_event(user["id"], username, 'login_failed', 'Invalid credentials')
+            
+            # Show lockout message if username is now locked
+            if is_locked:
+                minutes = remaining_seconds // 60
+                seconds = remaining_seconds % 60
+                if minutes > 0:
+                    time_msg = f"{minutes} minute{'s' if minutes > 1 else ''} and {seconds} second{'s' if seconds != 1 else ''}"
+                else:
+                    time_msg = f"{seconds} second{'s' if seconds != 1 else ''}"
+                flash(f"Too many failed login attempts for account '{username}'. Account locked for {time_msg}.", "error")
+            else:
+                flash("Invalid username or password.", "error")
         else:
+            # Username doesn't exist - don't track attempts, just show generic error
+            log_security_event(None, username, 'login_failed', 'Invalid credentials - username not found')
             flash("Invalid username or password.", "error")
         
         return redirect(url_for("auth.login_get"))
@@ -531,15 +526,16 @@ def verify_totp_post():
     
     update_last_login(user["id"])
     
-    # Clear IP-based lockout on successful login
-    ip_address = request.remote_addr
-    clear_failed_login_attempts(ip_address)
+    # Clear username-based lockout on successful login
+    clear_username_login_attempts(user["username"])
     
     # Track session with risk scoring - use request.sid (actual Flask session ID)
     session_token = request.sid if hasattr(request, 'sid') else session.get('_id', str(user["id"]))
     print(f"DEBUG: TOTP verify - session_token = {session_token}")
     print(f"DEBUG: TOTP verify - request.sid = {getattr(request, 'sid', 'NOT AVAILABLE')}")
     print(f"DEBUG: TOTP verify - session._id = {session.get('_id')}")
+    
+    ip_address = request.remote_addr
     user_agent = request.headers.get('User-Agent', '')
     total_risk_score = create_or_update_session(user["id"], session_token, ip_address, user_agent)
     
@@ -632,9 +628,8 @@ def verify_otp_post():
     
     update_last_login(user["id"])
     
-    # Clear IP-based lockout on successful login
-    ip_address = request.remote_addr
-    clear_failed_login_attempts(ip_address)
+    # Clear username-based lockout on successful login
+    clear_username_login_attempts(user["username"])
     
     # Track session with risk scoring - use request.sid (actual Flask session ID)
     session_token = request.sid if hasattr(request, 'sid') else session.get('_id', str(user["id"]))
@@ -642,6 +637,7 @@ def verify_otp_post():
     print(f"DEBUG: Regular login - request.sid = {getattr(request, 'sid', 'NOT AVAILABLE')}")
     print(f"DEBUG: Regular login - session._id = {session.get('_id')}")
     
+    ip_address = request.remote_addr
     user_agent = request.headers.get('User-Agent', '')
     total_risk_score = create_or_update_session(user["id"], session_token, ip_address, user_agent)
     

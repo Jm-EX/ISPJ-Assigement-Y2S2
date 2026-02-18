@@ -1528,6 +1528,120 @@ def clear_failed_login_attempts(ip_address: str):
         print(f"Error clearing login attempts: {e}")
 
 
+# =========================
+# Username-Based Login Lockout Functions
+# =========================
+
+def check_username_lockout(username: str) -> tuple:
+    """Check if username is locked out. Returns (is_locked, remaining_seconds, attempts)"""
+    db = get_db()
+    cursor = db.cursor()
+    
+    try:
+        # Create table if not exists
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS username_login_attempts (
+                username VARCHAR(255) PRIMARY KEY,
+                failed_attempts INT NOT NULL DEFAULT 0,
+                lockout_until DATETIME,
+                last_attempt DATETIME NOT NULL
+            )
+        """)
+        db.commit()
+        
+        cursor.execute("""
+            SELECT failed_attempts, lockout_until 
+            FROM username_login_attempts 
+            WHERE username = %s
+        """, (username,))
+        
+        result = cursor.fetchone()
+        
+        if not result:
+            return (False, 0, 0)
+        
+        failed_attempts = result['failed_attempts']
+        lockout_until = result['lockout_until']
+        
+        # Check if currently locked out
+        if lockout_until and datetime.utcnow() < lockout_until:
+            remaining_seconds = int((lockout_until - datetime.utcnow()).total_seconds())
+            return (True, remaining_seconds, failed_attempts)
+        
+        return (False, 0, failed_attempts)
+        
+    except Exception as e:
+        print(f"Error checking username lockout: {e}")
+        return (False, 0, 0)
+
+
+def record_failed_login_by_username(username: str):
+    """Record a failed login attempt by username and apply lockout if needed"""
+    db = get_db()
+    cursor = db.cursor()
+    
+    try:
+        # Get current attempts
+        cursor.execute("""
+            SELECT failed_attempts, lockout_until 
+            FROM username_login_attempts 
+            WHERE username = %s
+        """, (username,))
+        
+        result = cursor.fetchone()
+        
+        if result:
+            failed_attempts = result['failed_attempts']
+            lockout_until = result['lockout_until']
+            
+            # If lockout expired, reset counter
+            if lockout_until and datetime.utcnow() >= lockout_until:
+                failed_attempts = 0
+            
+            failed_attempts += 1
+            
+            # Apply 2-minute lockout after 5 failed attempts
+            if failed_attempts >= 5:
+                lockout_until = datetime.utcnow() + timedelta(minutes=2)
+                cursor.execute("""
+                    UPDATE username_login_attempts 
+                    SET failed_attempts = %s, lockout_until = %s, last_attempt = %s
+                    WHERE username = %s
+                """, (failed_attempts, lockout_until, datetime.utcnow(), username))
+            else:
+                cursor.execute("""
+                    UPDATE username_login_attempts 
+                    SET failed_attempts = %s, last_attempt = %s
+                    WHERE username = %s
+                """, (failed_attempts, datetime.utcnow(), username))
+        else:
+            # First failed attempt for this username
+            cursor.execute("""
+                INSERT INTO username_login_attempts (username, failed_attempts, last_attempt)
+                VALUES (%s, 1, %s)
+            """, (username, datetime.utcnow()))
+        
+        db.commit()
+        
+    except Exception as e:
+        print(f"Error recording failed login by username: {e}")
+
+
+def clear_username_login_attempts(username: str):
+    """Clear failed login attempts for username after successful login"""
+    db = get_db()
+    cursor = db.cursor()
+    
+    try:
+        cursor.execute("""
+            DELETE FROM username_login_attempts WHERE username = %s
+        """, (username,))
+        db.commit()
+        
+    except Exception as e:
+        print(f"Error clearing username login attempts: {e}")
+
+
 def update_user_casino_balance(user_id: int, new_balance: int) -> bool:
     """Update user's casino balance"""
     try:
