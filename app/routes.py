@@ -246,6 +246,9 @@ def blackjack():
 
 @main.route("/book")
 def book_room():
+    if not session.get('user_id'):
+        flash('Please log in to book a room.', 'error')
+        return redirect(url_for('auth.login_get'))
     return render_template("book_room.html")
 
 @main.route("/other")
@@ -267,6 +270,11 @@ def allowed_file(filename):
 
 @main.route("/book/<room_type>", methods=["GET", "POST"])
 def book_room_confirm(room_type):
+    # Check if user is logged in
+    if not session.get('user_id'):
+        flash('Please log in to book a room.', 'error')
+        return redirect(url_for('auth.login_get'))
+    
     if request.method == "POST":
         check_in = request.form.get("check_in")
         check_out = request.form.get("check_out")
@@ -425,10 +433,29 @@ def create_checkout_session():
 
 @main.route("/booking/confirmation")
 def booking_confirmation():
+    # Check if user is logged in
+    if not session.get('user_id'):
+        flash('Please log in to complete your booking.', 'error')
+        return redirect(url_for('auth.login_get'))
+    
     booking_data = session.get("booking_data")
     if not booking_data:
         flash("No booking found", "error")
         return redirect(url_for("main.book_room"))
+    
+    # Save booking to database
+    try:
+        from app.auth_db import create_booking
+        user_id = session.get('user_id')
+        booking_id = create_booking(user_id, booking_data)
+        booking_data['booking_id'] = booking_id
+        booking_data['user_id'] = user_id
+        print(f"DEBUG: Saved booking {booking_id} for user {user_id}")
+    except Exception as e:
+        print(f"ERROR: Failed to save booking: {e}")
+        flash("Failed to save booking. Please contact support.", "error")
+        return redirect(url_for("main.book_room"))
+    
     return render_template("booking_confirmation.html", booking=booking_data)
 
 
