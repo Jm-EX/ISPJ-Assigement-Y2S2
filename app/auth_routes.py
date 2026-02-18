@@ -673,7 +673,10 @@ def logout():
     username = session.get("username")
     
     if user_id and username:
-        log_security_event(user_id, username, 'logout', 'User initiated logout')
+        try:
+            log_security_event(user_id, username, 'logout', 'User initiated logout')
+        except Exception as e:
+            print(f"Error logging security event during logout: {e}")
     
     session.clear()
     return redirect(url_for("main.index"))
