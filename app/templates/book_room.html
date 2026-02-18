@@ -68,13 +68,15 @@
               <span>{{ info.size }}</span>
             </div>
             <div class="room-footer">
-              <p class="price">From <span>${{ info.price }}</span> / night</p>
-              {% if room.available_count > 0 %}
-              <a href="{{ url_for('main.book_room_confirm', room_type=room.room_type) }}" class="book-now">BOOK NOW</a>
-              <p style="font-size: 12px; color: #666; margin-top: 8px;">{{ room.available_count }} rooms available</p>
-              {% else %}
-              <button class="book-now" style="background-color: #6c757d; cursor: not-allowed;" disabled>SOLD OUT</button>
-              {% endif %}
+              <div style="display: flex; flex-direction: column; gap: 8px; width: 100%;">
+                <p class="price" style="margin: 0;">From <span>${{ info.price }}</span> / night</p>
+                {% if room.available_count > 0 %}
+                <p style="font-size: 12px; color: #666; margin: 0;">{{ room.available_count }} rooms available</p>
+                <a href="{{ url_for('main.book_room_confirm', room_type=room.room_type) }}" class="book-now">BOOK NOW</a>
+                {% else %}
+                <button class="book-now" style="background-color: #6c757d; cursor: not-allowed;" disabled>SOLD OUT</button>
+                {% endif %}
+              </div>
             </div>
           </div>
         </article>
