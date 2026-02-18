@@ -585,6 +585,56 @@ def seed_admin(app):
         conn.close()
 
 
+def seed_rooms(app):
+    """Populate rooms table with available room types from the website"""
+    # Check if DATABASE_URL is provided (Render PostgreSQL)
+    database_url = os.environ.get("DATABASE_URL")
+    if database_url:
+        conn = psycopg.connect(database_url, row_factory=dict_row)
+        conn.autocommit = True
+    else:
+        conn = psycopg.connect(
+            host=app.config["MYSQL_HOST"],
+            port=app.config["MYSQL_PORT"],
+            user=app.config["MYSQL_USER"],
+            password=app.config["MYSQL_PASSWORD"],
+            dbname=app.config["MYSQL_DATABASE"],
+            row_factory=dict_row
+        )
+        conn.autocommit = True
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT COUNT(*) as count FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'rooms'"
+        )
+        if cursor.fetchone()["count"] == 0:
+            return
+        
+        # Room types from the website
+        rooms = [
+            {"room_type": "Luxury Suite", "total_count": 10, "price": 299.00},
+            {"room_type": "Deluxe Room", "total_count": 10, "price": 229.00},
+            {"room_type": "Executive Suite", "total_count": 10, "price": 399.00}
+        ]
+        
+        for room in rooms:
+            cursor.execute(
+                "SELECT id FROM rooms WHERE room_type = %s", (room["room_type"],)
+            )
+            existing = cursor.fetchone()
+            if existing is None:
+                cursor.execute(
+                    """
+                    INSERT INTO rooms (room_type, total_count, available_count, occupied_count, cleaning_count, maintenance_count, price_per_night, updated_at)
+                    VALUES (%s, %s, %s, 0, 0, 0, %s, %s)
+                    """,
+                    (room["room_type"], room["total_count"], room["total_count"], room["price"], datetime.utcnow())
+                )
+                print(f"Seeded room: {room['room_type']} with {room['total_count']} available")
+    finally:
+        conn.close()
+
+
 def get_user_by_username(username: str):
     db = get_db()
     cursor = db.cursor()
@@ -864,6 +914,9 @@ def delete_user(user_id: int):
         
         cursor.execute("DELETE FROM active_sessions WHERE user_id = %s", (user_id,))
         print(f"DEBUG: Deleted {cursor.rowcount} active_sessions")
+        
+        cursor.execute("DELETE FROM chat_messages WHERE user_id = %s", (user_id,))
+        print(f"DEBUG: Deleted {cursor.rowcount} chat_messages")
         
         # Note: We keep security_logs for audit trail - just set user_id to NULL
         cursor.execute("UPDATE security_logs SET user_id = NULL WHERE user_id = %s", (user_id,))
