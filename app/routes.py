@@ -1181,3 +1181,86 @@ def update_casino_balance():
         return jsonify({'success': True, 'balance': new_balance})
     else:
         return jsonify({'error': 'Failed to update balance'}), 500
+
+
+@main.route('/api/casino/create-checkout', methods=['POST'])
+def create_checkout():
+    """Create Stripe checkout session for chip purchase"""
+    if not session.get('user_id'):
+        return jsonify({'error': 'Not logged in'}), 401
+    
+    import stripe
+    import os
+    
+    stripe.api_key = os.environ.get('STRIPE_SECRET_KEY', 'sk_test_51QqhM8LcCPi1sFZ6p0rCWQiH0rCw5uHWKcPPV0b1234567890')
+    
+    try:
+        data = request.get_json()
+        chip_amount = data.get('amount', 0)
+        price_usd = data.get('price', 0)
+        user_id = session.get('user_id')
+        
+        # Create Stripe checkout session
+        checkout_session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items=[{
+                'price_data': {
+                    'currency': 'usd',
+                    'product_data': {
+                        'name': f'${chip_amount} Casino Chips',
+                        'description': f'Add ${chip_amount} to your casino balance',
+                    },
+                    'unit_amount': int(price_usd * 100),  # Stripe uses cents
+                },
+                'quantity': 1,
+            }],
+            mode='payment',
+            success_url=request.host_url + 'casino/purchase-success?session_id={CHECKOUT_SESSION_ID}&amount=' + str(chip_amount),
+            cancel_url=request.host_url + 'casino/blackjack?canceled=true',
+            client_reference_id=str(user_id),
+            metadata={
+                'user_id': str(user_id),
+                'chip_amount': str(chip_amount)
+            }
+        )
+        
+        return jsonify({'url': checkout_session.url})
+    
+    except Exception as e:
+        print(f"Stripe error: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+@main.route('/casino/purchase-success')
+def purchase_success():
+    """Handle successful chip purchase"""
+    if not session.get('user_id'):
+        return redirect(url_for('auth.login_get'))
+    
+    import stripe
+    import os
+    
+    stripe.api_key = os.environ.get('STRIPE_SECRET_KEY', 'sk_test_51QqhM8LcCPi1sFZ6p0rCWQiH0rCw5uHWKcPPV0b1234567890')
+    
+    session_id = request.args.get('session_id')
+    chip_amount = int(request.args.get('amount', 0))
+    
+    try:
+        # Verify the session with Stripe
+        checkout_session = stripe.checkout.Session.retrieve(session_id)
+        
+        if checkout_session.payment_status == 'paid':
+            # Add chips to user balance
+            from app.auth_db import get_user_casino_balance, update_user_casino_balance
+            user_id = session.get('user_id')
+            current_balance = get_user_casino_balance(user_id)
+            new_balance = current_balance + chip_amount
+            update_user_casino_balance(user_id, new_balance)
+            
+            flash(f'Successfully purchased ${chip_amount} chips!', 'success')
+        
+    except Exception as e:
+        print(f"Error processing purchase: {e}")
+        flash('Error processing purchase', 'error')
+    
+    return redirect(url_for('main.blackjack'))
