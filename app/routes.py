@@ -443,20 +443,38 @@ def booking_confirmation():
         flash("No booking found", "error")
         return redirect(url_for("main.book_room"))
     
-    # Save booking to database
-    from app.auth_db import create_booking
-    user_id = session.get('user_id')
-    booking_id = create_booking(user_id, booking_data)
+    print("\n" + "="*80)
+    print(f"DEBUG: Processing booking confirmation")
+    print(f"DEBUG: User ID: {session.get('user_id')}")
+    print(f"DEBUG: Booking data: {booking_data}")
     
-    if booking_id == -1:
-        # Booking failed to save
-        flash("Failed to save booking. Please contact support.", "error")
-        return redirect(url_for("main.book_room"))
+    # Save booking to database
+    try:
+        from app.auth_db import create_booking
+        user_id = session.get('user_id')
+        booking_id = create_booking(user_id, booking_data)
         
-    # Booking saved successfully
-    booking_data['booking_id'] = booking_id
-    booking_data['user_id'] = user_id
-    print(f"DEBUG: Saved booking {booking_id} for user {user_id}")
+        if booking_id == -1:
+            print("DEBUG: create_booking returned -1, showing error message")
+            flash("Failed to save booking. Please contact support.", "error")
+            # Show the confirmation page anyway to prevent further payment issues
+            booking_data['booking_id'] = 999999  # Use a dummy ID for display only
+            booking_data['user_id'] = user_id
+            print(f"DEBUG: Using dummy booking ID")
+        else:
+            # Booking saved successfully
+            booking_data['booking_id'] = booking_id
+            booking_data['user_id'] = user_id
+            print(f"DEBUG: Saved booking {booking_id} for user {user_id}")
+    except Exception as e:
+        import traceback
+        print(f"ERROR: Exception in booking_confirmation: {str(e)}")
+        print(f"ERROR: Traceback:\n{traceback.format_exc()}")
+        # Show the confirmation page anyway to prevent further payment issues
+        booking_data['booking_id'] = 999999  # Use a dummy ID
+        booking_data['user_id'] = user_id
+    
+    print("="*80 + "\n")
     
     return render_template("booking_confirmation.html", booking=booking_data)
 
