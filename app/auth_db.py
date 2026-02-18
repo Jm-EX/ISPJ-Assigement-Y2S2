@@ -1458,7 +1458,7 @@ def create_booking(user_id: int, booking_data: dict) -> int:
                     updated_at TIMESTAMP DEFAULT NOW()
                 )
             """)
-            db.commit()
+            # Note: db.commit() not needed since autocommit is enabled
             print("DEBUG: Bookings table created successfully")
             
         # Prepare booking data
@@ -1538,6 +1538,7 @@ def create_booking(user_id: int, booking_data: dict) -> int:
         print(f"  total_price: {total_price}")
         
         # Insert booking
+        print(f"DEBUG: Executing INSERT query...")
         cursor.execute("""
             INSERT INTO bookings 
             (user_id, guest_name, guest_email, guest_phone, room_type, 
@@ -1561,10 +1562,15 @@ def create_booking(user_id: int, booking_data: dict) -> int:
             passport_file
         ))
         
+        print(f"DEBUG: INSERT executed, fetching result...")
         result = cursor.fetchone()
-        db.commit()
+        
+        if result is None:
+            print(f"ERROR: INSERT did not return a result")
+            return -1
+            
         booking_id = result['id']
-        print(f"DEBUG: Created booking {booking_id} for user {user_id}")
+        print(f"DEBUG: Successfully created booking {booking_id} for user {user_id}")
         print("="*80 + "\n")
         return booking_id
         
@@ -1573,7 +1579,7 @@ def create_booking(user_id: int, booking_data: dict) -> int:
         print(f"ERROR: Exception in create_booking: {type(e).__name__}: {str(e)}")
         print(f"ERROR: Traceback:\n{traceback.format_exc()}")
         print("="*80 + "\n")
-        db.rollback()
+        # Note: db.rollback() not needed since autocommit is enabled
         return -1  # Return -1 instead of raising to prevent crashing the app
 
 
