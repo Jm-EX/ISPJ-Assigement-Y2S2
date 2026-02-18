@@ -1467,8 +1467,8 @@ def create_booking(user_id: int, booking_data: dict) -> int:
                 'special_requests': 'TEXT',
                 'notes': 'TEXT',
                 'passport_file': 'VARCHAR(255)',
-                'created_at': 'TIMESTAMP DEFAULT NOW()',
-                'updated_at': 'TIMESTAMP DEFAULT NOW()'
+                'created_at': 'TIMESTAMP',
+                'updated_at': 'TIMESTAMP'
             }
             
             # Get existing columns
@@ -1483,9 +1483,30 @@ def create_booking(user_id: int, booking_data: dict) -> int:
             # Add missing columns
             for col_name, col_type in required_columns.items():
                 if col_name not in existing_columns:
-                    print(f"CREATE_BOOKING: Adding missing column '{col_name}'...")
+                    print(f"CREATE_BOOKING: Adding missing column '{col_name}'...", flush=True)
+                    sys.stdout.flush()
                     cursor.execute(f"ALTER TABLE bookings ADD COLUMN {col_name} {col_type}")
-                    print(f"CREATE_BOOKING: Column '{col_name}' added successfully")
+                    print(f"CREATE_BOOKING: Column '{col_name}' added successfully", flush=True)
+                    sys.stdout.flush()
+            
+            # Check if created_at and updated_at have NOT NULL constraints and remove them
+            print("CREATE_BOOKING: Checking timestamp column constraints...", flush=True)
+            sys.stdout.flush()
+            cursor.execute("""
+                SELECT column_name, is_nullable 
+                FROM information_schema.columns 
+                WHERE table_schema = 'public' 
+                AND table_name = 'bookings' 
+                AND column_name IN ('created_at', 'updated_at')
+            """)
+            timestamp_cols = cursor.fetchall()
+            for col in timestamp_cols:
+                if col['is_nullable'] == 'NO':
+                    print(f"CREATE_BOOKING: Removing NOT NULL constraint from {col['column_name']}...", flush=True)
+                    sys.stdout.flush()
+                    cursor.execute(f"ALTER TABLE bookings ALTER COLUMN {col['column_name']} DROP NOT NULL")
+                    print(f"CREATE_BOOKING: NOT NULL constraint removed from {col['column_name']}", flush=True)
+                    sys.stdout.flush()
         
         if not table_exists:
             cursor.execute("""
@@ -1635,8 +1656,8 @@ def create_booking(user_id: int, booking_data: dict) -> int:
                 INSERT INTO bookings 
                 (user_id, guest_name, guest_email, guest_phone, room_type, 
                  check_in_date, check_out_date, num_guests, total_price, 
-                 status, special_requests, notes, passport_file)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                 status, special_requests, notes, passport_file, created_at, updated_at)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
                 RETURNING id
             """, (
                 user_id,
