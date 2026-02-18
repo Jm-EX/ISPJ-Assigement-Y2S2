@@ -1635,8 +1635,8 @@ def create_booking(user_id: int, booking_data: dict) -> int:
                 INSERT INTO bookings 
                 (user_id, guest_name, guest_email, guest_phone, room_type, 
                  check_in_date, check_out_date, num_guests, total_price, 
-                 status, special_requests, notes, passport_file)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                 status, special_requests, notes, passport_file, created_at, updated_at)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
                 RETURNING id
             """, (
                 user_id,
