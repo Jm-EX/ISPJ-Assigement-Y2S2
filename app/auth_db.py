@@ -1447,6 +1447,22 @@ def create_booking(user_id: int, booking_data: dict) -> int:
         
         if not table_exists:
             print("CREATE_BOOKING: Creating bookings table...")
+        else:
+            # Table exists - check if user_id column exists and add it if missing
+            print("CREATE_BOOKING: Checking if user_id column exists...")
+            cursor.execute("""
+                SELECT column_name FROM information_schema.columns 
+                WHERE table_schema = 'public' AND table_name = 'bookings' AND column_name = 'user_id'
+            """)
+            user_id_exists = cursor.fetchone() is not None
+            print(f"CREATE_BOOKING: user_id column exists: {user_id_exists}")
+            
+            if not user_id_exists:
+                print("CREATE_BOOKING: Adding user_id column to bookings table...")
+                cursor.execute("ALTER TABLE bookings ADD COLUMN user_id INTEGER")
+                print("CREATE_BOOKING: user_id column added successfully")
+        
+        if not table_exists:
             cursor.execute("""
                 CREATE TABLE bookings (
                     id SERIAL PRIMARY KEY,
