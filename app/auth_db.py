@@ -1460,7 +1460,7 @@ def create_booking(user_id: int, booking_data: dict) -> int:
             booking_data.get('room_type'),
             booking_data.get('check_in'),
             booking_data.get('check_out'),
-            booking_data.get('num_guests', 1),
+            booking_data.get('nights', 1),  # Use nights as num_guests if num_guests not provided
             booking_data.get('total_price'),
             'confirmed',  # Payment confirmed via Stripe
             booking_data.get('special_requests', ''),
