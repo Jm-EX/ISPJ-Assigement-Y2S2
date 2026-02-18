@@ -52,7 +52,7 @@ from app.auth_db import (
     log_security_event,
     check_account_lockout,
     increment_failed_attempts_by_user,
-    save_dh_public_key,
+    store_dh_public_key,
     get_dh_public_key,
     check_ip_lockout,
     record_failed_login,
