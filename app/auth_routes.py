@@ -33,25 +33,28 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from app import mail, limiter
 from app.auth_db import (
     create_otp_challenge,
-    create_passkey_credential,
-    create_password_reset_token,
     create_user,
-    delete_otp_challenge,
-    delete_passkey_credential,
-    delete_password_reset_token,
     get_otp_challenge,
-    get_passkey_by_credential_id,
     get_passkey_credentials,
-    get_password_reset_token,
     get_user_by_email,
     get_user_by_id,
     get_user_by_username,
-    increment_otp_attempts,
-    update_passkey_sign_count,
-    update_user_password,
+    store_passkey_credential,
+    mark_passkey_challenge_used,
+    create_password_reset_token,
+    get_password_reset_token,
+    delete_password_reset_token,
+    update_password,
+    delete_passkey_credential,
     log_security_event,
-    set_totp_secret,
-    get_totp_secret,
+    check_account_lockout,
+    increment_failed_attempts_by_user,
+    reset_failed_attempts,
+    save_dh_public_key,
+    get_dh_public_key,
+    check_ip_lockout,
+    record_failed_login,
+    clear_failed_login_attempts
 )
 
 
@@ -231,15 +234,29 @@ def login_get():
 def login_post():
     username = (request.form.get("username") or "").strip()
     password = request.form.get("password") or ""
+    
+    # Check IP-based lockout FIRST (before any authentication)
+    ip_address = request.remote_addr
+    is_locked, remaining_seconds, failed_attempts = check_ip_lockout(ip_address)
+    
+    if is_locked:
+        minutes = remaining_seconds // 60
+        seconds = remaining_seconds % 60
+        if minutes > 0:
+            time_msg = f"{minutes} minute{'s' if minutes > 1 else ''} and {seconds} second{'s' if seconds != 1 else ''}"
+        else:
+            time_msg = f"{seconds} second{'s' if seconds != 1 else ''}"
+        
+        flash(f"Too many failed login attempts. Your IP address is temporarily locked. Please try again in {time_msg}.", "error")
+        log_security_event(None, ip_address, 'login_blocked', f'IP lockout - {failed_attempts} failed attempts')
+        return redirect(url_for("auth.login_get"))
 
     user = get_user_by_username(username)
     
     # Check for account lockout if user exists
     if user:
-        from app.auth_db import check_account_lockout
-        ip_address = request.remote_addr
         user_agent = request.headers.get('User-Agent', '')
-        user_role = user.get('role')  # Get user role for threshold determination
+        user_role = user.get('role')
         is_locked, remaining_time = check_account_lockout(user["id"], ip_address, user_agent, user_role)
         
         if is_locked:
@@ -247,10 +264,11 @@ def login_post():
             return redirect(url_for("auth.login_get"))
     
     if user is None or not check_password_hash(user["password_hash"], password):
-        # Increment failed attempts if user exists
+        # Record failed login for IP-based lockout
+        record_failed_login(ip_address)
+        
+        # Increment failed attempts if user exists (user-based lockout)
         if user:
-            from app.auth_db import increment_failed_attempts_by_user
-            ip_address = request.remote_addr
             user_agent = request.headers.get('User-Agent', '')
             increment_failed_attempts_by_user(user["id"], ip_address, user_agent)
         
@@ -492,13 +510,15 @@ def verify_totp_post():
     from app.auth_db import update_last_login, create_or_update_session, send_high_risk_alert
     update_last_login(user["id"])
     
+    # Clear IP-based lockout on successful login
+    ip_address = request.remote_addr
+    clear_failed_login_attempts(ip_address)
+    
     # Track session with risk scoring - use request.sid (actual Flask session ID)
     session_token = request.sid if hasattr(request, 'sid') else session.get('_id', str(user["id"]))
     print(f"DEBUG: TOTP verify - session_token = {session_token}")
     print(f"DEBUG: TOTP verify - request.sid = {getattr(request, 'sid', 'NOT AVAILABLE')}")
     print(f"DEBUG: TOTP verify - session._id = {session.get('_id')}")
-    
-    ip_address = request.remote_addr
     user_agent = request.headers.get('User-Agent', '')
     total_risk_score = create_or_update_session(user["id"], session_token, ip_address, user_agent)
     
@@ -592,13 +612,16 @@ def verify_otp_post():
     from app.auth_db import update_last_login, create_or_update_session, send_high_risk_alert
     update_last_login(user["id"])
     
+    # Clear IP-based lockout on successful login
+    ip_address = request.remote_addr
+    clear_failed_login_attempts(ip_address)
+    
     # Track session with risk scoring - use request.sid (actual Flask session ID)
     session_token = request.sid if hasattr(request, 'sid') else session.get('_id', str(user["id"]))
     print(f"DEBUG: Regular login - session_token = {session_token}")
     print(f"DEBUG: Regular login - request.sid = {getattr(request, 'sid', 'NOT AVAILABLE')}")
     print(f"DEBUG: Regular login - session._id = {session.get('_id')}")
     
-    ip_address = request.remote_addr
     user_agent = request.headers.get('User-Agent', '')
     total_risk_score = create_or_update_session(user["id"], session_token, ip_address, user_agent)
     
