@@ -40,68 +40,46 @@
       <button class="filter-btn" data-category="luxury">Luxury</button>
     </div>
     <div class="room-grid">
-      <!-- Room 1 -->
-      <article class="room-card" data-category="luxury">
-        <div class="room-image">
-          <img src="{{ url_for('static', filename='images/luxury-suite.jpg') }}" alt="Luxury Suite">
-          <!-- Photo by Engin Akyurt: https://www.pexels.com/photo/modern-style-bedroom-2725675/ -->
-          <div class="room-badge">BEST VALUE</div>
-        </div>
-        <div class="room-details">
-          <h3>Luxury Suite</h3>
-          <p class="room-description">Elegant suite with panoramic city views, separate living area, and premium amenities.</p>
-          <div class="room-features">
-            <span>2 Guests</span>
-            <span>1 King Bed</span>
-            <span>55 m²</span>
+      {% set room_data = {
+        'Luxury Suite': {'category': 'luxury', 'image': 'luxury-suite.jpg', 'badge': 'BEST VALUE', 'description': 'Elegant suite with panoramic city views, separate living area, and premium amenities.', 'guests': '2 Guests', 'bed': '1 King Bed', 'size': '55 m²', 'price': 299},
+        'Deluxe Room': {'category': 'premium', 'image': 'deluxe-room.jpg', 'badge': '', 'description': 'Spacious room with modern amenities and stunning city or garden views.', 'guests': '2 Guests', 'bed': '1 King or 2 Queens', 'size': '42 m²', 'price': 229},
+        'Executive Suite': {'category': 'suite', 'image': 'executive-suite.jpg', 'badge': 'POPULAR', 'description': 'Luxurious suite with separate living area, work desk, and premium amenities.', 'guests': '2-4 Guests', 'bed': '1 King Bed + Sofa Bed', 'size': '65 m²', 'price': 399}
+      } %}
+      
+      {% for room in rooms %}
+        {% set info = room_data.get(room.room_type, {}) %}
+        {% if info %}
+        <article class="room-card" data-category="{{ info.category }}">
+          <div class="room-image">
+            <img src="{{ url_for('static', filename='images/' + info.image) }}" alt="{{ room.room_type }}">
+            {% if info.badge %}
+            <div class="room-badge">{{ info.badge }}</div>
+            {% endif %}
+            {% if room.available_count == 0 %}
+            <div class="room-badge" style="background-color: #dc3545;">SOLD OUT</div>
+            {% endif %}
           </div>
-          <div class="room-footer">
-            <p class="price">From <span>$299</span> / night</p>
-            <a href="{{ url_for('main.book_room_confirm', room_type='Luxury Suite') }}" class="book-now">BOOK NOW</a>
+          <div class="room-details">
+            <h3>{{ room.room_type }}</h3>
+            <p class="room-description">{{ info.description }}</p>
+            <div class="room-features">
+              <span>{{ info.guests }}</span>
+              <span>{{ info.bed }}</span>
+              <span>{{ info.size }}</span>
+            </div>
+            <div class="room-footer">
+              <p class="price">From <span>${{ info.price }}</span> / night</p>
+              {% if room.available_count > 0 %}
+              <a href="{{ url_for('main.book_room_confirm', room_type=room.room_type) }}" class="book-now">BOOK NOW</a>
+              <p style="font-size: 12px; color: #666; margin-top: 8px;">{{ room.available_count }} rooms available</p>
+              {% else %}
+              <button class="book-now" style="background-color: #6c757d; cursor: not-allowed;" disabled>SOLD OUT</button>
+              {% endif %}
+            </div>
           </div>
-        </div>
-      </article>
-      <!-- Room 2 -->
-      <article class="room-card" data-category="premium">
-        <div class="room-image">
-          <img src="{{ url_for('static', filename='images/deluxe-room.jpg') }}" alt="Deluxe Room">
-          <!-- Photo by cottonbro studio: https://www.pexels.com/photo/interior-design-of-a-hotel-room-5379175/ -->
-        </div>
-        <div class="room-details">
-          <h3>Deluxe Room</h3>
-          <p class="room-description">Spacious room with modern amenities and stunning city or garden views.</p>
-          <div class="room-features">
-            <span>2 Guests</span>
-            <span>1 King or 2 Queens</span>
-            <span>42 m²</span>
-          </div>
-          <div class="room-footer">
-            <p class="price">From <span>$229</span> / night</p>
-            <a href="{{ url_for('main.book_room_confirm', room_type='Deluxe Room') }}" class="book-now">BOOK NOW</a>
-          </div>
-        </div>
-      </article>
-      <!-- Room 3 -->
-      <article class="room-card" data-category="suite">
-        <div class="room-image">
-          <img src="{{ url_for('static', filename='images/executive-suite.jpg') }}" alt="Executive Suite">
-          <!-- Photo by Tobi: https://www.pexels.com/photo/a-room-with-view-of-mountains-2346091/ -->
-          <div class="room-badge">POPULAR</div>
-        </div>
-        <div class="room-details">
-          <h3>Executive Suite</h3>
-          <p class="room-description">Luxurious suite with separate living area, work desk, and premium amenities.</p>
-          <div class="room-features">
-            <span>2-4 Guests</span>
-            <span>1 King Bed + Sofa Bed</span>
-            <span>65 m²</span>
-          </div>
-          <div class="room-footer">
-            <p class="price">From <span>$399</span> / night</p>
-            <a href="{{ url_for('main.book_room_confirm', room_type='Executive Suite') }}" class="book-now">BOOK NOW</a>
-          </div>
-        </div>
-      </article>
+        </article>
+        {% endif %}
+      {% endfor %}
     </div>
   </section>
   <section class="hotel-features">

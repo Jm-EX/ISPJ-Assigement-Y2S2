@@ -249,7 +249,12 @@ def book_room():
     if not session.get('user_id'):
         flash('Please log in to book a room.', 'error')
         return redirect(url_for('auth.login_get'))
-    return render_template("book_room.html")
+    
+    # Get room availability from database
+    from app.auth_db import get_room_availability
+    rooms = get_room_availability()
+    
+    return render_template("book_room.html", rooms=rooms)
 
 @main.route("/other")
 def others():
@@ -282,6 +287,19 @@ def book_room_confirm(room_type):
         print("BOOKING FLOW: User not logged in, redirecting to login")
         flash('Please log in to book a room.', 'error')
         return redirect(url_for('auth.login_get'))
+    
+    # Check room availability
+    from app.auth_db import get_room_availability
+    rooms = get_room_availability()
+    room_available = None
+    for room in rooms:
+        if room['room_type'] == room_type:
+            room_available = room
+            break
+    
+    if room_available and room_available['available_count'] <= 0:
+        flash(f'{room_type} is currently sold out. Please choose another room type.', 'error')
+        return redirect(url_for('main.book_room'))
     
     if request.method == "POST":
         print("\n" + "="*80)
