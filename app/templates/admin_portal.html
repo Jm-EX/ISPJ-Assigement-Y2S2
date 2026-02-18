@@ -1455,5 +1455,49 @@ function updateUnreadCount() {
   // This would be updated with real data from the database
   console.log('Updating unread count...');
 }
+
+// =========================
+// Sub-Admin Creation
+// =========================
+
+document.getElementById('subAdminForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  
+  const username = document.getElementById('subAdminUsername').value;
+  const email = document.getElementById('subAdminEmail').value;
+  const password = document.getElementById('subAdminPassword').value;
+  
+  const permissions = {
+    view_bookings: document.getElementById('perm_view_bookings').checked,
+    modify_bookings: document.getElementById('perm_modify_bookings').checked,
+    view_guest_profiles: document.getElementById('perm_view_guest_profiles').checked,
+    add_guest_notes: document.getElementById('perm_add_guest_notes').checked,
+    update_room_status: document.getElementById('perm_update_room_status').checked,
+    delete_user: document.getElementById('perm_delete_user').checked,
+    view_active_sessions: document.getElementById('perm_view_active_sessions').checked
+  };
+  
+  try {
+    const response = await fetch('/admin/create-sub-admin', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ username, email, password, permissions })
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      alert('Sub-admin created successfully!');
+      document.getElementById('subAdminForm').reset();
+      window.location.reload();
+    } else {
+      alert('Error: ' + (result.error || 'Failed to create sub-admin'));
+    }
+  } catch (error) {
+    alert('Error creating sub-admin: ' + error.message);
+  }
+});
 </script>
 {% endblock %}
