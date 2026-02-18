@@ -1512,7 +1512,8 @@ def create_booking(user_id: int, booking_data: dict) -> int:
             print("CREATE_BOOKING: Bookings table created successfully")
             
         # Prepare booking data
-        print("\nCREATE_BOOKING: Preparing booking data...")
+        print("\nCREATE_BOOKING: Preparing booking data...", flush=True)
+        sys.stdout.flush()
         from datetime import datetime
         
         # Get and validate data fields
@@ -1523,33 +1524,39 @@ def create_booking(user_id: int, booking_data: dict) -> int:
         room_type = booking_data.get('room_type') or 'Standard Room'
         
         # Log validation
-        print(f"CREATE_BOOKING: guest_name: '{guest_name}'")
-        print(f"CREATE_BOOKING: guest_email: '{guest_email}'")
-        print(f"CREATE_BOOKING: guest_phone: '{guest_phone}'")
-        print(f"CREATE_BOOKING: room_type: '{room_type}'")
+        print(f"CREATE_BOOKING: guest_name: '{guest_name}'", flush=True)
+        print(f"CREATE_BOOKING: guest_email: '{guest_email}'", flush=True)
+        print(f"CREATE_BOOKING: guest_phone: '{guest_phone}'", flush=True)
+        print(f"CREATE_BOOKING: room_type: '{room_type}'", flush=True)
+        sys.stdout.flush()
         
         # Ensure total_price is a valid Numeric value
         try:
             raw_price = booking_data.get('total_price')
-            print(f"CREATE_BOOKING: raw_price from booking_data: {raw_price} (type: {type(raw_price)})")
+            print(f"CREATE_BOOKING: raw_price from booking_data: {raw_price} (type: {type(raw_price)})", flush=True)
+            sys.stdout.flush()
             if raw_price is None or raw_price == '':
                 total_price = 0.0
-                print("CREATE_BOOKING: total_price is None or empty, using 0.0")
+                print("CREATE_BOOKING: total_price is None or empty, using 0.0", flush=True)
             else:
                 total_price = float(raw_price)
-                print(f"CREATE_BOOKING: Converted total_price to {total_price}")
+                print(f"CREATE_BOOKING: Converted total_price to {total_price}", flush=True)
+            sys.stdout.flush()
         except (ValueError, TypeError) as e:
-            print(f"CREATE_BOOKING: Error converting total_price to float: {e}, using 0.0")
+            print(f"CREATE_BOOKING: Error converting total_price to float: {e}, using 0.0", flush=True)
+            sys.stdout.flush()
             total_price = 0.0
             
         special_requests = booking_data.get('special_requests', '')
-        print(f"CREATE_BOOKING: special_requests: '{special_requests}'")
+        print(f"CREATE_BOOKING: special_requests: '{special_requests}'", flush=True)
+        sys.stdout.flush()
         
         # Handle passport file (make sure we have a default value)
         passport_file = booking_data.get('passport_file')
         if passport_file is None:
             passport_file = ''
-        print(f"CREATE_BOOKING: passport_file: '{passport_file}'")
+        print(f"CREATE_BOOKING: passport_file: '{passport_file}'", flush=True)
+        sys.stdout.flush()
         
         # Check if the file exists and is accessible
         if passport_file:
@@ -1560,57 +1567,68 @@ def create_booking(user_id: int, booking_data: dict) -> int:
                 print(f"DEBUG: Passport file not found at {file_path}, but will save reference anyway")
         
         # Convert date strings to proper date objects
-        print("\nCREATE_BOOKING: Converting date strings...")
+        print("\nCREATE_BOOKING: Converting date strings...", flush=True)
+        sys.stdout.flush()
         check_in = datetime.now().date()  # Default
         check_out = datetime.now().date() + timedelta(days=1)  # Default
         
         raw_check_in = booking_data.get('check_in')
         raw_check_out = booking_data.get('check_out')
-        print(f"CREATE_BOOKING: raw check_in: {raw_check_in} (type: {type(raw_check_in)})")
-        print(f"CREATE_BOOKING: raw check_out: {raw_check_out} (type: {type(raw_check_out)})")
+        print(f"CREATE_BOOKING: raw check_in: {raw_check_in} (type: {type(raw_check_in)})", flush=True)
+        print(f"CREATE_BOOKING: raw check_out: {raw_check_out} (type: {type(raw_check_out)})", flush=True)
+        sys.stdout.flush()
         
         try:
             if raw_check_in:
                 check_in = datetime.strptime(raw_check_in, '%Y-%m-%d').date()
-                print(f"CREATE_BOOKING: Parsed check_in: {check_in}")
+                print(f"CREATE_BOOKING: Parsed check_in: {check_in}", flush=True)
+                sys.stdout.flush()
         except Exception as e:
-            print(f"CREATE_BOOKING: Error parsing check_in date: {e}, using default")
+            print(f"CREATE_BOOKING: Error parsing check_in date: {e}, using default", flush=True)
+            sys.stdout.flush()
             
         try:
             if raw_check_out:
                 check_out = datetime.strptime(raw_check_out, '%Y-%m-%d').date()
-                print(f"CREATE_BOOKING: Parsed check_out: {check_out}")
+                print(f"CREATE_BOOKING: Parsed check_out: {check_out}", flush=True)
+                sys.stdout.flush()
         except Exception as e:
-            print(f"CREATE_BOOKING: Error parsing check_out date: {e}, using default")
+            print(f"CREATE_BOOKING: Error parsing check_out date: {e}, using default", flush=True)
+            sys.stdout.flush()
         
         # Use nights as num_guests if num_guests not provided
         raw_nights = booking_data.get('nights', 1)
-        print(f"CREATE_BOOKING: raw nights: {raw_nights} (type: {type(raw_nights)})")
+        print(f"CREATE_BOOKING: raw nights: {raw_nights} (type: {type(raw_nights)})", flush=True)
+        sys.stdout.flush()
         try:
             num_guests = int(raw_nights)
-            print(f"CREATE_BOOKING: num_guests: {num_guests}")
+            print(f"CREATE_BOOKING: num_guests: {num_guests}", flush=True)
+            sys.stdout.flush()
         except (ValueError, TypeError):
-            print(f"CREATE_BOOKING: Error converting nights to int, using 1")
+            print(f"CREATE_BOOKING: Error converting nights to int, using 1", flush=True)
+            sys.stdout.flush()
             num_guests = 1
         
         # Print prepared values
-        print("\n" + "="*80)
-        print("CREATE_BOOKING: ========== FINAL DATA FOR INSERT ==========")
-        print(f"CREATE_BOOKING:   user_id: {user_id}")
-        print(f"CREATE_BOOKING:   guest_name: {guest_name}")
-        print(f"CREATE_BOOKING:   guest_email: {guest_email}")
-        print(f"CREATE_BOOKING:   guest_phone: {guest_phone}")
-        print(f"CREATE_BOOKING:   room_type: {room_type}")
-        print(f"CREATE_BOOKING:   check_in: {check_in}")
-        print(f"CREATE_BOOKING:   check_out: {check_out}")
-        print(f"CREATE_BOOKING:   num_guests: {num_guests}")
-        print(f"CREATE_BOOKING:   total_price: {total_price}")
-        print(f"CREATE_BOOKING:   special_requests: {special_requests}")
-        print(f"CREATE_BOOKING:   passport_file: {passport_file}")
-        print("="*80)
+        print("\n" + "="*80, flush=True)
+        print("CREATE_BOOKING: ========== FINAL DATA FOR INSERT ==========", flush=True)
+        print(f"CREATE_BOOKING:   user_id: {user_id}", flush=True)
+        print(f"CREATE_BOOKING:   guest_name: {guest_name}", flush=True)
+        print(f"CREATE_BOOKING:   guest_email: {guest_email}", flush=True)
+        print(f"CREATE_BOOKING:   guest_phone: {guest_phone}", flush=True)
+        print(f"CREATE_BOOKING:   room_type: {room_type}", flush=True)
+        print(f"CREATE_BOOKING:   check_in: {check_in}", flush=True)
+        print(f"CREATE_BOOKING:   check_out: {check_out}", flush=True)
+        print(f"CREATE_BOOKING:   num_guests: {num_guests}", flush=True)
+        print(f"CREATE_BOOKING:   total_price: {total_price}", flush=True)
+        print(f"CREATE_BOOKING:   special_requests: {special_requests}", flush=True)
+        print(f"CREATE_BOOKING:   passport_file: {passport_file}", flush=True)
+        print("="*80, flush=True)
+        sys.stdout.flush()
         
         # Insert booking
-        print("\nCREATE_BOOKING: Executing INSERT query...")
+        print("\nCREATE_BOOKING: Executing INSERT query...", flush=True)
+        sys.stdout.flush()
         cursor.execute("""
             INSERT INTO bookings 
             (user_id, guest_name, guest_email, guest_phone, room_type, 
