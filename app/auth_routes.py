@@ -274,13 +274,28 @@ def login_post():
         # Record failed login for IP-based lockout
         record_failed_login(ip_address)
         
+        # Check if IP is now locked out after recording this attempt
+        is_locked, remaining_seconds, failed_attempts = check_ip_lockout(ip_address)
+        
         # Increment failed attempts if user exists (user-based lockout)
         if user:
             user_agent = request.headers.get('User-Agent', '')
             increment_failed_attempts_by_user(user["id"], ip_address, user_agent)
         
         log_security_event(None, username, 'login_failed', 'Invalid credentials')
-        flash("Invalid username or password.", "error")
+        
+        # Show lockout message if IP is now locked
+        if is_locked:
+            minutes = remaining_seconds // 60
+            seconds = remaining_seconds % 60
+            if minutes > 0:
+                time_msg = f"{minutes} minute{'s' if minutes > 1 else ''} and {seconds} second{'s' if seconds != 1 else ''}"
+            else:
+                time_msg = f"{seconds} second{'s' if seconds != 1 else ''}"
+            flash(f"Too many failed login attempts. Your IP address is locked for {time_msg}.", "error")
+        else:
+            flash("Invalid username or password.", "error")
+        
         return redirect(url_for("auth.login_get"))
 
     # Master admin account (Admin1!) cannot use passkey/TouchID/FaceID
