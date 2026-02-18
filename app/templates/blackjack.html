@@ -529,6 +529,12 @@ function setMessage(msg) {
     document.getElementById('game-message').textContent = msg;
 }
 
+function getSecureRandom() {
+    var array = new Uint32Array(1);
+    crypto.getRandomValues(array);
+    return array[0] / (0xffffffff + 1);
+}
+
 function createDeck() {
     deck = [];
     for (var i = 0; i < suits.length; i++) {
@@ -537,7 +543,7 @@ function createDeck() {
         }
     }
     for (var i = deck.length - 1; i > 0; i--) {
-        var j = Math.floor(Math.random() * (i + 1));
+        var j = Math.floor(getSecureRandom() * (i + 1));
         var temp = deck[i];
         deck[i] = deck[j];
         deck[j] = temp;
