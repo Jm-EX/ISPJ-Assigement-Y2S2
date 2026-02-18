@@ -151,6 +151,121 @@
         // DH constants
         const DH_PRIME = BigInt('0xFFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD129024E088A67CC74020BBEA63B139B22514A08798E3404DDEF9519B3CD3A431B302B0A6DF25F14374FE1356D6D51C245E485B576625E7EC6F44C42E9A637ED6B0BFF5CB6F406B7EDEE386BFB5A899FA5AE9F24117C4B1FE649286651ECE45B3DC2007CB8A163BF0598DA48361C55D39A69163FA8FD24CF5F83655D23DCA3AD961C62F356208552BB9ED529077096966D670C354E4ABC9804F1746C08CA18217C32905E462E36CE3BE39E772C180E86039B2783A2EC07A28FB5C55DF06F4C52C9DE2BCBF6955817183995497CEA956AE515D2261898FA051015728E5A8AACAA68FFFFFFFFFFFFFFFF');
         const DH_GENERATOR = BigInt(2);
+        
+        // Modular exponentiation for DH
+        function modPow(base, exponent, modulus) {
+            if (modulus === 1n) return 0n;
+            let result = 1n;
+            base = base % modulus;
+            while (exponent > 0n) {
+                if (exponent % 2n === 1n) {
+                    result = (result * base) % modulus;
+                }
+                exponent = exponent >> 1n;
+                base = (base * base) % modulus;
+            }
+            return result;
+        }
+        
+        // Generate deterministic shared key from session ID
+        async function generateDeterministicKey(sessionId) {
+            const password = `shared_secret_${sessionId}_ispj_chat_2026`;
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password);
+            const hash = await crypto.subtle.digest('SHA-256', data);
+            const key = await crypto.subtle.importKey(
+                'raw',
+                hash,
+                { name: 'AES-GCM' },
+                false,
+                ['encrypt', 'decrypt']
+            );
+            return key;
+        }
+        
+        // Encrypt message for sending
+        async function encryptMessage(message, key) {
+            try {
+                const iv = crypto.getRandomValues(new Uint8Array(12));
+                const encoded = new TextEncoder().encode(JSON.stringify(message));
+                
+                const encrypted = await crypto.subtle.encrypt(
+                    {
+                        name: 'AES-GCM',
+                        iv: iv
+                    },
+                    key,
+                    encoded
+                );
+                
+                const encryptedArray = new Uint8Array(encrypted);
+                const tag = encryptedArray.slice(-16);
+                const encryptedData = encryptedArray.slice(0, encryptedArray.length - 16);
+                
+                const combined = new Uint8Array(iv.length + tag.length + encryptedData.length);
+                combined.set(iv);
+                combined.set(tag, iv.length);
+                combined.set(encryptedData, iv.length + tag.length);
+                
+                return btoa(String.fromCharCode(...combined));
+            } catch (error) {
+                console.error('Encryption error:', error);
+                return null;
+            }
+        }
+        
+        // Decrypt received message
+        async function decryptMessage(encryptedData, key) {
+            try {
+                if (!encryptedData || typeof encryptedData !== 'string') {
+                    console.warn('Decryption skipped: invalid input data');
+                    return null;
+                }
+                
+                encryptedData = encryptedData.trim();
+                
+                if (encryptedData.length < 40) {
+                    console.log('Message is plain text (too short for encrypted):', encryptedData);
+                    return { msg: encryptedData, sender: 'unknown', timestamp: '', encrypted: false };
+                }
+                
+                let combined;
+                try {
+                    combined = new Uint8Array(atob(encryptedData).split('').map(c => c.charCodeAt(0)));
+                } catch (atobError) {
+                    console.log('Message is plain text (not base64):', encryptedData.substring(0, 50));
+                    return { msg: encryptedData, sender: 'unknown', timestamp: '', encrypted: false };
+                }
+                
+                if (combined.length < 29) {
+                    console.log('Message is plain text (decoded too short):', encryptedData);
+                    return { msg: encryptedData, sender: 'unknown', timestamp: '', encrypted: false };
+                }
+                
+                const iv = combined.slice(0, 12);
+                const tag = combined.slice(12, 28);
+                const encrypted = combined.slice(28);
+                
+                const encryptedWithTag = new Uint8Array(encrypted.length + tag.length);
+                encryptedWithTag.set(encrypted);
+                encryptedWithTag.set(tag, encrypted.length);
+                
+                const decrypted = await crypto.subtle.decrypt(
+                    {
+                        name: 'AES-GCM',
+                        iv: iv
+                    },
+                    key,
+                    encryptedWithTag
+                );
+                
+                const decoded = new TextDecoder().decode(decrypted);
+                return JSON.parse(decoded);
+            } catch (error) {
+                console.log('Decryption failed, treating as plain text:', encryptedData.substring(0, 50));
+                return { msg: encryptedData, sender: 'unknown', timestamp: '', encrypted: false };
+            }
+        }
     </script>
 </body>
 </html>
