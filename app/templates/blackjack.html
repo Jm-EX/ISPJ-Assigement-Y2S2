@@ -75,6 +75,28 @@
         font-weight: 700;
     }
 
+    .add-chips-btn {
+        background: linear-gradient(135deg, #2ecc71, #27ae60);
+        color: white;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: none;
+        font-size: 20px;
+        font-weight: bold;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: 8px;
+        transition: all 0.2s;
+    }
+
+    .add-chips-btn:hover {
+        background: linear-gradient(135deg, #3ae07b, #2ecc71);
+        transform: scale(1.1);
+    }
+
     /* Game Table */
     .game-table {
         width: 100%;
@@ -286,6 +308,67 @@
 
     .modal-btns { display: flex; gap: 15px; justify-content: center; }
 
+    /* Purchase Modal */
+    .purchase-modal .modal-box {
+        max-width: 500px;
+    }
+
+    .purchase-modal h2 {
+        color: #2ecc71;
+        font-size: 32px;
+    }
+
+    .chip-packages {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin: 25px 0;
+    }
+
+    .chip-package {
+        background: linear-gradient(135deg, #2c3e50, #34495e);
+        padding: 20px;
+        border-radius: 12px;
+        border: 2px solid #3498db;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-align: center;
+    }
+
+    .chip-package:hover {
+        border-color: #2ecc71;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(46, 204, 113, 0.3);
+    }
+
+    .chip-package.selected {
+        border-color: #2ecc71;
+        background: linear-gradient(135deg, #27ae60, #2ecc71);
+    }
+
+    .package-amount {
+        font-size: 28px;
+        font-weight: 700;
+        color: #ffd700;
+        margin-bottom: 8px;
+    }
+
+    .package-price {
+        font-size: 18px;
+        color: #3498db;
+        font-weight: 600;
+    }
+
+    .chip-package.selected .package-price {
+        color: #fff;
+    }
+
+    .purchase-info {
+        color: #95a5a6;
+        font-size: 13px;
+        margin-top: 10px;
+    }
+
     /* Responsive */
     @media (max-width: 700px) {
         .game-table { padding: 20px; border-radius: 100px 100px 15px 15px; min-height: 400px; }
@@ -312,6 +395,7 @@
                     <div class="stat-label">Balance</div>
                     <div class="stat-value">$<span id="balance">{{ balance }}</span></div>
                 </div>
+                <button class="add-chips-btn" onclick="showPurchaseModal()">+</button>
             </div>
             <div class="stat-item">
                 <div>
@@ -392,6 +476,40 @@
         <div class="modal-btns">
             <button class="btn btn-clear" onclick="hideLeaveModal()">Cancel</button>
             <button class="btn btn-stand" onclick="leaveGame()">Leave</button>
+        </div>
+    </div>
+</div>
+
+<!-- Purchase Chips Modal -->
+<div class="modal-overlay purchase-modal" id="purchase-modal">
+    <div class="modal-box">
+        <h2>💰 Purchase Chips</h2>
+        <p>Select a chip package to add to your balance</p>
+        
+        <div class="chip-packages">
+            <div class="chip-package" onclick="selectPackage(100, 5)" id="package-100">
+                <div class="package-amount">$100</div>
+                <div class="package-price">$5.00</div>
+            </div>
+            <div class="chip-package" onclick="selectPackage(500, 20)" id="package-500">
+                <div class="package-amount">$500</div>
+                <div class="package-price">$20.00</div>
+            </div>
+            <div class="chip-package" onclick="selectPackage(1000, 35)" id="package-1000">
+                <div class="package-amount">$1,000</div>
+                <div class="package-price">$35.00</div>
+            </div>
+            <div class="chip-package" onclick="selectPackage(5000, 150)" id="package-5000">
+                <div class="package-amount">$5,000</div>
+                <div class="package-price">$150.00</div>
+            </div>
+        </div>
+        
+        <p class="purchase-info">Test Mode: Use card 4242 4242 4242 4242</p>
+        
+        <div class="modal-btns">
+            <button class="btn btn-clear" onclick="hidePurchaseModal()">Cancel</button>
+            <button class="btn btn-deal" id="purchase-btn" onclick="purchaseChips()" disabled>Purchase</button>
         </div>
     </div>
 </div>
@@ -699,6 +817,62 @@ function hideLeaveModal() {
 function leaveGame() {
     saveBalance();
     window.location.href = '/';
+}
+
+var selectedChipAmount = 0;
+var selectedPrice = 0;
+
+function showPurchaseModal() {
+    document.getElementById('purchase-modal').style.display = 'flex';
+}
+
+function hidePurchaseModal() {
+    document.getElementById('purchase-modal').style.display = 'none';
+    selectedChipAmount = 0;
+    selectedPrice = 0;
+    var packages = document.querySelectorAll('.chip-package');
+    for (var i = 0; i < packages.length; i++) {
+        packages[i].classList.remove('selected');
+    }
+    document.getElementById('purchase-btn').disabled = true;
+}
+
+function selectPackage(chips, price) {
+    selectedChipAmount = chips;
+    selectedPrice = price;
+    
+    var packages = document.querySelectorAll('.chip-package');
+    for (var i = 0; i < packages.length; i++) {
+        packages[i].classList.remove('selected');
+    }
+    
+    document.getElementById('package-' + chips).classList.add('selected');
+    document.getElementById('purchase-btn').disabled = false;
+}
+
+function purchaseChips() {
+    if (selectedChipAmount === 0) return;
+    
+    fetch('/api/casino/create-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+            amount: selectedChipAmount,
+            price: selectedPrice
+        })
+    })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+        if (data.url) {
+            window.location.href = data.url;
+        } else {
+            alert('Error creating checkout session');
+        }
+    })
+    .catch(function(error) {
+        console.error('Error:', error);
+        alert('Error processing purchase');
+    });
 }
 
 updateUI();
