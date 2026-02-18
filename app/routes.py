@@ -315,9 +315,10 @@ def book_room_confirm(room_type):
             
             file_ext = passport.filename.rsplit('.', 1)[1].lower()
             
-            # Validate image files with Pillow
+            # Validate files based on type
             if file_ext in ['jpg', 'jpeg', 'png']:
                 try:
+                    # Validate image files with Pillow
                     img = Image.open(passport)
                     img.verify()  # Verify image integrity
                     passport.seek(0)  # Reset pointer for saving
@@ -325,10 +326,31 @@ def book_room_confirm(room_type):
                     flash('Uploaded file is not a valid image', 'error')
                     logging.warning(f"Invalid file upload attempt by {request.form.get('full_name')} ({request.form.get('email')})")
                     return redirect(request.url)
-            
-            # Save the file
-            passport.save(filepath)
-            booking_data["passport_file"] = filename
+            elif file_ext == 'pdf':
+                # For PDFs, just check the file size is reasonable (< 5MB)
+                try:
+                    passport.seek(0, os.SEEK_END)
+                    file_size = passport.tell()
+                    passport.seek(0)  # Reset pointer for saving
+                    
+                    if file_size > 5 * 1024 * 1024:  # 5MB limit
+                        flash('PDF file too large. Maximum size is 5MB.', 'error')
+                        logging.warning(f"PDF too large: {file_size/1024/1024:.2f}MB by {request.form.get('full_name')}")
+                        return redirect(request.url)
+                except Exception as e:
+                    flash('Error processing PDF file', 'error')
+                    logging.error(f"PDF processing error: {e}")
+                    return redirect(request.url)
+                    
+            # If we got here, the file is valid - save it
+            try:
+                passport.save(filepath)
+                print(f"DEBUG: Saved passport file '{filename}' to {filepath}")
+                booking_data["passport_file"] = filename
+            except Exception as e:
+                flash('Error saving file', 'error')
+                logging.error(f"File save error: {e}")
+                return redirect(request.url)
         elif passport:
             flash('Invalid file type. Only PDF, JPG, JPEG, PNG allowed.', 'error')
             logging.warning(f"Invalid file upload attempt by {request.form.get('full_name')} ({request.form.get('email')})")
