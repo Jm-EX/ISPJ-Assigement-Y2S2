@@ -35,12 +35,15 @@ from app.auth_db import (
     create_otp_challenge,
     create_user,
     get_otp_challenge,
+    increment_otp_attempts,
+    delete_otp_challenge,
     get_passkey_credentials,
     get_user_by_email,
     get_user_by_id,
     get_user_by_username,
-    store_passkey_credential,
-    mark_passkey_challenge_used,
+    create_passkey_credential,
+    get_passkey_by_credential_id,
+    update_passkey_sign_count,
     create_password_reset_token,
     get_password_reset_token,
     delete_password_reset_token,
@@ -54,7 +57,12 @@ from app.auth_db import (
     get_dh_public_key,
     check_ip_lockout,
     record_failed_login,
-    clear_failed_login_attempts
+    clear_failed_login_attempts,
+    get_totp_secret,
+    set_totp_secret,
+    update_last_login,
+    create_or_update_session,
+    send_high_risk_alert
 )
 
 
@@ -507,7 +515,6 @@ def verify_totp_post():
     # Now pop the pending flag
     session.pop("pending_totp_user_id", None)
     
-    from app.auth_db import update_last_login, create_or_update_session, send_high_risk_alert
     update_last_login(user["id"])
     
     # Clear IP-based lockout on successful login
@@ -609,7 +616,6 @@ def verify_otp_post():
     session["email"] = user["email"]
     session["is_admin"] = bool(user["is_admin"])
     
-    from app.auth_db import update_last_login, create_or_update_session, send_high_risk_alert
     update_last_login(user["id"])
     
     # Clear IP-based lockout on successful login
@@ -638,8 +644,6 @@ def verify_otp_post():
 
 @auth.get("/logout")
 def logout():
-    from app.auth_db import log_security_event
-    
     # Log logout event before clearing session
     user_id = session.get("user_id")
     username = session.get("username")
