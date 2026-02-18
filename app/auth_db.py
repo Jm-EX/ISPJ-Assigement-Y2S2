@@ -1448,19 +1448,41 @@ def create_booking(user_id: int, booking_data: dict) -> int:
         if not table_exists:
             print("CREATE_BOOKING: Creating bookings table...")
         else:
-            # Table exists - check if user_id column exists and add it if missing
-            print("CREATE_BOOKING: Checking if user_id column exists...")
+            # Table exists - check for all required columns and add missing ones
+            print("CREATE_BOOKING: Checking for missing columns...")
+            
+            required_columns = {
+                'user_id': 'INTEGER',
+                'guest_name': 'VARCHAR(255)',
+                'guest_email': 'VARCHAR(255)',
+                'guest_phone': 'VARCHAR(50)',
+                'room_type': 'VARCHAR(100)',
+                'check_in_date': 'DATE',
+                'check_out_date': 'DATE',
+                'num_guests': 'INTEGER DEFAULT 1',
+                'total_price': 'NUMERIC(10, 2)',
+                'status': "VARCHAR(50) DEFAULT 'pending'",
+                'special_requests': 'TEXT',
+                'notes': 'TEXT',
+                'passport_file': 'VARCHAR(255)',
+                'created_at': 'TIMESTAMP DEFAULT NOW()',
+                'updated_at': 'TIMESTAMP DEFAULT NOW()'
+            }
+            
+            # Get existing columns
             cursor.execute("""
                 SELECT column_name FROM information_schema.columns 
-                WHERE table_schema = 'public' AND table_name = 'bookings' AND column_name = 'user_id'
+                WHERE table_schema = 'public' AND table_name = 'bookings'
             """)
-            user_id_exists = cursor.fetchone() is not None
-            print(f"CREATE_BOOKING: user_id column exists: {user_id_exists}")
+            existing_columns = {row['column_name'] for row in cursor.fetchall()}
+            print(f"CREATE_BOOKING: Existing columns: {existing_columns}")
             
-            if not user_id_exists:
-                print("CREATE_BOOKING: Adding user_id column to bookings table...")
-                cursor.execute("ALTER TABLE bookings ADD COLUMN user_id INTEGER")
-                print("CREATE_BOOKING: user_id column added successfully")
+            # Add missing columns
+            for col_name, col_type in required_columns.items():
+                if col_name not in existing_columns:
+                    print(f"CREATE_BOOKING: Adding missing column '{col_name}'...")
+                    cursor.execute(f"ALTER TABLE bookings ADD COLUMN {col_name} {col_type}")
+                    print(f"CREATE_BOOKING: Column '{col_name}' added successfully")
         
         if not table_exists:
             cursor.execute("""
