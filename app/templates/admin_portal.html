@@ -1359,8 +1359,8 @@ async function logoutSession(sessionId, username) {
 // User Message Management
 // =========================
 
-// Store messages per user session
-let userMessages = {}; // Format: { sessionId: [messages] }
+// userMessages is declared in admin_base.html
+// Format: { sessionId: [messages] }
 
 // Add customer message to chat (only for current user)
 function addCustomerMessageToChat(messageData) {

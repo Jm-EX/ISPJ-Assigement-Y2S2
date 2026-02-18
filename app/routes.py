@@ -158,6 +158,7 @@ if gemini_api_key:
                 'gemini-2.0-flash',
                 'gemini-2.0-flash-lite',
                 'gemini-2.5-flash',
+                'gemini-3-flash-preview'
                 'gemini-2.5-flash-lite', 
                 'gemini-pro-latest',
                 'gemini-1.5-flash',
@@ -439,6 +440,7 @@ def get_gemini_response(message):
                 'gemini-2.0-flash',
                 'gemini-2.0-flash-lite',
                 'gemini-2.5-flash',
+                'gemini-3-flash-preview'
                 'gemini-2.5-flash-lite', 
                 'gemini-pro-latest',
                 'gemini-1.5-flash',

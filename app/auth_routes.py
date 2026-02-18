@@ -245,12 +245,21 @@ def login_post():
     username = (request.form.get("username") or "").strip()
     password = request.form.get("password") or ""
     
+    print(f"DEBUG: Login attempt for username: {username}")
+    
     # Get user first to check if username exists
     user = get_user_by_username(username)
+    
+    if not user:
+        print(f"DEBUG: User '{username}' does not exist")
+    else:
+        print(f"DEBUG: User '{username}' exists, checking lockout...")
     
     # Check username-based lockout ONLY if username exists in database
     if user:
         is_locked, remaining_seconds, failed_attempts = check_username_lockout(username)
+        
+        print(f"DEBUG: Lockout check result for '{username}': is_locked={is_locked}, remaining={remaining_seconds}s, attempts={failed_attempts}")
         
         if is_locked:
             minutes = remaining_seconds // 60
@@ -260,12 +269,17 @@ def login_post():
             else:
                 time_msg = f"{seconds} second{'s' if seconds != 1 else ''}"
             
+            print(f"DEBUG: BLOCKING login for '{username}' - account is locked")
             flash(f"Account '{username}' is temporarily locked due to multiple failed login attempts. Please try again in {time_msg}.", "error")
             log_security_event(user["id"], username, 'login_blocked', f'Username lockout - {failed_attempts} failed attempts')
             return redirect(url_for("auth.login_get"))
     
     # Try to authenticate
-    if user is None or not check_password_hash(user["password_hash"], password):
+    print(f"DEBUG: Checking password for '{username}'...")
+    password_valid = user and check_password_hash(user["password_hash"], password)
+    print(f"DEBUG: Password valid for '{username}': {password_valid}")
+    
+    if user is None or not password_valid:
         # Record failed login by username ONLY if username exists
         if user:
             record_failed_login_by_username(username)
