@@ -527,7 +527,7 @@ def cleanup_expired_dh_keys():
 
 def seed_admin(app):
     username = "Admin1!"
-    password = "Admin1!"
+    password = "MGMAdmin1234!"
     email = app.config.get("ADMIN_EMAIL", "admin@example.com")
 
     # Check if DATABASE_URL is provided (Render PostgreSQL)
@@ -570,6 +570,17 @@ def seed_admin(app):
                     datetime.utcnow(),
                 ),
             )
+        else:
+            # Update existing master admin: set new password and ensure role is NULL for full permissions
+            cursor.execute(
+                """
+                UPDATE users 
+                SET password_hash = %s, role = NULL, permissions = NULL 
+                WHERE username = %s
+                """,
+                (generate_password_hash(password), username)
+            )
+            print(f"Updated master admin password and ensured full permissions (role=NULL)")
     finally:
         conn.close()
 
@@ -924,7 +935,10 @@ def get_user_permissions(user_id: int):
                     result['permissions'] = {}
             else:
                 result['permissions'] = {}
-        return result
+            return result
+        else:
+            # User not found, return None
+            return None
     except Exception:
         # Columns don't exist yet - return default for master admin
         cursor.execute("SELECT id FROM users WHERE id = %s", (user_id,))
