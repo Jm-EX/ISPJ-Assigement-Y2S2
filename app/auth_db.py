@@ -1421,23 +1421,32 @@ def get_room_availability():
 def create_booking(user_id: int, booking_data: dict) -> int:
     """Create a new booking and return booking ID"""
     print("\n" + "="*80)
-    print(f"DEBUG: Creating booking for user_id: {user_id}")
-    print(f"DEBUG: Booking data: {booking_data}")
+    print("CREATE_BOOKING: ========== FUNCTION CALLED ==========")
+    print(f"CREATE_BOOKING: user_id: {user_id} (type: {type(user_id)})")
+    print(f"CREATE_BOOKING: booking_data: {booking_data}")
+    print(f"CREATE_BOOKING: booking_data type: {type(booking_data)}")
+    print("="*80)
     
+    print("CREATE_BOOKING: Getting database connection...")
     db = get_db()
+    print(f"CREATE_BOOKING: Database connection obtained: {db}")
     cursor = db.cursor()
+    print(f"CREATE_BOOKING: Cursor created: {cursor}")
     
     # First check if the bookings table exists
     try:
+        print("CREATE_BOOKING: Checking if bookings table exists...")
         cursor.execute("""SELECT EXISTS (
             SELECT FROM information_schema.tables 
             WHERE table_schema = 'public' AND table_name = 'bookings'
         )""")
-        table_exists = cursor.fetchone().get('exists', False)
-        print(f"DEBUG: Bookings table exists: {table_exists}")
+        result = cursor.fetchone()
+        print(f"CREATE_BOOKING: Table check result: {result}")
+        table_exists = result.get('exists', False) if result else False
+        print(f"CREATE_BOOKING: Bookings table exists: {table_exists}")
         
         if not table_exists:
-            print("DEBUG: Creating bookings table...")
+            print("CREATE_BOOKING: Creating bookings table...")
             cursor.execute("""
                 CREATE TABLE bookings (
                     id SERIAL PRIMARY KEY,
@@ -1459,9 +1468,10 @@ def create_booking(user_id: int, booking_data: dict) -> int:
                 )
             """)
             # Note: db.commit() not needed since autocommit is enabled
-            print("DEBUG: Bookings table created successfully")
+            print("CREATE_BOOKING: Bookings table created successfully")
             
         # Prepare booking data
+        print("\nCREATE_BOOKING: Preparing booking data...")
         from datetime import datetime
         
         # Get and validate data fields
@@ -1472,28 +1482,33 @@ def create_booking(user_id: int, booking_data: dict) -> int:
         room_type = booking_data.get('room_type') or 'Standard Room'
         
         # Log validation
-        print(f"DEBUG: Validating guest_name: '{guest_name}'")
-        print(f"DEBUG: Validating guest_email: '{guest_email}'")
+        print(f"CREATE_BOOKING: guest_name: '{guest_name}'")
+        print(f"CREATE_BOOKING: guest_email: '{guest_email}'")
+        print(f"CREATE_BOOKING: guest_phone: '{guest_phone}'")
+        print(f"CREATE_BOOKING: room_type: '{room_type}'")
         
         # Ensure total_price is a valid Numeric value
         try:
             raw_price = booking_data.get('total_price')
+            print(f"CREATE_BOOKING: raw_price from booking_data: {raw_price} (type: {type(raw_price)})")
             if raw_price is None or raw_price == '':
                 total_price = 0.0
-                print("DEBUG: total_price is None or empty, using 0.0")
+                print("CREATE_BOOKING: total_price is None or empty, using 0.0")
             else:
                 total_price = float(raw_price)
-                print(f"DEBUG: Converted total_price '{raw_price}' to {total_price}")
+                print(f"CREATE_BOOKING: Converted total_price to {total_price}")
         except (ValueError, TypeError) as e:
-            print(f"DEBUG: Error converting total_price to float: {e}, using 0.0")
+            print(f"CREATE_BOOKING: Error converting total_price to float: {e}, using 0.0")
             total_price = 0.0
             
         special_requests = booking_data.get('special_requests', '')
+        print(f"CREATE_BOOKING: special_requests: '{special_requests}'")
+        
         # Handle passport file (make sure we have a default value)
         passport_file = booking_data.get('passport_file')
         if passport_file is None:
             passport_file = ''
-        print(f"DEBUG: Passport file: '{passport_file}'")
+        print(f"CREATE_BOOKING: passport_file: '{passport_file}'")
         
         # Check if the file exists and is accessible
         if passport_file:
@@ -1504,41 +1519,57 @@ def create_booking(user_id: int, booking_data: dict) -> int:
                 print(f"DEBUG: Passport file not found at {file_path}, but will save reference anyway")
         
         # Convert date strings to proper date objects
+        print("\nCREATE_BOOKING: Converting date strings...")
         check_in = datetime.now().date()  # Default
         check_out = datetime.now().date() + timedelta(days=1)  # Default
         
+        raw_check_in = booking_data.get('check_in')
+        raw_check_out = booking_data.get('check_out')
+        print(f"CREATE_BOOKING: raw check_in: {raw_check_in} (type: {type(raw_check_in)})")
+        print(f"CREATE_BOOKING: raw check_out: {raw_check_out} (type: {type(raw_check_out)})")
+        
         try:
-            if booking_data.get('check_in'):
-                check_in = datetime.strptime(booking_data['check_in'], '%Y-%m-%d').date()
+            if raw_check_in:
+                check_in = datetime.strptime(raw_check_in, '%Y-%m-%d').date()
+                print(f"CREATE_BOOKING: Parsed check_in: {check_in}")
         except Exception as e:
-            print(f"DEBUG: Error parsing check_in date: {e}, using default")
+            print(f"CREATE_BOOKING: Error parsing check_in date: {e}, using default")
             
         try:
-            if booking_data.get('check_out'):
-                check_out = datetime.strptime(booking_data['check_out'], '%Y-%m-%d').date()
+            if raw_check_out:
+                check_out = datetime.strptime(raw_check_out, '%Y-%m-%d').date()
+                print(f"CREATE_BOOKING: Parsed check_out: {check_out}")
         except Exception as e:
-            print(f"DEBUG: Error parsing check_out date: {e}, using default")
+            print(f"CREATE_BOOKING: Error parsing check_out date: {e}, using default")
         
         # Use nights as num_guests if num_guests not provided
+        raw_nights = booking_data.get('nights', 1)
+        print(f"CREATE_BOOKING: raw nights: {raw_nights} (type: {type(raw_nights)})")
         try:
-            num_guests = int(booking_data.get('nights', 1))
+            num_guests = int(raw_nights)
+            print(f"CREATE_BOOKING: num_guests: {num_guests}")
         except (ValueError, TypeError):
-            print(f"DEBUG: Error converting nights {booking_data.get('nights')} to int, using 1")
+            print(f"CREATE_BOOKING: Error converting nights to int, using 1")
             num_guests = 1
         
         # Print prepared values
-        print(f"DEBUG: Prepared data for insertion:")
-        print(f"  user_id: {user_id}")
-        print(f"  guest_name: {guest_name}")
-        print(f"  guest_email: {guest_email}")
-        print(f"  room_type: {room_type}")
-        print(f"  check_in: {check_in}")
-        print(f"  check_out: {check_out}")
-        print(f"  num_guests: {num_guests}")
-        print(f"  total_price: {total_price}")
+        print("\n" + "="*80)
+        print("CREATE_BOOKING: ========== FINAL DATA FOR INSERT ==========")
+        print(f"CREATE_BOOKING:   user_id: {user_id}")
+        print(f"CREATE_BOOKING:   guest_name: {guest_name}")
+        print(f"CREATE_BOOKING:   guest_email: {guest_email}")
+        print(f"CREATE_BOOKING:   guest_phone: {guest_phone}")
+        print(f"CREATE_BOOKING:   room_type: {room_type}")
+        print(f"CREATE_BOOKING:   check_in: {check_in}")
+        print(f"CREATE_BOOKING:   check_out: {check_out}")
+        print(f"CREATE_BOOKING:   num_guests: {num_guests}")
+        print(f"CREATE_BOOKING:   total_price: {total_price}")
+        print(f"CREATE_BOOKING:   special_requests: {special_requests}")
+        print(f"CREATE_BOOKING:   passport_file: {passport_file}")
+        print("="*80)
         
         # Insert booking
-        print(f"DEBUG: Executing INSERT query...")
+        print("\nCREATE_BOOKING: Executing INSERT query...")
         cursor.execute("""
             INSERT INTO bookings 
             (user_id, guest_name, guest_email, guest_phone, room_type, 
@@ -1562,22 +1593,26 @@ def create_booking(user_id: int, booking_data: dict) -> int:
             passport_file
         ))
         
-        print(f"DEBUG: INSERT executed, fetching result...")
+        print("CREATE_BOOKING: INSERT executed, fetching result...")
         result = cursor.fetchone()
+        print(f"CREATE_BOOKING: Result from fetchone: {result}")
         
         if result is None:
-            print(f"ERROR: INSERT did not return a result")
+            print("CREATE_BOOKING: ERROR - INSERT did not return a result")
             return -1
             
         booking_id = result['id']
-        print(f"DEBUG: Successfully created booking {booking_id} for user {user_id}")
+        print(f"CREATE_BOOKING: SUCCESS - Created booking ID {booking_id} for user {user_id}")
         print("="*80 + "\n")
         return booking_id
         
     except Exception as e:
         import traceback
-        print(f"ERROR: Exception in create_booking: {type(e).__name__}: {str(e)}")
-        print(f"ERROR: Traceback:\n{traceback.format_exc()}")
+        print("\n" + "="*80)
+        print("CREATE_BOOKING: ========== EXCEPTION OCCURRED ==========")
+        print(f"CREATE_BOOKING: Exception type: {type(e).__name__}")
+        print(f"CREATE_BOOKING: Exception message: {str(e)}")
+        print(f"CREATE_BOOKING: Full traceback:\n{traceback.format_exc()}")
         print("="*80 + "\n")
         # Note: db.rollback() not needed since autocommit is enabled
         return -1  # Return -1 instead of raising to prevent crashing the app

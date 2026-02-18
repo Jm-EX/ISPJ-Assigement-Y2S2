@@ -270,12 +270,25 @@ def allowed_file(filename):
 
 @main.route("/book/<room_type>", methods=["GET", "POST"])
 def book_room_confirm(room_type):
+    print("\n" + "="*80)
+    print("BOOKING FLOW: book_room_confirm route called")
+    print(f"BOOKING FLOW: Room type: {room_type}")
+    print(f"BOOKING FLOW: Request method: {request.method}")
+    print(f"BOOKING FLOW: User ID in session: {session.get('user_id')}")
+    print("="*80)
+    
     # Check if user is logged in
     if not session.get('user_id'):
+        print("BOOKING FLOW: User not logged in, redirecting to login")
         flash('Please log in to book a room.', 'error')
         return redirect(url_for('auth.login_get'))
     
     if request.method == "POST":
+        print("\n" + "="*80)
+        print("BOOKING FLOW: POST request received - processing booking form")
+        print(f"BOOKING FLOW: Form data keys: {list(request.form.keys())}")
+        print(f"BOOKING FLOW: Files keys: {list(request.files.keys())}")
+        print("="*80)
         check_in = request.form.get("check_in")
         check_out = request.form.get("check_out")
 
@@ -300,6 +313,18 @@ def book_room_confirm(room_type):
             "phone": request.form.get("phone"),
             "total_price": room_prices.get(room_type, 0) * nights,
         }
+        
+        print("\n" + "="*80)
+        print("BOOKING FLOW: Booking data created")
+        print(f"BOOKING FLOW: room_type: {booking_data['room_type']}")
+        print(f"BOOKING FLOW: check_in: {booking_data['check_in']}")
+        print(f"BOOKING FLOW: check_out: {booking_data['check_out']}")
+        print(f"BOOKING FLOW: nights: {booking_data['nights']}")
+        print(f"BOOKING FLOW: guest_name: {booking_data['guest_name']}")
+        print(f"BOOKING FLOW: email: {booking_data['email']}")
+        print(f"BOOKING FLOW: phone: {booking_data['phone']}")
+        print(f"BOOKING FLOW: total_price: {booking_data['total_price']}")
+        print("="*80)
 
         # Handle passport upload
         passport = request.files.get("passport")
@@ -357,6 +382,12 @@ def book_room_confirm(room_type):
             return redirect(request.url)
 
         session["booking_data"] = booking_data
+        
+        print("\n" + "="*80)
+        print("BOOKING FLOW: Booking data saved to session")
+        print(f"BOOKING FLOW: Session keys after save: {list(session.keys())}")
+        print(f"BOOKING FLOW: booking_data in session: {session.get('booking_data')}")
+        print("="*80)
 
         # reCAPTCHA verification
         recaptcha_response = request.form.get('g-recaptcha-response')
@@ -387,6 +418,12 @@ def book_room_confirm(room_type):
             return redirect(request.url)
 
         # CREATE STRIPE CHECKOUT SESSION
+        print("\n" + "="*80)
+        print("BOOKING FLOW: Creating Stripe checkout session")
+        print(f"BOOKING FLOW: Amount: {int(booking_data['total_price'] * 100)} cents")
+        print(f"BOOKING FLOW: Success URL: {url_for('main.booking_confirmation', _external=True)}")
+        print("="*80)
+        
         checkout_session = stripe.checkout.Session.create(
             payment_method_types=["card"],
             line_items=[
@@ -405,6 +442,12 @@ def book_room_confirm(room_type):
             success_url=url_for("main.booking_confirmation", _external=True),
             cancel_url=url_for("main.book_room_confirm", room_type=room_type, _external=True),
         )
+        
+        print("\n" + "="*80)
+        print("BOOKING FLOW: Stripe checkout session created successfully")
+        print(f"BOOKING FLOW: Checkout session ID: {checkout_session.id}")
+        print(f"BOOKING FLOW: Redirecting to: {checkout_session.url}")
+        print("="*80)
 
         return redirect(checkout_session.url, code=303)
 
@@ -455,47 +498,72 @@ def create_checkout_session():
 
 @main.route("/booking/confirmation")
 def booking_confirmation():
+    print("\n" + "="*80)
+    print("BOOKING FLOW: ========== BOOKING CONFIRMATION ROUTE ==========")
+    print(f"BOOKING FLOW: Route /booking/confirmation called")
+    print(f"BOOKING FLOW: Session keys: {list(session.keys())}")
+    print("="*80)
+    
     # Check if user is logged in
     if not session.get('user_id'):
+        print("BOOKING FLOW: ERROR - User not logged in")
         flash('Please log in to complete your booking.', 'error')
         return redirect(url_for('auth.login_get'))
     
+    print(f"BOOKING FLOW: User ID from session: {session.get('user_id')}")
+    
     booking_data = session.get("booking_data")
     if not booking_data:
+        print("BOOKING FLOW: ERROR - No booking_data in session!")
+        print(f"BOOKING FLOW: Full session contents: {dict(session)}")
         flash("No booking found", "error")
         return redirect(url_for("main.book_room"))
     
     print("\n" + "="*80)
-    print(f"DEBUG: Processing booking confirmation")
-    print(f"DEBUG: User ID: {session.get('user_id')}")
-    print(f"DEBUG: Booking data: {booking_data}")
+    print("BOOKING FLOW: Booking data retrieved from session:")
+    print(f"BOOKING FLOW: booking_data type: {type(booking_data)}")
+    print(f"BOOKING FLOW: booking_data keys: {list(booking_data.keys()) if isinstance(booking_data, dict) else 'NOT A DICT'}")
+    for key, value in booking_data.items():
+        print(f"BOOKING FLOW:   {key}: {value}")
+    print("="*80)
     
     # Save booking to database
+    print("\n" + "="*80)
+    print("BOOKING FLOW: Attempting to save booking to database...")
+    print("="*80)
+    
     try:
         from app.auth_db import create_booking
         user_id = session.get('user_id')
+        print(f"BOOKING FLOW: Calling create_booking(user_id={user_id}, booking_data={booking_data})")
+        
         booking_id = create_booking(user_id, booking_data)
         
+        print(f"BOOKING FLOW: create_booking returned: {booking_id}")
+        
         if booking_id == -1:
-            print("DEBUG: create_booking returned -1, showing error message")
+            print("BOOKING FLOW: ERROR - create_booking returned -1")
             flash("Failed to save booking. Please contact support.", "error")
             # Show the confirmation page anyway to prevent further payment issues
             booking_data['booking_id'] = 999999  # Use a dummy ID for display only
             booking_data['user_id'] = user_id
-            print(f"DEBUG: Using dummy booking ID")
+            print("BOOKING FLOW: Using dummy booking ID 999999")
         else:
             # Booking saved successfully
             booking_data['booking_id'] = booking_id
             booking_data['user_id'] = user_id
-            print(f"DEBUG: Saved booking {booking_id} for user {user_id}")
+            print(f"BOOKING FLOW: SUCCESS - Booking saved with ID {booking_id}")
     except Exception as e:
         import traceback
-        print(f"ERROR: Exception in booking_confirmation: {str(e)}")
-        print(f"ERROR: Traceback:\n{traceback.format_exc()}")
+        print(f"BOOKING FLOW: EXCEPTION in booking_confirmation: {type(e).__name__}: {str(e)}")
+        print(f"BOOKING FLOW: Traceback:\n{traceback.format_exc()}")
         # Show the confirmation page anyway to prevent further payment issues
         booking_data['booking_id'] = 999999  # Use a dummy ID
-        booking_data['user_id'] = user_id
+        booking_data['user_id'] = session.get('user_id')
     
+    print("\n" + "="*80)
+    print("BOOKING FLOW: Rendering booking_confirmation.html template")
+    print(f"BOOKING FLOW: Final booking_data: {booking_data}")
     print("="*80 + "\n")
     
     return render_template("booking_confirmation.html", booking=booking_data)
