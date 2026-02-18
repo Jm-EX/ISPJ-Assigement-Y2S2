@@ -503,6 +503,17 @@
     {% endif %}
   </div>
 
+  <!-- Booking Management Section -->
+  <div class="dashboard-section">
+    <div class="section-header">
+      <h2>Booking Management</h2>
+      <div id="bookingButtons" style="display: flex; gap: 8px;">
+        <!-- Buttons will be added by JavaScript based on permissions -->
+      </div>
+    </div>
+    <p style="color: #666; margin-bottom: 16px;">Manage hotel bookings and room availability</p>
+  </div>
+
   <!-- Chat Management Section -->
   <div class="dashboard-section">
     <div class="section-header">
@@ -1455,6 +1466,42 @@ function updateUnreadCount() {
   // This would be updated with real data from the database
   console.log('Updating unread count...');
 }
+
+// =========================
+// Booking Management Buttons
+// =========================
+
+function initializeBookingButtons() {
+  const bookingButtonsContainer = document.getElementById('bookingButtons');
+  
+  // Check if master admin (no permissions element) or has booking permissions
+  const hasViewBookings = document.querySelector('[data-permission="view_bookings"]') !== null || 
+                          !document.querySelector('[data-permission]'); // Master admin has no permission elements
+  const hasModifyBookings = document.querySelector('[data-permission="modify_bookings"]') !== null ||
+                            !document.querySelector('[data-permission]'); // Master admin has no permission elements
+  
+  // For master admin, check if there's any permission data - if not, grant all permissions
+  const isMasterAdmin = !document.querySelector('[data-permission]');
+  
+  if (isMasterAdmin || hasViewBookings) {
+    const viewBtn = document.createElement('button');
+    viewBtn.onclick = () => window.location.href = '/admin/bookings';
+    viewBtn.style.cssText = 'padding: 8px 16px; background: #2196F3; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 600;';
+    viewBtn.textContent = '📋 View Bookings';
+    bookingButtonsContainer.appendChild(viewBtn);
+  }
+  
+  if (isMasterAdmin || hasModifyBookings) {
+    const modifyBtn = document.createElement('button');
+    modifyBtn.onclick = () => window.location.href = '/admin/bookings/manage';
+    modifyBtn.style.cssText = 'padding: 8px 16px; background: #FF9800; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 600;';
+    modifyBtn.textContent = '✏️ Manage Bookings';
+    bookingButtonsContainer.appendChild(modifyBtn);
+  }
+}
+
+// Initialize booking buttons on page load
+document.addEventListener('DOMContentLoaded', initializeBookingButtons);
 
 // =========================
 // Sub-Admin Creation
