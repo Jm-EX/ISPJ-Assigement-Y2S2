@@ -1489,7 +1489,19 @@ def create_booking(user_id: int, booking_data: dict) -> int:
             total_price = 0.0
             
         special_requests = booking_data.get('special_requests', '')
-        passport_file = booking_data.get('passport_file', '')
+        # Handle passport file (make sure we have a default value)
+        passport_file = booking_data.get('passport_file')
+        if passport_file is None:
+            passport_file = ''
+        print(f"DEBUG: Passport file: '{passport_file}'")
+        
+        # Check if the file exists and is accessible
+        if passport_file:
+            file_path = os.path.join('app', 'static', 'uploads', 'passports', passport_file)
+            if os.path.exists(file_path):
+                print(f"DEBUG: Passport file exists at {file_path}")
+            else:
+                print(f"DEBUG: Passport file not found at {file_path}, but will save reference anyway")
         
         # Convert date strings to proper date objects
         check_in = datetime.now().date()  # Default
