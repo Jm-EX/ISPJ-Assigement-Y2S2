@@ -1281,6 +1281,139 @@ def get_user_casino_balance(user_id: int) -> int:
         return 1000
 
 
+# =========================
+# Booking Management Functions
+# =========================
+
+def get_all_bookings(limit: int = 100):
+    """Get all bookings from database"""
+    db = get_db()
+    cursor = db.cursor()
+    try:
+        cursor.execute("""
+            SELECT b.*, u.username as created_by_name 
+            FROM bookings b
+            LEFT JOIN users u ON b.created_by = u.id
+            ORDER BY b.created_at DESC
+            LIMIT %s
+        """, (limit,))
+        bookings = cursor.fetchall()
+        return bookings
+    except Exception as e:
+        print(f"Error getting bookings: {e}")
+        return []
+
+
+def get_booking_by_id(booking_id: int):
+    """Get specific booking by ID"""
+    db = get_db()
+    cursor = db.cursor()
+    try:
+        cursor.execute("""
+            SELECT b.*, u.username as created_by_name 
+            FROM bookings b
+            LEFT JOIN users u ON b.created_by = u.id
+            WHERE b.id = %s
+        """, (booking_id,))
+        return cursor.fetchone()
+    except Exception as e:
+        print(f"Error getting booking: {e}")
+        return None
+
+
+def get_room_availability():
+    """Get room availability status"""
+    db = get_db()
+    cursor = db.cursor()
+    try:
+        cursor.execute("SELECT * FROM rooms ORDER BY room_type")
+        return cursor.fetchall()
+    except Exception as e:
+        print(f"Error getting room availability: {e}")
+        # Create table if it doesn't exist
+        try:
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS rooms (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    room_type VARCHAR(100) NOT NULL,
+                    total_count INT NOT NULL DEFAULT 0,
+                    available_count INT NOT NULL DEFAULT 0,
+                    occupied_count INT NOT NULL DEFAULT 0,
+                    cleaning_count INT NOT NULL DEFAULT 0,
+                    maintenance_count INT NOT NULL DEFAULT 0,
+                    price_per_night DECIMAL(10, 2) NOT NULL,
+                    updated_at DATETIME NOT NULL
+                )
+            """)
+            db.commit()
+            return []
+        except:
+            return []
+
+
+def update_booking(booking_id: int, data: dict) -> bool:
+    """Update booking information"""
+    db = get_db()
+    cursor = db.cursor()
+    try:
+        cursor.execute("""
+            UPDATE bookings 
+            SET guest_name = %s, 
+                guest_email = %s, 
+                guest_phone = %s,
+                room_type = %s,
+                check_in_date = %s,
+                check_out_date = %s,
+                num_guests = %s,
+                total_price = %s,
+                status = %s,
+                special_requests = %s,
+                notes = %s,
+                updated_at = %s
+            WHERE id = %s
+        """, (
+            data.get('guest_name'),
+            data.get('guest_email'),
+            data.get('guest_phone'),
+            data.get('room_type'),
+            data.get('check_in_date'),
+            data.get('check_out_date'),
+            data.get('num_guests'),
+            data.get('total_price'),
+            data.get('status'),
+            data.get('special_requests'),
+            data.get('notes'),
+            datetime.utcnow(),
+            booking_id
+        ))
+        db.commit()
+        return True
+    except Exception as e:
+        print(f"Error updating booking: {e}")
+        return False
+
+
+def update_room_status(room_type: str, available: int, occupied: int, cleaning: int, maintenance: int) -> bool:
+    """Update room availability counts"""
+    db = get_db()
+    cursor = db.cursor()
+    try:
+        cursor.execute("""
+            UPDATE rooms 
+            SET available_count = %s,
+                occupied_count = %s,
+                cleaning_count = %s,
+                maintenance_count = %s,
+                updated_at = %s
+            WHERE room_type = %s
+        """, (available, occupied, cleaning, maintenance, datetime.utcnow(), room_type))
+        db.commit()
+        return True
+    except Exception as e:
+        print(f"Error updating room status: {e}")
+        return False
+
+
 def update_user_casino_balance(user_id: int, new_balance: int) -> bool:
     """Update user's casino balance"""
     try:
