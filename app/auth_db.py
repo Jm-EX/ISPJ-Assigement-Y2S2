@@ -1414,6 +1414,120 @@ def update_room_status(room_type: str, available: int, occupied: int, cleaning: 
         return False
 
 
+# =========================
+# IP-Based Login Lockout Functions
+# =========================
+
+def check_ip_lockout(ip_address: str) -> tuple:
+    """Check if IP is locked out. Returns (is_locked, remaining_seconds, attempts)"""
+    db = get_db()
+    cursor = db.cursor()
+    
+    try:
+        # Create table if not exists
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS login_attempts (
+                ip_address VARCHAR(50) PRIMARY KEY,
+                failed_attempts INT NOT NULL DEFAULT 0,
+                lockout_until DATETIME,
+                last_attempt DATETIME NOT NULL
+            )
+        """)
+        db.commit()
+        
+        cursor.execute("""
+            SELECT failed_attempts, lockout_until 
+            FROM login_attempts 
+            WHERE ip_address = %s
+        """, (ip_address,))
+        
+        result = cursor.fetchone()
+        
+        if not result:
+            return (False, 0, 0)
+        
+        failed_attempts = result['failed_attempts']
+        lockout_until = result['lockout_until']
+        
+        # Check if currently locked out
+        if lockout_until and datetime.utcnow() < lockout_until:
+            remaining_seconds = int((lockout_until - datetime.utcnow()).total_seconds())
+            return (True, remaining_seconds, failed_attempts)
+        
+        return (False, 0, failed_attempts)
+        
+    except Exception as e:
+        print(f"Error checking IP lockout: {e}")
+        return (False, 0, 0)
+
+
+def record_failed_login(ip_address: str):
+    """Record a failed login attempt and apply lockout if needed"""
+    db = get_db()
+    cursor = db.cursor()
+    
+    try:
+        # Get current attempts
+        cursor.execute("""
+            SELECT failed_attempts, lockout_until 
+            FROM login_attempts 
+            WHERE ip_address = %s
+        """, (ip_address,))
+        
+        result = cursor.fetchone()
+        
+        if result:
+            failed_attempts = result['failed_attempts']
+            lockout_until = result['lockout_until']
+            
+            # If lockout expired, reset counter
+            if lockout_until and datetime.utcnow() >= lockout_until:
+                failed_attempts = 0
+            
+            failed_attempts += 1
+            
+            # Apply 2-minute lockout after 5 failed attempts
+            if failed_attempts >= 5:
+                lockout_until = datetime.utcnow() + timedelta(minutes=2)
+                cursor.execute("""
+                    UPDATE login_attempts 
+                    SET failed_attempts = %s, lockout_until = %s, last_attempt = %s
+                    WHERE ip_address = %s
+                """, (failed_attempts, lockout_until, datetime.utcnow(), ip_address))
+            else:
+                cursor.execute("""
+                    UPDATE login_attempts 
+                    SET failed_attempts = %s, last_attempt = %s
+                    WHERE ip_address = %s
+                """, (failed_attempts, datetime.utcnow(), ip_address))
+        else:
+            # First failed attempt for this IP
+            cursor.execute("""
+                INSERT INTO login_attempts (ip_address, failed_attempts, last_attempt)
+                VALUES (%s, 1, %s)
+            """, (ip_address, datetime.utcnow()))
+        
+        db.commit()
+        
+    except Exception as e:
+        print(f"Error recording failed login: {e}")
+
+
+def clear_failed_login_attempts(ip_address: str):
+    """Clear failed login attempts after successful login"""
+    db = get_db()
+    cursor = db.cursor()
+    
+    try:
+        cursor.execute("""
+            DELETE FROM login_attempts WHERE ip_address = %s
+        """, (ip_address,))
+        db.commit()
+        
+    except Exception as e:
+        print(f"Error clearing login attempts: {e}")
+
+
 def update_user_casino_balance(user_id: int, new_balance: int) -> bool:
     """Update user's casino balance"""
     try:

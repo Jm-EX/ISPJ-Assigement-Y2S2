@@ -1300,6 +1300,62 @@ function addOrUpdateActiveUser(messageData) {
 }
 
 // =========================
+// User Management Functions
+// =========================
+
+async function deleteUser(userId, username) {
+  if (!confirm(`Are you sure you want to delete user "${username}"? This action cannot be undone.`)) {
+    return;
+  }
+  
+  try {
+    const response = await fetch(`/admin/delete-user/${userId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      alert(`User "${username}" has been deleted successfully.`);
+      window.location.reload();
+    } else {
+      alert('Error: ' + (result.error || 'Failed to delete user'));
+    }
+  } catch (error) {
+    alert('Error deleting user: ' + error.message);
+  }
+}
+
+async function logoutSession(sessionId, username) {
+  if (!confirm(`Are you sure you want to logout "${username}"?`)) {
+    return;
+  }
+  
+  try {
+    const response = await fetch(`/admin/logout-session/${sessionId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      alert(`Session for "${username}" has been logged out.`);
+      window.location.reload();
+    } else {
+      alert('Error: ' + (result.error || 'Failed to logout session'));
+    }
+  } catch (error) {
+    alert('Error logging out session: ' + error.message);
+  }
+}
+
+// =========================
 // User Message Management
 // =========================
 
