@@ -1543,8 +1543,8 @@ def check_username_lockout(username: str) -> tuple:
             CREATE TABLE IF NOT EXISTS username_login_attempts (
                 username VARCHAR(255) PRIMARY KEY,
                 failed_attempts INT NOT NULL DEFAULT 0,
-                lockout_until DATETIME,
-                last_attempt DATETIME NOT NULL
+                lockout_until TIMESTAMP,
+                last_attempt TIMESTAMP NOT NULL
             )
         """)
         db.commit()
