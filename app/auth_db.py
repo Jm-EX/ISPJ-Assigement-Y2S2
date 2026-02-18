@@ -1558,16 +1558,21 @@ def check_username_lockout(username: str) -> tuple:
         result = cursor.fetchone()
         
         if not result:
+            print(f"DEBUG: No lockout record found for username '{username}'")
             return (False, 0, 0)
         
         failed_attempts = result['failed_attempts']
         lockout_until = result['lockout_until']
         
+        print(f"DEBUG: Username '{username}' - attempts: {failed_attempts}, lockout_until: {lockout_until}, current_time: {datetime.utcnow()}")
+        
         # Check if currently locked out
         if lockout_until and datetime.utcnow() < lockout_until:
             remaining_seconds = int((lockout_until - datetime.utcnow()).total_seconds())
+            print(f"DEBUG: Username '{username}' IS LOCKED - remaining: {remaining_seconds}s")
             return (True, remaining_seconds, failed_attempts)
         
+        print(f"DEBUG: Username '{username}' NOT LOCKED")
         return (False, 0, failed_attempts)
         
     except Exception as e:
@@ -1594,15 +1599,20 @@ def record_failed_login_by_username(username: str):
             failed_attempts = result['failed_attempts']
             lockout_until = result['lockout_until']
             
+            print(f"DEBUG: Recording failed login for '{username}' - current attempts: {failed_attempts}")
+            
             # If lockout expired, reset counter
             if lockout_until and datetime.utcnow() >= lockout_until:
+                print(f"DEBUG: Lockout expired for '{username}', resetting counter")
                 failed_attempts = 0
             
             failed_attempts += 1
+            print(f"DEBUG: Incremented attempts for '{username}' to {failed_attempts}")
             
             # Apply 2-minute lockout after 5 failed attempts
             if failed_attempts >= 5:
                 lockout_until = datetime.utcnow() + timedelta(minutes=2)
+                print(f"DEBUG: APPLYING LOCKOUT for '{username}' until {lockout_until}")
                 cursor.execute("""
                     UPDATE username_login_attempts 
                     SET failed_attempts = %s, lockout_until = %s, last_attempt = %s
@@ -1616,15 +1626,19 @@ def record_failed_login_by_username(username: str):
                 """, (failed_attempts, datetime.utcnow(), username))
         else:
             # First failed attempt for this username
+            print(f"DEBUG: First failed login for '{username}'")
             cursor.execute("""
                 INSERT INTO username_login_attempts (username, failed_attempts, last_attempt)
                 VALUES (%s, 1, %s)
             """, (username, datetime.utcnow()))
         
         db.commit()
+        print(f"DEBUG: Successfully committed failed login record for '{username}'")
         
     except Exception as e:
         print(f"Error recording failed login by username: {e}")
+        import traceback
+        print(f"Traceback: {traceback.format_exc()}")
 
 
 def clear_username_login_attempts(username: str):
