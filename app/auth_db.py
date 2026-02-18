@@ -1420,12 +1420,14 @@ def get_room_availability():
 
 def create_booking(user_id: int, booking_data: dict) -> int:
     """Create a new booking and return booking ID"""
-    print("\n" + "="*80)
-    print("CREATE_BOOKING: ========== FUNCTION CALLED ==========")
-    print(f"CREATE_BOOKING: user_id: {user_id} (type: {type(user_id)})")
-    print(f"CREATE_BOOKING: booking_data: {booking_data}")
-    print(f"CREATE_BOOKING: booking_data type: {type(booking_data)}")
-    print("="*80)
+    import sys
+    print("\n" + "="*80, flush=True)
+    print("CREATE_BOOKING: ========== FUNCTION CALLED ==========", flush=True)
+    print(f"CREATE_BOOKING: user_id: {user_id} (type: {type(user_id)})", flush=True)
+    print(f"CREATE_BOOKING: booking_data: {booking_data}", flush=True)
+    print(f"CREATE_BOOKING: booking_data type: {type(booking_data)}", flush=True)
+    print("="*80, flush=True)
+    sys.stdout.flush()
     
     print("CREATE_BOOKING: Getting database connection...")
     db = get_db()
@@ -1475,7 +1477,8 @@ def create_booking(user_id: int, booking_data: dict) -> int:
                 WHERE table_schema = 'public' AND table_name = 'bookings'
             """)
             existing_columns = {row['column_name'] for row in cursor.fetchall()}
-            print(f"CREATE_BOOKING: Existing columns: {existing_columns}")
+            print(f"CREATE_BOOKING: Existing columns: {existing_columns}", flush=True)
+            sys.stdout.flush()
             
             # Add missing columns
             for col_name, col_type in required_columns.items():
@@ -1631,17 +1634,32 @@ def create_booking(user_id: int, booking_data: dict) -> int:
             passport_file
         ))
         
-        print("CREATE_BOOKING: INSERT executed, fetching result...")
+        print("CREATE_BOOKING: INSERT executed, fetching result...", flush=True)
+        sys.stdout.flush()
         result = cursor.fetchone()
-        print(f"CREATE_BOOKING: Result from fetchone: {result}")
+        print(f"CREATE_BOOKING: Result from fetchone: {result}", flush=True)
+        sys.stdout.flush()
         
         if result is None:
-            print("CREATE_BOOKING: ERROR - INSERT did not return a result")
+            print("CREATE_BOOKING: ERROR - INSERT did not return a result", flush=True)
+            sys.stdout.flush()
             return -1
             
         booking_id = result['id']
-        print(f"CREATE_BOOKING: SUCCESS - Created booking ID {booking_id} for user {user_id}")
-        print("="*80 + "\n")
+        print(f"CREATE_BOOKING: SUCCESS - Created booking ID {booking_id} for user {user_id}", flush=True)
+        
+        # Verify the booking was actually saved
+        cursor.execute("SELECT * FROM bookings WHERE id = %s", (booking_id,))
+        verify_result = cursor.fetchone()
+        print(f"CREATE_BOOKING: Verification query result: {verify_result}", flush=True)
+        
+        # Also count total bookings
+        cursor.execute("SELECT COUNT(*) as count FROM bookings")
+        count_result = cursor.fetchone()
+        print(f"CREATE_BOOKING: Total bookings in database: {count_result['count']}", flush=True)
+        
+        print("="*80 + "\n", flush=True)
+        sys.stdout.flush()
         return booking_id
         
     except Exception as e:
