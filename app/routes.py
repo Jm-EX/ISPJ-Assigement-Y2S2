@@ -154,14 +154,15 @@ if gemini_api_key:
             
             # Test all desired models
             models_to_test = [
+                'gemini-2.5-pro',
+                'gemini-2.0-flash',
+                'gemini-2.0-flash-lite',
                 'gemini-2.5-flash',
-                'gemini-2.5-flash-lite',
-                'gemini-2.5-flash-preview-tts',
-                'gemini-3-flash-preview',
-                'gemini-robotics-er-1.5-preview',
-                'gemini-2.0-flash', 
+                'gemini-2.5-flash-lite', 
+                'gemini-pro-latest',
                 'gemini-1.5-flash',
-                'gemini-pro-latest'
+                'gemini-2.0-flash-exp',
+                'gemini-2.0-pro-exp',
             ]
             
             print("DEBUG: Testing all desired models...")
@@ -434,14 +435,15 @@ def get_gemini_response(message):
     """Get AI response for hotel-related questions"""
     # Use pre-tested working models from initialization
     models_to_try = working_models if working_models else [
-        'gemini-2.5-flash',
-        'gemini-2.5-flash-lite',
-        'gemini-2.5-flash-preview-tts',
-        'gemini-3-flash-preview',
-        'gemini-robotics-er-1.5-preview',
-        'gemini-2.0-flash', 
-        'gemini-1.5-flash',
-        'gemini-pro-latest'
+                'gemini-2.5-pro',
+                'gemini-2.0-flash',
+                'gemini-2.0-flash-lite',
+                'gemini-2.5-flash',
+                'gemini-2.5-flash-lite', 
+                'gemini-pro-latest',
+                'gemini-1.5-flash',
+                'gemini-2.0-flash-exp',
+                'gemini-2.0-pro-exp',
     ]
     
     for model_name in models_to_try:
