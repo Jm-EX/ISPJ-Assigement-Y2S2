@@ -1418,6 +1418,66 @@ def get_room_availability():
             return []
 
 
+def create_booking(user_id: int, booking_data: dict) -> int:
+    """Create a new booking and return booking ID"""
+    db = get_db()
+    cursor = db.cursor()
+    try:
+        # Create bookings table if it doesn't exist
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS bookings (
+                id SERIAL PRIMARY KEY,
+                user_id INTEGER REFERENCES users(id),
+                guest_name VARCHAR(255) NOT NULL,
+                guest_email VARCHAR(255) NOT NULL,
+                guest_phone VARCHAR(50),
+                room_type VARCHAR(100) NOT NULL,
+                check_in_date DATE NOT NULL,
+                check_out_date DATE NOT NULL,
+                num_guests INTEGER DEFAULT 1,
+                total_price DECIMAL(10, 2) NOT NULL,
+                status VARCHAR(50) DEFAULT 'pending',
+                special_requests TEXT,
+                notes TEXT,
+                passport_file VARCHAR(255),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        
+        cursor.execute("""
+            INSERT INTO bookings 
+            (user_id, guest_name, guest_email, guest_phone, room_type, 
+             check_in_date, check_out_date, num_guests, total_price, 
+             status, special_requests, notes, passport_file)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            RETURNING id
+        """, (
+            user_id,
+            booking_data.get('guest_name'),
+            booking_data.get('email'),
+            booking_data.get('phone'),
+            booking_data.get('room_type'),
+            booking_data.get('check_in'),
+            booking_data.get('check_out'),
+            booking_data.get('num_guests', 1),
+            booking_data.get('total_price'),
+            'confirmed',  # Payment confirmed via Stripe
+            booking_data.get('special_requests', ''),
+            '',
+            booking_data.get('passport_file', '')
+        ))
+        
+        result = cursor.fetchone()
+        db.commit()
+        print(f"Created booking {result['id']} for user {user_id}")
+        return result['id']
+    except Exception as e:
+        print(f"Error creating booking: {e}")
+        db.rollback()
+        raise
+
+
 def update_booking(booking_id: int, data: dict) -> bool:
     """Update booking information"""
     db = get_db()
