@@ -1449,7 +1449,7 @@ def create_booking(user_id: int, booking_data: dict) -> int:
                     check_in_date DATE NOT NULL,
                     check_out_date DATE NOT NULL,
                     num_guests INTEGER DEFAULT 1,
-                    total_price DECIMAL(10, 2) NOT NULL,
+                    total_price NUMERIC(10, 2) NOT NULL,
                     status VARCHAR(50) DEFAULT 'pending',
                     special_requests TEXT,
                     notes TEXT,
@@ -1465,11 +1465,29 @@ def create_booking(user_id: int, booking_data: dict) -> int:
         from datetime import datetime
         
         # Get and validate data fields
-        guest_name = booking_data.get('guest_name', '')
-        guest_email = booking_data.get('email', '')
-        guest_phone = booking_data.get('phone', '')
-        room_type = booking_data.get('room_type', 'Standard Room')
-        total_price = booking_data.get('total_price', 0.0)
+        # Ensure required fields have fallbacks for database constraints
+        guest_name = booking_data.get('guest_name') or 'Guest'
+        guest_email = booking_data.get('email') or f'guest{user_id}@example.com'
+        guest_phone = booking_data.get('phone') or ''
+        room_type = booking_data.get('room_type') or 'Standard Room'
+        
+        # Log validation
+        print(f"DEBUG: Validating guest_name: '{guest_name}'")
+        print(f"DEBUG: Validating guest_email: '{guest_email}'")
+        
+        # Ensure total_price is a valid Numeric value
+        try:
+            raw_price = booking_data.get('total_price')
+            if raw_price is None or raw_price == '':
+                total_price = 0.0
+                print("DEBUG: total_price is None or empty, using 0.0")
+            else:
+                total_price = float(raw_price)
+                print(f"DEBUG: Converted total_price '{raw_price}' to {total_price}")
+        except (ValueError, TypeError) as e:
+            print(f"DEBUG: Error converting total_price to float: {e}, using 0.0")
+            total_price = 0.0
+            
         special_requests = booking_data.get('special_requests', '')
         passport_file = booking_data.get('passport_file', '')
         
@@ -1490,7 +1508,11 @@ def create_booking(user_id: int, booking_data: dict) -> int:
             print(f"DEBUG: Error parsing check_out date: {e}, using default")
         
         # Use nights as num_guests if num_guests not provided
-        num_guests = int(booking_data.get('nights', 1))
+        try:
+            num_guests = int(booking_data.get('nights', 1))
+        except (ValueError, TypeError):
+            print(f"DEBUG: Error converting nights {booking_data.get('nights')} to int, using 1")
+            num_guests = 1
         
         # Print prepared values
         print(f"DEBUG: Prepared data for insertion:")
