@@ -47,7 +47,7 @@ from app.auth_db import (
     create_password_reset_token,
     get_password_reset_token,
     delete_password_reset_token,
-    update_password,
+    update_user_password,
     delete_passkey_credential,
     log_security_event,
     check_account_lockout,
