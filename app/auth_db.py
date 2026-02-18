@@ -1629,34 +1629,48 @@ def create_booking(user_id: int, booking_data: dict) -> int:
         # Insert booking
         print("\nCREATE_BOOKING: Executing INSERT query...", flush=True)
         sys.stdout.flush()
-        cursor.execute("""
-            INSERT INTO bookings 
-            (user_id, guest_name, guest_email, guest_phone, room_type, 
-             check_in_date, check_out_date, num_guests, total_price, 
-             status, special_requests, notes, passport_file)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            RETURNING id
-        """, (
-            user_id,
-            guest_name,
-            guest_email,
-            guest_phone,
-            room_type,
-            check_in,
-            check_out,
-            num_guests,
-            total_price,
-            'confirmed',  # Payment confirmed via Stripe
-            special_requests,
-            '',
-            passport_file
-        ))
         
-        print("CREATE_BOOKING: INSERT executed, fetching result...", flush=True)
+        try:
+            cursor.execute("""
+                INSERT INTO bookings 
+                (user_id, guest_name, guest_email, guest_phone, room_type, 
+                 check_in_date, check_out_date, num_guests, total_price, 
+                 status, special_requests, notes, passport_file)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                RETURNING id
+            """, (
+                user_id,
+                guest_name,
+                guest_email,
+                guest_phone,
+                room_type,
+                check_in,
+                check_out,
+                num_guests,
+                total_price,
+                'confirmed',  # Payment confirmed via Stripe
+                special_requests,
+                '',
+                passport_file
+            ))
+            print("CREATE_BOOKING: INSERT query executed successfully", flush=True)
+            sys.stdout.flush()
+        except Exception as insert_error:
+            print(f"CREATE_BOOKING: ERROR during INSERT execution: {type(insert_error).__name__}: {insert_error}", flush=True)
+            sys.stdout.flush()
+            raise
+        
+        print("CREATE_BOOKING: Fetching result...", flush=True)
         sys.stdout.flush()
-        result = cursor.fetchone()
-        print(f"CREATE_BOOKING: Result from fetchone: {result}", flush=True)
-        sys.stdout.flush()
+        
+        try:
+            result = cursor.fetchone()
+            print(f"CREATE_BOOKING: Result from fetchone: {result}", flush=True)
+            sys.stdout.flush()
+        except Exception as fetch_error:
+            print(f"CREATE_BOOKING: ERROR during fetchone: {type(fetch_error).__name__}: {fetch_error}", flush=True)
+            sys.stdout.flush()
+            raise
         
         if result is None:
             print("CREATE_BOOKING: ERROR - INSERT did not return a result", flush=True)
