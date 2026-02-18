@@ -34,11 +34,11 @@
         }
 
         .chat-popup {
-            position: absolute;
+            position: fixed;
             bottom: 70px;
-            right: 0;
+            right: 20px;
             width: 350px;
-            height: 500px; /* Adjusted height */
+            max-height: calc(100vh - 90px);
             background: white;
             border-radius: 15px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.25);
