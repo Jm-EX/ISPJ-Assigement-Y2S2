@@ -1,0 +1,191 @@
+{% extends "admin_base.html" %}
+
+{% block title %}View Bookings - Admin{% endblock %}
+
+{% block head %}
+<style>
+.bookings-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.page-header {
+  margin-bottom: 32px;
+}
+
+.page-header h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+}
+
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.stat-card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.stat-card h3 {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.stat-card .value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.section {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.section-header h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th {
+  text-align: left;
+  padding: 12px;
+  background: #f8f9fa;
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.data-table td {
+  padding: 12px;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 14px;
+  color: #444;
+}
+
+.data-table tr:hover {
+  background: #f8f9fa;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge.pending { background: #fff3e0; color: #e65100; }
+.badge.confirmed { background: #e8f5e9; color: #2e7d32; }
+.badge.checked-in { background: #e3f2fd; color: #1976d2; }
+.badge.checked-out { background: #f3e5f5; color: #7b1fa2; }
+.badge.cancelled { background: #ffebee; color: #c62828; }
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #999;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="bookings-container">
+  <div class="page-header">
+    <h1>📅 View Bookings</h1>
+    <p style="color: #666;">View all hotel bookings and room availability</p>
+  </div>
+
+  <!-- Room Availability Stats -->
+  <div class="stats-row">
+    {% for room in rooms %}
+    <div class="stat-card">
+      <h3>{{ room.room_type }}</h3>
+      <div class="value">{{ room.available_count }}/{{ room.total_count }}</div>
+      <div style="font-size: 12px; color: #666; margin-top: 4px;">
+        Available: {{ room.available_count }} | Occupied: {{ room.occupied_count }}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Bookings Table -->
+  <div class="section">
+    <div class="section-header">
+      <h2>All Bookings</h2>
+    </div>
+
+    {% if bookings %}
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Guest Name</th>
+          <th>Email</th>
+          <th>Room Type</th>
+          <th>Check-In</th>
+          <th>Check-Out</th>
+          <th>Guests</th>
+          <th>Total Price</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for booking in bookings %}
+        <tr>
+          <td><strong>#{{ booking.id }}</strong></td>
+          <td>{{ booking.guest_name }}</td>
+          <td><small>{{ booking.guest_email }}</small></td>
+          <td>{{ booking.room_type }}</td>
+          <td>{{ booking.check_in_date.strftime('%Y-%m-%d') if booking.check_in_date else 'N/A' }}</td>
+          <td>{{ booking.check_out_date.strftime('%Y-%m-%d') if booking.check_out_date else 'N/A' }}</td>
+          <td>{{ booking.num_guests }}</td>
+          <td>${{ "%.2f"|format(booking.total_price) }}</td>
+          <td>
+            <span class="badge {{ booking.status }}">
+              {{ booking.status|title }}
+            </span>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+      <p>📋 No bookings found</p>
+      <p style="font-size: 14px; margin-top: 8px;">Bookings will appear here once they are created</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

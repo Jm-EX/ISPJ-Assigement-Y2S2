@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}Admin Panel{% endblock %}</title>
+    {% block head %}{% endblock %}
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+        
+        /* Admin Navigation Bar */
+        .admin-nav {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            padding: 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .admin-nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+        }
+        
+        .admin-nav-left {
+            display: flex;
+            align-items: center;
+            gap: 0;
+        }
+        
+        .admin-brand {
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+            padding: 20px 24px;
+            text-decoration: none;
+            border-right: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .admin-nav-links {
+            display: flex;
+            gap: 0;
+        }
+        
+        .admin-nav-link {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            padding: 20px 24px;
+            font-weight: 500;
+            transition: all 0.2s;
+            border-right: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .admin-nav-link:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        
+        .admin-nav-link.active {
+            background: rgba(102, 126, 234, 0.2);
+            color: #ffd700;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .admin-nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .admin-user-info {
+            color: rgba(255,255,255,0.9);
+            font-size: 14px;
+        }
+        
+        .admin-logout-btn {
+            background: #f44336;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.2s;
+        }
+        
+        .admin-logout-btn:hover {
+            background: #d32f2f;
+            transform: translateY(-1px);
+        }
+        
+        /* Main Content */
+        .admin-content {
+            min-height: calc(100vh - 61px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Admin Navigation -->
+    <nav class="admin-nav">
+        <div class="admin-nav-content">
+            <div class="admin-nav-left">
+                <a href="/admin" class="admin-brand">🛡️ Admin Panel</a>
+                <div class="admin-nav-links">
+                    <a href="/admin" class="admin-nav-link">Dashboard</a>
+                    <a href="/admin/chat" class="admin-nav-link">💬 Chat</a>
+                    {% if session.get('permissions') %}
+                        {% if session.get('permissions').get('view_bookings') %}
+                        <a href="/admin/bookings" class="admin-nav-link">📅 View Bookings</a>
+                        {% endif %}
+                        {% if session.get('permissions').get('modify_bookings') %}
+                        <a href="/admin/bookings/manage" class="admin-nav-link">✏️ Manage Bookings</a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+            <div class="admin-nav-right">
+                <span class="admin-user-info">👤 {{ session.get('username', 'Admin') }}</span>
+                <a href="/logout" class="admin-logout-btn">Logout</a>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main Content Area -->
+    <div class="admin-content">
+        {% block content %}{% endblock %}
+    </div>
+    
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+        // Initialize Socket.IO for admin pages
+        var socket = io();
+        
+        // Global storage objects for chat
+        var userMessages = {};
+        var encryptionKeys = {};
+        var dhKeyPairs = {};
+        var sharedSecrets = {};
+        
+        // DH constants
+        const DH_PRIME = BigInt('0xFFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD129024E088A67CC74020BBEA63B139B22514A08798E3404DDEF9519B3CD3A431B302B0A6DF25F14374FE1356D6D51C245E485B576625E7EC6F44C42E9A637ED6B0BFF5CB6F406B7EDEE386BFB5A899FA5AE9F24117C4B1FE649286651ECE45B3DC2007CB8A163BF0598DA48361C55D39A69163FA8FD24CF5F83655D23DCA3AD961C62F356208552BB9ED529077096966D670C354E4ABC9804F1746C08CA18217C32905E462E36CE3BE39E772C180E86039B2783A2EC07A28FB5C55DF06F4C52C9DE2BCBF6955817183995497CEA956AE515D2261898FA051015728E5A8AACAA68FFFFFFFFFFFFFFFF');
+        const DH_GENERATOR = BigInt(2);
+    </script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 from flask import Blueprint, redirect, render_template, session, url_for, request, jsonify, flash
-from app.auth_db import get_login_stats, get_all_users, delete_user, get_security_logs, create_sub_admin, update_user_role, get_user_permissions, get_active_sessions, delete_session, get_active_conversations
+from app.auth_db import get_login_stats, get_all_users, delete_user, get_security_logs, create_sub_admin, update_user_role, get_user_permissions, get_active_sessions, delete_session, get_active_conversations, get_all_bookings, get_booking_by_id, update_booking, get_room_availability, update_room_status
 from werkzeug.security import generate_password_hash
 import json
 
@@ -35,6 +35,19 @@ def portal():
         return redirect(url_for("auth.login_get"))
     if not session.get("is_admin"):
         return redirect(url_for("main.index"))
+    
+    # Add user permissions to session for nav display
+    current_user_id = session.get("user_id")
+    user_perms = get_user_permissions(current_user_id)
+    if user_perms:
+        permissions = user_perms.get('permissions', {})
+        if isinstance(permissions, str):
+            try:
+                permissions = json.loads(permissions)
+            except:
+                permissions = {}
+        session['permissions'] = permissions
+        session['role'] = user_perms.get('role')
     
     stats = get_login_stats()
     users = get_all_users()
@@ -212,3 +225,89 @@ def logout_session_route(session_id):
         return jsonify({"success": True})
     else:
         return jsonify({"error": "You do not have permission to logout sessions"}), 403
+
+
+@admin.get("/admin/bookings")
+def view_bookings():
+    """View all bookings page"""
+    if not session.get("user_id"):
+        return redirect(url_for("auth.login_get"))
+    if not session.get("is_admin"):
+        return redirect(url_for("main.index"))
+    
+    current_user_id = session.get("user_id")
+    if not check_permission(current_user_id, 'view_bookings'):
+        flash('You do not have permission to view bookings', 'error')
+        return redirect(url_for("admin.portal"))
+    
+    bookings = get_all_bookings()
+    rooms = get_room_availability()
+    
+    return render_template("admin_bookings.html", bookings=bookings, rooms=rooms)
+
+
+@admin.get("/admin/bookings/manage")
+def manage_bookings():
+    """Manage bookings page (modify permission required)"""
+    if not session.get("user_id"):
+        return redirect(url_for("auth.login_get"))
+    if not session.get("is_admin"):
+        return redirect(url_for("main.index"))
+    
+    current_user_id = session.get("user_id")
+    if not check_permission(current_user_id, 'modify_bookings'):
+        flash('You do not have permission to modify bookings', 'error')
+        return redirect(url_for("admin.portal"))
+    
+    bookings = get_all_bookings()
+    rooms = get_room_availability()
+    
+    return render_template("admin_manage_bookings.html", bookings=bookings, rooms=rooms)
+
+
+@admin.post("/admin/bookings/update/<int:booking_id>")
+def update_booking_route(booking_id):
+    """API endpoint to update booking"""
+    if not session.get("user_id"):
+        return jsonify({"error": "Not authenticated"}), 401
+    if not session.get("is_admin"):
+        return jsonify({"error": "Not authorized"}), 403
+    
+    current_user_id = session.get("user_id")
+    if not check_permission(current_user_id, 'modify_bookings'):
+        return jsonify({"error": "You do not have permission to modify bookings"}), 403
+    
+    data = request.get_json()
+    success = update_booking(booking_id, data)
+    
+    if success:
+        return jsonify({"success": True})
+    else:
+        return jsonify({"error": "Failed to update booking"}), 500
+
+
+@admin.post("/admin/rooms/update")
+def update_room_route():
+    """API endpoint to update room availability"""
+    if not session.get("user_id"):
+        return jsonify({"error": "Not authenticated"}), 401
+    if not session.get("is_admin"):
+        return jsonify({"error": "Not authorized"}), 403
+    
+    current_user_id = session.get("user_id")
+    if not check_permission(current_user_id, 'update_room_status'):
+        return jsonify({"error": "You do not have permission to update room status"}), 403
+    
+    data = request.get_json()
+    success = update_room_status(
+        data.get('room_type'),
+        data.get('available', 0),
+        data.get('occupied', 0),
+        data.get('cleaning', 0),
+        data.get('maintenance', 0)
+    )
+    
+    if success:
+        return jsonify({"success": True})
+    else:
+        return jsonify({"error": "Failed to update room status"}), 500

@@ -1,0 +1,486 @@
+{% extends "admin_base.html" %}
+
+{% block title %}Manage Bookings - Admin{% endblock %}
+
+{% block head %}
+<style>
+.bookings-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.page-header {
+  margin-bottom: 32px;
+}
+
+.page-header h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+}
+
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.stat-card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.stat-card h3 {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.stat-card .value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.section {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.section-header h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th {
+  text-align: left;
+  padding: 12px;
+  background: #f8f9fa;
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.data-table td {
+  padding: 12px;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 14px;
+  color: #444;
+}
+
+.data-table tr:hover {
+  background: #f8f9fa;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge.pending { background: #fff3e0; color: #e65100; }
+.badge.confirmed { background: #e8f5e9; color: #2e7d32; }
+.badge.checked-in { background: #e3f2fd; color: #1976d2; }
+.badge.checked-out { background: #f3e5f5; color: #7b1fa2; }
+.badge.cancelled { background: #ffebee; color: #c62828; }
+
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.btn-edit {
+  background: #2196f3;
+  color: white;
+}
+
+.btn-edit:hover {
+  background: #1976d2;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  padding: 32px;
+  border-radius: 16px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal h2 {
+  margin-bottom: 24px;
+  font-size: 24px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #333;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.form-group textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.btn-cancel {
+  background: #9e9e9e;
+  color: white;
+}
+
+.btn-save {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #999;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="bookings-container">
+  <div class="page-header">
+    <h1>✏️ Manage Bookings</h1>
+    <p style="color: #666;">Edit and update hotel bookings</p>
+  </div>
+
+  <!-- Room Availability Management -->
+  <div class="section">
+    <div class="section-header">
+      <h2>Room Availability</h2>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
+      {% for room in rooms %}
+      <div style="border: 2px solid #e0e0e0; padding: 16px; border-radius: 12px;">
+        <h3 style="margin-bottom: 12px; font-size: 18px;">{{ room.room_type }}</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px;">
+          <div>
+            <label style="color: #666; font-size: 11px;">Total</label>
+            <div style="font-weight: 600;">{{ room.total_count }}</div>
+          </div>
+          <div>
+            <label style="color: #666; font-size: 11px;">Available</label>
+            <input type="number" id="available-{{ room.id }}" value="{{ room.available_count }}" 
+                   style="width: 60px; padding: 4px; border: 1px solid #ddd; border-radius: 4px;">
+          </div>
+          <div>
+            <label style="color: #666; font-size: 11px;">Occupied</label>
+            <input type="number" id="occupied-{{ room.id }}" value="{{ room.occupied_count }}" 
+                   style="width: 60px; padding: 4px; border: 1px solid #ddd; border-radius: 4px;">
+          </div>
+          <div>
+            <label style="color: #666; font-size: 11px;">Cleaning</label>
+            <input type="number" id="cleaning-{{ room.id }}" value="{{ room.cleaning_count }}" 
+                   style="width: 60px; padding: 4px; border: 1px solid #ddd; border-radius: 4px;">
+          </div>
+          <div>
+            <label style="color: #666; font-size: 11px;">Maintenance</label>
+            <input type="number" id="maintenance-{{ room.id }}" value="{{ room.maintenance_count }}" 
+                   style="width: 60px; padding: 4px; border: 1px solid #ddd; border-radius: 4px;">
+          </div>
+        </div>
+        <button class="btn btn-edit" style="width: 100%; margin-top: 12px;" 
+                onclick="updateRoom('{{ room.room_type }}', {{ room.id }})">
+          Update
+        </button>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Bookings Table -->
+  <div class="section">
+    <div class="section-header">
+      <h2>All Bookings</h2>
+    </div>
+
+    {% if bookings %}
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Guest Name</th>
+          <th>Room Type</th>
+          <th>Check-In</th>
+          <th>Check-Out</th>
+          <th>Guests</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for booking in bookings %}
+        <tr>
+          <td><strong>#{{ booking.id }}</strong></td>
+          <td>{{ booking.guest_name }}</td>
+          <td>{{ booking.room_type }}</td>
+          <td>{{ booking.check_in_date.strftime('%Y-%m-%d') if booking.check_in_date else 'N/A' }}</td>
+          <td>{{ booking.check_out_date.strftime('%Y-%m-%d') if booking.check_out_date else 'N/A' }}</td>
+          <td>{{ booking.num_guests }}</td>
+          <td>
+            <span class="badge {{ booking.status }}">
+              {{ booking.status|title }}
+            </span>
+          </td>
+          <td>
+            <button class="btn btn-edit" onclick="editBooking({{ booking.id }})">Edit</button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+      <p>📋 No bookings found</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Edit Booking Modal -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <h2>Edit Booking</h2>
+    <form id="editForm">
+      <input type="hidden" id="bookingId">
+      
+      <div class="form-group">
+        <label>Guest Name</label>
+        <input type="text" id="guestName" required>
+      </div>
+      
+      <div class="form-group">
+        <label>Guest Email</label>
+        <input type="email" id="guestEmail" required>
+      </div>
+      
+      <div class="form-group">
+        <label>Guest Phone</label>
+        <input type="tel" id="guestPhone">
+      </div>
+      
+      <div class="form-group">
+        <label>Room Type</label>
+        <select id="roomType" required>
+          {% for room in rooms %}
+          <option value="{{ room.room_type }}">{{ room.room_type }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label>Check-In Date</label>
+        <input type="date" id="checkInDate" required>
+      </div>
+      
+      <div class="form-group">
+        <label>Check-Out Date</label>
+        <input type="date" id="checkOutDate" required>
+      </div>
+      
+      <div class="form-group">
+        <label>Number of Guests</label>
+        <input type="number" id="numGuests" min="1" required>
+      </div>
+      
+      <div class="form-group">
+        <label>Total Price</label>
+        <input type="number" id="totalPrice" step="0.01" required>
+      </div>
+      
+      <div class="form-group">
+        <label>Status</label>
+        <select id="status" required>
+          <option value="pending">Pending</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="checked-in">Checked In</option>
+          <option value="checked-out">Checked Out</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label>Special Requests</label>
+        <textarea id="specialRequests"></textarea>
+      </div>
+      
+      <div class="form-group">
+        <label>Admin Notes</label>
+        <textarea id="notes"></textarea>
+      </div>
+      
+      <div class="modal-actions">
+        <button type="button" class="btn btn-cancel" onclick="closeModal()">Cancel</button>
+        <button type="submit" class="btn btn-save">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+const bookingsData = {{ bookings|tojson|safe }};
+
+function editBooking(bookingId) {
+  const booking = bookingsData.find(b => b.id === bookingId);
+  if (!booking) return;
+  
+  document.getElementById('bookingId').value = booking.id;
+  document.getElementById('guestName').value = booking.guest_name;
+  document.getElementById('guestEmail').value = booking.guest_email;
+  document.getElementById('guestPhone').value = booking.guest_phone || '';
+  document.getElementById('roomType').value = booking.room_type;
+  document.getElementById('checkInDate').value = booking.check_in_date;
+  document.getElementById('checkOutDate').value = booking.check_out_date;
+  document.getElementById('numGuests').value = booking.num_guests;
+  document.getElementById('totalPrice').value = booking.total_price;
+  document.getElementById('status').value = booking.status;
+  document.getElementById('specialRequests').value = booking.special_requests || '';
+  document.getElementById('notes').value = booking.notes || '';
+  
+  document.getElementById('editModal').style.display = 'flex';
+}
+
+function closeModal() {
+  document.getElementById('editModal').style.display = 'none';
+}
+
+document.getElementById('editForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  
+  const bookingId = document.getElementById('bookingId').value;
+  const data = {
+    guest_name: document.getElementById('guestName').value,
+    guest_email: document.getElementById('guestEmail').value,
+    guest_phone: document.getElementById('guestPhone').value,
+    room_type: document.getElementById('roomType').value,
+    check_in_date: document.getElementById('checkInDate').value,
+    check_out_date: document.getElementById('checkOutDate').value,
+    num_guests: parseInt(document.getElementById('numGuests').value),
+    total_price: parseFloat(document.getElementById('totalPrice').value),
+    status: document.getElementById('status').value,
+    special_requests: document.getElementById('specialRequests').value,
+    notes: document.getElementById('notes').value
+  };
+  
+  try {
+    const response = await fetch(`/admin/bookings/update/${bookingId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      alert('Booking updated successfully!');
+      window.location.reload();
+    } else {
+      alert('Error: ' + (result.error || 'Failed to update booking'));
+    }
+  } catch (error) {
+    alert('Error updating booking: ' + error.message);
+  }
+});
+
+async function updateRoom(roomType, roomId) {
+  const data = {
+    room_type: roomType,
+    available: parseInt(document.getElementById(`available-${roomId}`).value),
+    occupied: parseInt(document.getElementById(`occupied-${roomId}`).value),
+    cleaning: parseInt(document.getElementById(`cleaning-${roomId}`).value),
+    maintenance: parseInt(document.getElementById(`maintenance-${roomId}`).value)
+  };
+  
+  try {
+    const response = await fetch('/admin/rooms/update', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      alert('Room status updated successfully!');
+      window.location.reload();
+    } else {
+      alert('Error: ' + (result.error || 'Failed to update room status'));
+    }
+  } catch (error) {
+    alert('Error updating room: ' + error.message);
+  }
+}
+</script>
+{% endblock %}
